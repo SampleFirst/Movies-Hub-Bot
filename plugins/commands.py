@@ -45,7 +45,7 @@ async def start(client, message):
             InlineKeyboardButton('sᴜʀᴘʀɪsᴇ', callback_data='start')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-        m=await message.reply_sticker("CAACAgUAAxkBAAEBnwtkY73EAWVHu0Vo5VIfpTpVoqJWHwACiwwAArrgIVdWnTkjmfSssB4E") 
+        m=await message.reply_sticker("CAACAgUAAxkBAAEBxDxkbMi7m5yPjM2FRRdNj7NOBHV2VgAClggAAoa3aFdjTaNrw1_91R4E") 
         await asyncio.sleep(1)
         await m.delete()        
         await message.reply_photo(
@@ -64,11 +64,7 @@ async def start(client, message):
         btn = [
             [
                 InlineKeyboardButton(
-                    "📢 𝙹𝙾𝙸𝙽 𝚄𝙿𝙳𝙰𝚃𝙴𝚂 𝙲𝙷𝙰𝙽𝙽𝙴𝙻 📢", url=invite_link.invite_link
-                )
-            ],[
-                InlineKeyboardButton(
-                    "🔥 𝙹𝙾𝙸𝙽 𝚈𝙾𝚄𝚃𝚄𝙱𝙴 𝙲𝙷𝙰𝙽𝙽𝙴𝙻 🔥", url='https://youtube.com/@InvisibleYTV'
+                    "🤖 Join Updates Channel", url=invite_link.invite_link
                 )
             ]
         ]
@@ -82,7 +78,7 @@ async def start(client, message):
                 btn.append([InlineKeyboardButton(" 🔄 Try Again", url=f"https://t.me/{temp.U_NAME}?start={message.command[1]}")])
         await client.send_message(
             chat_id=message.from_user.id,
-            text="**Please Join My Both Updates Channel to use this Bot!**",
+            text="**Please Join My Updates Channel to use this Bot!**",
             reply_markup=InlineKeyboardMarkup(btn),
             parse_mode=enums.ParseMode.MARKDOWN
             )
