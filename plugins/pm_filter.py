@@ -113,7 +113,7 @@ async def pm_text(bot, message):
     user = message.from_user.first_name
     user_id = message.from_user.id
     if content.startswith("/") or content.startswith("#"): return  # ignore commands and hashtags
-    await message.reply_text("<b>✨HOW TO USE ME✨\n\n1) ADD ME TO YOUR PUBLIC GROUP AND MAKE ME AN ADMIN\n2) THEN SEND MOVIE OR SERIES NAME IN GROUP\n3)JOINE 👉 [JOINE NOW](https://t.me/+_FmlDFAh13FlNTVl) OFFICIAL GROUP AND SEND MOVIES OR SERIES NAME</b>")
+    await message.reply_text("<b>JOINE 👉 [OFFICIAL GROUP](https://t.me/+_FmlDFAh13FlNTVl) AND SEND MOVIES OR SERIES NAME IN THE GROUP</b>")
     await bot.send_message(
         chat_id=LOG_CHANNEL_PM,
         text=f"<b>#PM_MSG\n\nName : {user}\n\nID : {user_id}\n\nMessage : {content}</b>"
@@ -516,7 +516,9 @@ async def cb_handler(client: Client, query: CallbackQuery):
                             [
                                 [
                                     InlineKeyboardButton("🔥 ᴄʜᴀɴɴᴇʟ 🔥", url=(MAIN_CHANNEL))
-                                ]
+                                ],[
+            InlineKeyboardButton("🎉 ᴄʜᴀɴɴᴇʟ 🎉", url="https://t.me/+VnG269AYxSM3OGFl")
+            ]
                             ]
                         )
                     )
