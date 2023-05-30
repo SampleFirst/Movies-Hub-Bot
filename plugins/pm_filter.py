@@ -113,7 +113,7 @@ async def pm_text(bot, message):
     user = message.from_user.first_name
     user_id = message.from_user.id
     if content.startswith("/") or content.startswith("#"): return  # ignore commands and hashtags
-    await message.reply_text("<b>JOINE 👉 [OFFICIAL GROUP](https://t.me/+_FmlDFAh13FlNTVl) AND SEND MOVIES OR SERIES NAME IN THE GROUP</b>")
+    await message.reply_text("<b>JOINE 👉 [OFFICIAL GROUP](https://t.me/+_SiXJv4cfBw1MTRl) AND SEND MOVIES OR SERIES NAME IN THE GROUP</b>")
     await bot.send_message(
         chat_id=LOG_CHANNEL_PM,
         text=f"<b>#PM_MSG\n\nName : {user}\n\nID : {user_id}\n\nMessage : {content}</b>"
