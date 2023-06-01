@@ -354,7 +354,7 @@ async def delete_all_index(bot, message):
     )
     
 # Deletename command
-@app.on_message(filters.command('deletename') & filters.user(ADMINS))
+@Client.on_message(filters.command('deletename') & filters.user(ADMINS))
 async def delete_name(bot, message):
     """Delete specific file by name from the database"""
     file_name = " ".join(message.command[1:])  # Extract the file name from the command
