@@ -353,18 +353,25 @@ async def delete_all_index(bot, message):
         quote=True,
     )
     
-# Deletename command
 @Client.on_message(filters.command('deletename') & filters.user(ADMINS))
 async def delete_name(bot, message):
     """Delete files with a specific name from the database"""
     file_name = " ".join(message.command[1:])  # Extract the file name from the command
 
-    result = await Media.collection.delete_many({
+    result = await Media.collection.count_documents({
         'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
     })
 
-    if result.deleted_count:
-        await message.reply_text(f'Successfully deleted all related files with names "{file_name}" from the database', quote=True)
+    if result > 0:
+        confirmation_message = f'{result} files found with the name "{file_name}" in the database.\n'
+        confirmation_message += 'Are you sure you want to delete them?'
+
+        keyboard = [
+            [{"text": "YES", "callback_data": f"delete_files:{file_name}"}],
+            [{"text": "CANCEL", "callback_data": "cancel_delete"}]
+        ]
+
+        await message.reply_text(confirmation_message, quote=True, reply_markup={"inline_keyboard": keyboard})
     else:
         await message.reply_text(f'No files found with the name "{file_name}" in the database', quote=True)
         
