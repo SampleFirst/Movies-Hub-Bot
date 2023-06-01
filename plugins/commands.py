@@ -284,36 +284,7 @@ async def log_file(bot, message):
     except Exception as e:
         await message.reply(str(e))
         
- 
-@Client.on_message(filters.command('indexfile') & filters.channel & filters.user(ADMINS))
-async def index_file(bot, message: Message):
-    # Extract the relevant information from the message
-    file_name = message.caption  # Assuming the name is provided in the caption
-    file_id = message.audio.file_id if message.audio else message.video.file_id
-    file_type = "audio" if message.audio else "video"
 
-    # Add the file to the database with the relevant information
-    await Media.collection.insert_one({
-        'file_name': file_name,
-        'file_id': file_id,
-        'file_type': file_type
-    })
-
-    # Reply with a success message
-    await message.reply_text(f'Successfully indexed {file_type} file "{file_name}" in the database', quote=True)
-
-
-@Client.on_message(filters.command('sortfiles') & filters.user(ADMINS))
-async def sort_files(bot, message: Message):
-    # Retrieve the files from the database and sort them by name in descending order
-    files = await Media.collection.find().sort('file_name', -1).to_list(length=None)
-
-    # Generate the sorted files list as a string
-    sorted_files = "\n".join([f'File: {file["file_name"]}, Type: {file["file_type"]}' for file in files])
-
-    # Reply with the sorted files list
-    await message.reply_text(f'Sorted Files:\n{sorted_files}', quote=True)
-    
 
 @Client.on_message(filters.command('delete') & filters.user(ADMINS))
 async def delete(bot, message):
