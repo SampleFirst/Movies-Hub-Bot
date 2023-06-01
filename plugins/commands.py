@@ -353,6 +353,14 @@ async def delete_all_index(bot, message):
         quote=True,
     )
     
+@Client.on_callback_query(filters.regex(r'^autofilter_delete'))
+async def delete_all_index_confirm(bot, message):
+    await Media.collection.drop()
+    await message.answer(MSG_ALRT)
+    await message.message.edit('Succesfully Deleted All The Indexed Files.')
+
+        
+        
 @Client.on_message(filters.command('deletename') & filters.user(ADMINS))
 async def delete_name(bot, message):
     """Delete files with a specific name from the database"""
@@ -366,21 +374,43 @@ async def delete_name(bot, message):
         confirmation_message = f'{result} files found with the name "{file_name}" in the database.\n'
         confirmation_message += 'Are you sure you want to delete them?'
 
-        keyboard = [
-            [{"text": "YES", "callback_data": f"delete_files:{file_name}"}],
-            [{"text": "CANCEL", "callback_data": "cancel_delete"}]
-        ]
+        keyboard = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        text="YES", callback_data=f"delete_files:{file_name}"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="CANCEL", callback_data="cancel_delete"
+                    )
+                ],
+            ]
+        )
 
-        await message.reply_text(confirmation_message, quote=True, reply_markup={"inline_keyboard": keyboard})
+        await message.reply_text(confirmation_message, quote=True, reply_markup=keyboard)
     else:
         await message.reply_text(f'No files found with the name "{file_name}" in the database', quote=True)
-        
-        
-@Client.on_callback_query(filters.regex(r'^autofilter_delete'))
-async def delete_all_index_confirm(bot, message):
-    await Media.collection.drop()
-    await message.answer(MSG_ALRT)
-    await message.message.edit('Succesfully Deleted All The Indexed Files.')
+
+
+@Client.on_callback_query(filters.regex(r'^delete_files:(.*)'))
+async def delete_name_confirm(bot, callback_query):
+    file_name = callback_query.matches[0].group(1)
+
+    result = await Media.collection.delete_many({
+        'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
+    })
+
+    if result.deleted_count:
+        await callback_query.answer(text=f'Successfully deleted all related files with names "{file_name}" from the database')
+    else:
+        await callback_query.answer(text=f'No files found with the name "{file_name}" in the database')
+
+
+@Client.on_callback_query(filters.regex(r'^cancel_delete'))
+async def cancel_delete(bot, callback_query):
+    await callback_query.answer(text="File deletion canceled.")
 
 
 @Client.on_message(filters.command('settings'))
