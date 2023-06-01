@@ -275,23 +275,27 @@ async def channel_info(bot, message):
         await message.reply_document(file)
         os.remove(file)
 
-    @Client.on_message(filters.command('listname') & filters.user(ADMINS))
-async def list_files(bot, message):
-    """List files with names related to a specific name in the database"""
-    file_name = " ".join(message.command[1:])  # Extract the specific name from the command
+        
+@Client.on_message(filters.command('findfiles') & filters.user(ADMINS))
+async def find_files(bot, message):
+    """Find all files related to a specific name in the database"""
+    file_name = " ".join(message.command[1:])  # Extract the file name from the command
 
-    files = await Media.collection.find({
+    results = await Media.collection.find({
         'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
-    }).to_list(None)
+    }).to_list(length=None)
 
-    if files:
-        file_list = '\n'.join([f"{index + 1}) {file['file_name']}" for index, file in enumerate(files)])
-        response_message = f'Files found with names related to "{file_name}" in the database:\n\n{file_list}'
+    if results:
+        result_message = f'{len(results)} files found with the name "{file_name}" in the database:\n\n'
+        for result in results:
+            result_message += f'File ID: {result["_id"]}\n'
+            result_message += f'File Name: {result["file_name"]}\n'
+            result_message += f'File Size: {result["file_size"]}\n\n'
     else:
-        response_message = f'No files found with names related to "{file_name}" in the database'
+        result_message = f'No files found with the name "{file_name}" in the database'
 
-    await message.reply_text(response_message, quote=True)
-    
+    await message.reply_text(result_message, quote=True)
+
 
 @Client.on_message(filters.command('logs') & filters.user(ADMINS))
 async def log_file(bot, message):
