@@ -275,6 +275,23 @@ async def channel_info(bot, message):
         await message.reply_document(file)
         os.remove(file)
 
+    @Client.on_message(filters.command('listname') & filters.user(ADMINS))
+async def list_files(bot, message):
+    """List files with names related to a specific name in the database"""
+    file_name = " ".join(message.command[1:])  # Extract the specific name from the command
+
+    files = await Media.collection.find({
+        'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
+    }).to_list(None)
+
+    if files:
+        file_list = '\n'.join([f"{index + 1}) {file['file_name']}" for index, file in enumerate(files)])
+        response_message = f'Files found with names related to "{file_name}" in the database:\n\n{file_list}'
+    else:
+        response_message = f'No files found with names related to "{file_name}" in the database'
+
+    await message.reply_text(response_message, quote=True)
+    
 
 @Client.on_message(filters.command('logs') & filters.user(ADMINS))
 async def log_file(bot, message):
@@ -418,22 +435,6 @@ async def cancel_delete(bot, callback_query):
     await callback_query.message.edit_text("Deletion canceled.")
 
     
- @Client.on_message(filters.command('listname') & filters.user(ADMINS))
-async def list_files(bot, message):
-    """List files with names related to a specific name in the database"""
-    file_name = " ".join(message.command[1:])  # Extract the specific name from the command
-
-    files = await Media.collection.find({
-        'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
-    }).to_list(None)
-
-    if files:
-        file_list = '\n'.join([file['file_name'] for file in files])
-        response_message = f'Files found with names related to "{file_name}" in the database:\n\n{file_list}'
-    else:
-        response_message = f'No files found with names related to "{file_name}" in the database'
-
-    await message.reply_text(response_message, quote=True)
 
     
 @Client.on_message(filters.command('settings'))
