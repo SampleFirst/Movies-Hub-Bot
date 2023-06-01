@@ -383,7 +383,7 @@ async def delete_name(bot, message):
                 ],
                 [
                     InlineKeyboardButton(
-                        text="CANCEL", callback_data="close_data"
+                        text="CANCEL", callback_data="cancel_delete"
                     )
                 ],
             ]
@@ -404,8 +404,16 @@ async def delete_name_confirm(bot, callback_query):
 
     if result.deleted_count:
         await callback_query.answer(text=f'Successfully deleted all related files with names "{file_name}" from the database')
+        await callback_query.message.edit_text("Files deleted.")
     else:
         await callback_query.answer(text=f'No files found with the name "{file_name}" in the database')
+        await callback_query.message.edit_text("Deletion failed.")
+
+
+@Client.on_callback_query(filters.regex(r'^cancel_delete'))
+async def cancel_delete(bot, callback_query):
+    await callback_query.answer(text="File deletion canceled.")
+    await callback_query.message.edit_text("Deletion canceled.")
 
 
 
