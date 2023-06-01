@@ -417,8 +417,23 @@ async def cancel_delete(bot, callback_query):
     await callback_query.answer(text="File deletion canceled.")
     await callback_query.message.edit_text("Deletion canceled.")
 
+    
+ @Client.on_message(filters.command('listname') & filters.user(ADMINS))
+async def list_name(bot, message):
+    """List files with a specific name from the database"""
+    file_name = " ".join(message.command[1:])  # Extract the file name from the command
 
+    files = await Media.collection.find({
+        'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
+    }).to_list(length=None)
 
+    if files:
+        file_list = "\n".join([f'{file["file_name"]} - {file["file_number"]}' for file in files])
+        await message.reply_text(f'Files with the name "{file_name}":\n{file_list}', quote=True)
+    else:
+        await message.reply_text(f'No files found with the name "{file_name}" in the database', quote=True)   
+
+    
 @Client.on_message(filters.command('settings'))
 async def settings(client, message):
     userid = message.from_user.id if message.from_user else None
