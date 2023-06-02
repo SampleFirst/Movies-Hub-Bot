@@ -494,49 +494,49 @@ async def cb_handler(client: Client, query: CallbackQuery):
 
         try:
             if AUTH_CHANNEL and not await is_subscribed(client, query):
-                if clicked == typed:
-                    await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
-                    return
-                else:
-                    await query.answer(f"Hᴇʏ {query.from_user.first_name}, Tʜɪs Is Nᴏᴛ Yᴏᴜʀ Mᴏᴠɪᴇ Rᴇǫᴜᴇsᴛ. Rᴇǫᴜᴇsᴛ Yᴏᴜʀ's !", show_alert=True)
-            elif settings['botpm']:
-                if clicked == typed:
-                    await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
-                    return
-                else:
-                    await query.answer(f"Hᴇʏ {query.from_user.first_name}, Tʜɪs Is Nᴏᴛ Yᴏᴜʀ Mᴏᴠɪᴇ Rᴇǫᴜᴇsᴛ. Rᴇǫᴜᴇsᴛ Yᴏᴜʀ's !", show_alert=True)
-                else:
-                if clicked == typed:
-            file_send = await client.send_cached_media(
-                chat_id=FILE_CHANNEL,
-                file_id=file_id,
-                caption=script.CHANNEL_CAP.format(query.from_user.mention, title, query.message.chat.title),
-                protect_content=True if ident == "filep" else False,
-                reply_markup=InlineKeyboardMarkup(
+    if clicked == typed:
+        await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
+        return
+    else:
+        await query.answer(f"Hᴇʏ {query.from_user.first_name}, Tʜɪs Is Nᴏᴛ Yᴏᴜʀ Mᴏᴠɪᴇ Rᴇǫᴜᴇsᴛ. Rᴇǫᴜᴇsᴛ Yᴏᴜʀ's !", show_alert=True)
+elif settings['botpm']:
+    if clicked == typed:
+        await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
+        return
+    else:
+        await query.answer(f"Hᴇʏ {query.from_user.first_name}, Tʜɪs Is Nᴏᴛ Yᴏᴜʀ Mᴏᴠɪᴇ Rᴇǫᴜᴇsᴛ. Rᴇǫᴜᴇsᴛ Yᴏᴜʀ's !", show_alert=True)
+else:
+    if clicked == typed:
+        file_send = await client.send_cached_media(
+            chat_id=FILE_CHANNEL,
+            file_id=file_id,
+            caption=script.CHANNEL_CAP.format(query.from_user.mention, title, query.message.chat.title),
+            protect_content=True if ident == "filep" else False,
+            reply_markup=InlineKeyboardMarkup(
+                [
                     [
-                        [
-                            InlineKeyboardButton("🔥 ᴄʜᴀɴɴᴇʟ 🔥", url=(MAIN_CHANNEL))
-                        ],
-                        [
-                            InlineKeyboardButton("🎉 ᴄʜᴀɴɴᴇʟ 🎉", url="https://t.me/+VnG269AYxSM3OGFl")
-                        ]
-                    ]
-                )
-            )
-            Joel_tgx = await query.message.reply_text(
-                script.FILE_MSG.format(query.from_user.mention, title, size),
-                parse_mode=enums.ParseMode.HTML,
-                reply_markup=InlineKeyboardMarkup(
+                        InlineKeyboardButton("🔥 ᴄʜᴀɴɴᴇʟ 🔥", url=(MAIN_CHANNEL))
+                    ],
                     [
-                        [
-                            InlineKeyboardButton('📥 𝖣𝗈𝗐𝗇𝗅𝗈𝖺𝖽 𝖫𝗂𝗇𝗄 📥', url=file_send.link)
-                        ],
-                        [
-                            InlineKeyboardButton("⚠️ 𝖢𝖺𝗇'𝗍 𝖠𝖼𝖼𝖾𝗌𝗌 ❓ 𝖢𝗅𝗂𝖼𝗄 𝖧𝖾𝗋𝖾 ⚠️", url=(FILE_FORWARD))
-                        ]
+                        InlineKeyboardButton("🎉 ᴄʜᴀɴɴᴇʟ 🎉", url="https://t.me/+VnG269AYxSM3OGFl")
                     ]
-                )
+                ]
             )
+        )
+        Joel_tgx = await query.message.reply_text(
+            script.FILE_MSG.format(query.from_user.mention, title, size),
+            parse_mode=enums.ParseMode.HTML,
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton('📥 𝖣𝗈𝗐𝗇𝗅𝗈𝖺𝖽 𝖫𝗂𝗇𝗄 📥', url=file_send.link)
+                    ],
+                    [
+                        InlineKeyboardButton("⚠️ 𝖢𝖺𝗇'𝗍 𝖠𝖼𝖼𝖾𝗌𝗌 ❓ 𝖢𝗅𝗂𝖼𝗄 𝖧𝖾𝗋𝖾 ⚠️", url=(FILE_FORWARD))
+                    ]
+                ]
+            )
+        )
                     if settings['auto_delete']:
                         await asyncio.sleep(600)
                         await Joel_tgx.delete()
