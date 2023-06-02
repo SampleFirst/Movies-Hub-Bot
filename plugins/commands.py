@@ -399,18 +399,30 @@ async def delete_name(bot, message):
 
     if result > 0:
         confirmation_message = f'{result} files found with the name "{file_name}" in the database.\n'
-        confirmation_message += 'Are you sure you want to delete them?'
+        confirmation_message += 'Please select the search criteria to find the file you want to delete:'
 
         keyboard = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
-                        text="YES", callback_data=f"delete_files:{file_name}"
-                    )
+                        text="Search by First Words",
+                        callback_data=f"search_first_words:{file_name}"
+                    ),
+                    InlineKeyboardButton(
+                        text="Search by Second or Third Words",
+                        callback_data=f"search_second_third_words:{file_name}"
+                    ),
                 ],
                 [
                     InlineKeyboardButton(
-                        text="CANCEL", callback_data="cancel_delete"
+                        text="Search by Full File Name",
+                        callback_data=f"search_full_name:{file_name}"
+                    ),
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="CANCEL",
+                        callback_data="cancel_delete"
                     )
                 ],
             ]
@@ -419,6 +431,65 @@ async def delete_name(bot, message):
         await message.reply_text(confirmation_message, quote=True, reply_markup=keyboard)
     else:
         await message.reply_text(f'No files found with the name "{file_name}" in the database', quote=True)
+
+
+@Client.on_callback_query(filters.regex('^search_first_words'))
+async def search_first_words_callback(bot, cq):
+    file_name = cq.data.split(':')[1]
+    # Implement the logic to search files by first words and return the results
+    search_results = await Media.collection.find({
+        'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
+    }).to_list(length=None)
+    
+    if search_results:
+        result_message = "Search results:\n"
+        for result in search_results:
+            result_message += f"- {result['file_name']}\n"
+    else:
+        result_message = f"No files found with the name '{file_name}'."
+    
+    await bot.answer_callback_query(cq.id, result_message)
+
+
+@Client.on_callback_query(filters.regex('^search_second_third_words'))
+async def search_second_third_words_callback(bot, cq):
+    file_name = cq.data.split(':')[1]
+    # Implement the logic to search files by second or third words and return the results
+    search_results = await Media.collection.find({
+        'file_name': {"$regex": f"(?i)(?<=\s|^){re.escape(file_name)}(?=\s|$)"}
+    }).to_list(length=None)
+    
+    if search_results:
+        result_message = "Search results:\n"
+        for result in search_results:
+            result_message += f"- {result['file_name']}\n"
+    else:
+        result_message = f"No files found with the name '{file_name}'."
+    
+    await bot.answer_callback_query(cq.id, result_message)
+
+
+@Client.on_callback_query(filters.regex('^search_full_name'))
+async def search_full_name_callback(bot, cq):
+    file_name = cq.data.split(':')[1]
+    # Implement the logic to search files by full name and return the results
+    search_results = await Media.collection.find({
+        'file_name': file_name
+    }).to_list(length=None)
+    
+    if search_results:
+        result_message = "Search results:\n"
+        for result in search_results:
+            result_message += f"- {result['file_name']}\n"
+    else:
+        result_message = f"No files found with the name '{file_name}'."
+    
+    await bot.answer_callback_query(cq.id, result_message)
+
+
+@Client.on_callback_query(filters.regex('^cancel_delete'))
+async def cancel_delete_callback(bot, cq):
+    await bot.answer_callback_query(cq.id, "Deletion process canceled.")
 
 
 @Client.on_callback_query(filters.regex(r'^delete_files:(.*)'))
@@ -437,12 +508,11 @@ async def delete_name_confirm(bot, callback_query):
         await callback_query.message.edit_text("Deletion failed.")
 
 
-@Client.on_callback_query(filters.regex(r'^cancel_delete'))
-async def cancel_delete(bot, callback_query):
-    await callback_query.answer(text="File deletion canceled.")
-    await callback_query.message.edit_text("Deletion canceled.")
+@Client.on_callback_query()
+async def callback_query_handler(bot, cq):
+    await bot.answer_callback_query(cq.id, "Invalid callback query.")
 
-    
+        
 
     
 @Client.on_message(filters.command('settings'))
