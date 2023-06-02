@@ -639,7 +639,7 @@ elif query.data == "sprint":
     await k.edit_text(text=f"<b>Successfully deleted {deleted} S-Print files.</b>")
             
         
-    elif query.data == "pages":
+    if query.data == "pages":
         await query.answer()
 
     elif query.data == "reqinfo":
