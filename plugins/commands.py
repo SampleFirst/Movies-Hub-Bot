@@ -278,21 +278,25 @@ async def channel_info(bot, message):
         
 @Client.on_message(filters.command('findfiles') & filters.user(ADMINS))
 async def find_files(bot, message):
-    """Find all files related to a specific name in the database"""
-    file_name = " ".join(message.command[1:])  # Extract the file name from the command
+    """Find files in the database based on search criteria"""
+    search_query = " ".join(message.command[1:])  # Extract the search query from the command
 
-    results = await Media.collection.find({
-        'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
-    }).to_list(length=None)
+    # Build the MongoDB query to search for files
+    query = {
+        'file_name': {"$regex": f".*{re.escape(search_query)}.*", "$options": "i"}
+    }
+
+    # Fetch the matching files from the database
+    results = await Media.collection.find(query).to_list(length=None)
 
     if results:
-        result_message = f'{len(results)} files found with the name "{file_name}" in the database:\n\n'
+        result_message = f'{len(results)} files found matching the search query "{search_query}" in the database:\n\n'
         for result in results:
             result_message += f'File ID: {result["_id"]}\n'
             result_message += f'File Name: {result["file_name"]}\n'
             result_message += f'File Size: {result["file_size"]}\n\n'
     else:
-        result_message = f'No files found with the name "{file_name}" in the database'
+        result_message = f'No files found matching the search query "{search_query}" in the database'
 
     await message.reply_text(result_message, quote=True)
 
