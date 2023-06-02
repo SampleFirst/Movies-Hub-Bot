@@ -298,8 +298,58 @@ async def find_files(bot, message):
     else:
         result_message = f'No files found matching the search query "{search_query}" in the database'
 
-    await message.reply_text(result_message, quote=True)
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("Find Related Name Files", callback_data=f"related_files:{search_query}")
+            ],
+            [
+                InlineKeyboardButton("Find Starting Name Files", callback_data=f"starting_files:{search_query}")
+            ]
+        ]
+    )
 
+    await message.reply_text(result_message, quote=True, reply_markup=keyboard)
+
+
+@Client.on_callback_query(filters.regex('^related_files'))
+async def find_related_files(client, callback_query):
+    search_query = callback_query.data.split(":", 1)[1]
+    query = {
+        'file_name': {"$regex": f".*{re.escape(search_query)}.*", "$options": "i"}
+    }
+    results = await Media.collection.find(query).to_list(length=None)
+
+    if results:
+        result_message = f'{len(results)} files found with related names to "{search_query}" in the database:\n\n'
+        for result in results:
+            result_message += f'File ID: {result["_id"]}\n'
+            result_message += f'File Name: {result["file_name"]}\n'
+            result_message += f'File Size: {result["file_size"]}\n\n'
+    else:
+        result_message = f'No files found with related names to "{search_query}" in the database'
+
+    await callback_query.message.edit_text(result_message)
+
+
+@Client.on_callback_query(filters.regex('^starting_files'))
+async def find_starting_files(client, callback_query):
+    search_query = callback_query.data.split(":", 1)[1]
+    query = {
+        'file_name': {"$regex": f"^{re.escape(search_query)}", "$options": "i"}
+    }
+    results = await Media.collection.find(query).to_list(length=None)
+
+    if results:
+        result_message = f'{len(results)} files found with names starting "{search_query}" in the database:\n\n'
+        for result in results:
+            result_message += f'File ID: {result["_id"]}\n'
+            result_message += f'File Name: {result["file_name"]}\n'
+            result_message += f'File Size: {result["file_size"]}\n\n'
+    else:
+        result_message = f'No files found with names starting "{search_query}" in the database'
+
+    await callback_query.message.edit_text(result_message)
 
 @Client.on_message(filters.command('logs') & filters.user(ADMINS))
 async def log_file(bot, message):
@@ -389,13 +439,13 @@ async def delete_all_index_confirm(bot, message):
         
         
 @Client.on_message(filters.command('deletename') & filters.user(ADMINS))
-async def delete_name(client, message):
+async def delete_files(client, message):
     """Delete files with a specific name from the database"""
-    file_name = message.text.split(' ', 1)[1].strip()
-
-    if not file_name:
+    if len(message.text.split()) == 1:
         await message.reply_text("Please provide a file name to delete.")
         return
+
+    file_name = message.text.split(' ', 1)[1].strip()
 
     result = await Media.collection.count_documents({
         'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
@@ -403,6 +453,10 @@ async def delete_name(client, message):
 
     if result > 0:
         confirmation_message = f'{result} files found with the name "{file_name}" in the database.\n'
+        starting_result = await Media.collection.count_documents({
+            'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
+        })
+        confirmation_message += f'{starting_result} files found with names starting "{file_name}" in the database.\n'
         confirmation_message += 'Please select the deletion option:'
 
         keyboard = InlineKeyboardMarkup(
@@ -423,20 +477,19 @@ async def delete_name(client, message):
     else:
         await message.reply_text(f'No files found with the name "{file_name}" in the database')
 
+
 @Client.on_callback_query(filters.regex('^delete_related'))
 async def delete_related_files(client, callback_query):
     file_name = callback_query.data.split(":", 1)[1]
     result = await Media.collection.delete_many({
         'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
     })
-    message = f'Successfully deleted all related files with names "{file_name}" from the database'
 
     if result.deleted_count:
-        await callback_query.answer(message)
         await callback_query.message.edit_text(f"Deleted {result.deleted_count} files.")
     else:
-        await callback_query.answer('No files found with the specified criteria')
         await callback_query.message.edit_text("Deletion failed. No files deleted.")
+
 
 @Client.on_callback_query(filters.regex('^delete_starting'))
 async def delete_starting_files(client, callback_query):
@@ -444,20 +497,18 @@ async def delete_starting_files(client, callback_query):
     result = await Media.collection.delete_many({
         'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
     })
-    message = f'Successfully deleted all files with names starting "{file_name}" from the database'
 
     if result.deleted_count:
-        await callback_query.answer(message)
         await callback_query.message.edit_text(f"Deleted {result.deleted_count} files.")
     else:
-        await callback_query.answer('No files found with the specified criteria')
         await callback_query.message.edit_text("Deletion failed. No files deleted.")
+
 
 @Client.on_callback_query(filters.regex('^cancel_delete'))
 async def cancel_delete(client, callback_query):
-    await callback_query.answer("Deletion canceled.")
-    await callback_query.message.edit_text("Deletion canceled")
-
+    await callback_query.message.edit_text("Deletion canceled.")
+    
+    
 
     
 @Client.on_message(filters.command('settings'))
