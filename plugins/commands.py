@@ -379,7 +379,7 @@ async def find_starting_files(client, callback_query):
     await callback_query.answer()
 
  
-@app.on_callback_query(filters.regex('^findfiles:'))
+@Client.on_callback_query(filters.regex('^findfiles:'))
 async def back_find_files(client, callback_query):
     search_query = callback_query.data.split(':')[1]
 
