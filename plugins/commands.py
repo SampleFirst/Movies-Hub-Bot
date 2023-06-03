@@ -300,19 +300,19 @@ async def find_files(bot, message):
         await message.reply_text(result_message, quote=True)
         return
 
-    keyboard = InlineKeyboardMarkup(
+    buttons = [
         [
-            [
-                InlineKeyboardButton("🌟 Find Related Name Files", callback_data=f"related_files:{search_query}")
-            ],
-            [
-                InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:{search_query}")
-            ],
-            [
-                InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
-            ]
+            InlineKeyboardButton("🌟 Find Related Name Files", callback_data=f"related_files:{search_query}")
+        ],
+        [
+            InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:{search_query}")
+        ],
+        [
+            InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
         ]
-    )
+    ]
+
+    keyboard = InlineKeyboardMarkup(buttons)
 
     await message.reply_text(result_message, quote=True, reply_markup=keyboard)
 
@@ -334,14 +334,17 @@ async def find_related_files(client, callback_query):
     else:
         result_message = f'No files found with related names to "{search_query}" in the database'
 
-    keyboard = InlineKeyboardMarkup(
-        [
+    buttons = [
             [
                 InlineKeyboardButton("🔙 Back", callback_data="findfiles"),
                 InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
             ]
         ]
-    )
+
+    keyboard = InlineKeyboardMarkup(buttons)
+
+    await callback_query.message.edit_text(result_message, reply_markup=keyboard)
+    await callback_query.answer()
 
     # Hide previous message and inline keyboard buttons
     await callback_query.message.edit_text(result_message, reply_markup=keyboard)
@@ -365,14 +368,14 @@ async def find_starting_files(client, callback_query):
     else:
         result_message = f'No files found with names starting "{search_query}" in the database'
 
-    keyboard = InlineKeyboardMarkup(
-        [
+    buttons = [
             [
                 InlineKeyboardButton("🔙 Back", callback_data="findfiles"),
                 InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
             ]
         ]
-    )
+
+    keyboard = InlineKeyboardMarkup(buttons)
 
     # Hide previous message and inline keyboard buttons
     await callback_query.message.edit_text(result_message, reply_markup=keyboard)
