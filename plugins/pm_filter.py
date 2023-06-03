@@ -673,19 +673,19 @@ async def cb_handler(client: Client, query: CallbackQuery):
     else:
          result_message = f'No files found matching the search query "{search_query}" in the database'
 
-        keyboard = InlineKeyboardMarkup(
-         [
-            [
-                InlineKeyboardButton("🌟 Find Related Name Files", callback_data=f"related_files:{search_query}")
-            ],
-            [
-                InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:{search_query}")
-            ],
-            [
-                InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
-            ],
-         ]
-         )
+        buttons = [
+        [
+            InlineKeyboardButton("🌟 Find Related Name Files", callback_data=f"related_files:{search_query}")
+        ],
+        [
+            InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:{search_query}")
+        ],
+        [
+            InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
+        ]
+    ]
+
+    keyboard = InlineKeyboardMarkup(buttons)
  
     await query.message.edit_text(result_message, reply_markup=keyboard)
         
