@@ -119,13 +119,13 @@ async def pm_text(bot, message):
         [
             [
                 InlineKeyboardButton("More Bots", url="https://t.me/+9Z1w2KOebaliYzdl"),
-                InlineKeyboardButton("Join Search Group", url="https://t.me/+_SiXJv4cfBw1MTRl")
+                InlineKeyboardButton("Search Group", url="https://t.me/+_SiXJv4cfBw1MTRl")
             ]
         ]
     )
     
     await message.reply_text(
-        "<b>Join First **More Bots** Channel For More Alternative Bots.\n\nJoin **Search Group** For Search Your Querys.</b>",
+        "<b>Join 'More Bots' Channel For More Alternative Bots.\n\nJoin 'Search Group' For Search Your Querys.\n\nShare And Support</b>",
         reply_markup=keyboard)
         
     
