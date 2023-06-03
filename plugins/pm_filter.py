@@ -659,35 +659,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         await k.edit_text(text=f"<b>Successfully deleted {deleted} S-Print files.</b>")
 
      
-    elif query.data == "findfiles":
-         search_query = query.data.split(':')[1]
-
-         # Reconstruct the original query to display the result count and options
-         query = {
-         'file_name': {"$regex": f".*{re.escape(search_query)}.*", "$options": "i"}
-         }
-         results = await Media.collection.find(query).to_list(length=None)
-
-    if results:
-         result_message = f'{len(results)} files found matching the search query "{search_query}" in the database:\n\n'
-    else:
-         result_message = f'No files found matching the search query "{search_query}" in the database'
-
-        buttons = [
-        [
-            InlineKeyboardButton("🌟 Find Related Name Files", callback_data=f"related_files:{search_query}")
-        ],
-        [
-            InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:{search_query}")
-        ],
-        [
-            InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
-        ]
-    ]
-
-    keyboard = InlineKeyboardMarkup(buttons)
- 
-    await query.message.edit_text(result_message, reply_markup=keyboard)
+    
         
     elif query.data == "pages":
         await query.answer()
