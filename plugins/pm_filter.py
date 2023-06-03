@@ -668,9 +668,9 @@ async def cb_handler(client: Client, query: CallbackQuery):
          }
          results = await Media.collection.find(query).to_list(length=None)
 
-         if results:
+    if results:
          result_message = f'{len(results)} files found matching the search query "{search_query}" in the database:\n\n'
-         else:
+    else:
          result_message = f'No files found matching the search query "{search_query}" in the database'
 
         keyboard = InlineKeyboardMarkup(
