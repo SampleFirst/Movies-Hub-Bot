@@ -278,9 +278,33 @@ async def channel_info(bot, message):
         
 @Client.on_callback_query(filters.regex('^findfiles'))
 async def go_back_find(client, callback_query):
-    await callback_query.message.edit_text("✨ Please provide a name.\n\nExample: /findfiles Kantara.")
-    await callback_query.answer()
+    search_query = callback_query.data.split(':')[1]  # Extract the search query from the callback data
 
+    # Build the MongoDB query to search for files
+    query = {
+        'file_name': {"$regex": f".*{re.escape(search_query)}.*", "$options": "i"}
+    }
+
+    # Fetch the matching files from the database
+    results = await Media.collection.find(query).to_list(length=None)
+
+    result_message = f'{len(results)} files found matching the search query "{search_query}" in the database:\n\n'
+
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("🌟 Find Related Name Files", callback_data=f"related_files:{search_query}")
+            ],
+            [
+                InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:{search_query}")
+            ],
+            [
+                InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
+            ]
+        ]
+    )
+
+    await callback_query.message.reply_text(result_message, quote=True, reply_markup=keyboard)
 
 @Client.on_message(filters.command('findfiles') & filters.user(ADMINS))
 async def find_files(bot, message):
@@ -394,7 +418,9 @@ async def cancel_find(client, callback_query):
     await callback_query.message.edit_text("☑️ Find canceled.")
     await callback_query.answer()
 
-        
+
+
+
     
 @Client.on_message(filters.command('logs') & filters.user(ADMINS))
 async def log_file(bot, message):
