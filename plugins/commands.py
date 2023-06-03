@@ -388,67 +388,16 @@ async def cancel_find(client, callback_query):
     await callback_query.message.edit_text("☑️ Find canceled.")
     await callback_query.answer()
 
-@Client.on_callback_query(filters.regex('^findfiles$'))
-async def find_files_callback(client, callback_query):
-    await callback_query.answer()  # Answer the callback query
 
-    # Get the chat ID and message ID to delete the previous message
-    chat_id = callback_query.message.chat.id
-    message_id = callback_query.message.message_id
+@Client.on_callback_query(filters.regex('^findfiles'))
+async def back_to_find_files(client, callback_query):
+    search_query = callback_query.data.split(":", 1)[1]
+    await find_files(client, search_query)
+    await callback_query.answer()
 
-    # Prompt the user to enter the search query
-    await client.send_message(chat_id, "Please provide a name to search for:")
-    
-    # Store the state of the conversation using user_data
-    client.user_data['search_query_message_id'] = message_id
-    client.user_data['search_query_chat_id'] = chat_id
 
-@Client.on_message(filters.text & filters.chat(user_data=lambda u: 'search_query_message_id' in u))
-async def process_search_query(bot, message):
-    # Retrieve the search query and the chat ID from user_data
-    search_query = message.text.strip()
-    chat_id = message.chat.id
-    
-    # Remove the user_data related to the search query prompt
-    del bot.user_data['search_query_message_id']
-    del bot.user_data['search_query_chat_id']
 
-    if not search_query:
-        await message.reply_text("✨ Please provide a name.\n\nExample: /findfiles Kantara.")
-        return
 
-    # Build the MongoDB query to search for files
-    query = {
-        'file_name': {"$regex": f".*{re.escape(search_query)}.*", "$options": "i"}
-    }
-
-    # Fetch the matching files from the database
-    results = await Media.collection.find(query).to_list(length=None)
-
-    if results:
-        result_message = f'{len(results)} files found matching the search query "{search_query}" in the database:\n\n'
-    else:
-        result_message = f'No files found matching the search query "{search_query}" in the database'
-        await message.reply_text(result_message, quote=True)
-        return
-
-    keyboard = InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton("🌟 Find Related Name Files", callback_data=f"related_files:{search_query}")
-            ],
-            [
-                InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:{search_query}")
-            ],
-            [
-                InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
-            ]
-        ]
-    )
-
-    # Delete the previous search query prompt and send the results with the keyboard
-    await bot.delete_message(chat_id, message.message_id)
-    await bot.send_message(chat_id, result_message, quote=True, reply_markup=keyboard)
 
 
     
