@@ -309,7 +309,7 @@ async def find_files(bot, message):
                 InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:{search_query}")
             ],
             [
-                InlineKeyboardButton("🔚 Close", callback_data="close_data")
+                InlineKeyboardButton("🔚 Close", callback_data="closefind")
             ]
         ]
     )
@@ -337,7 +337,7 @@ async def find_related_files(client, callback_query):
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("🔙 Back", callback_data="backmove")
+                InlineKeyboardButton("🔙 Back", callback_data="backfind")
             ]
         ]
     )
@@ -367,7 +367,7 @@ async def find_starting_files(client, callback_query):
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("🔙 Back", callback_data="backmove")
+                InlineKeyboardButton("🔙 Back", callback_data="backfind")
             ]
         ]
     )
@@ -376,11 +376,18 @@ async def find_starting_files(client, callback_query):
     await callback_query.message.edit_text(result_message, reply_markup=keyboard)
     await callback_query.answer()
 
-    
-@Client.on_callback_query(filters.regex('^backmove$'))
-async def go_back(client, callback_query):
+
+@Client.on_callback_query(filters.regex('^backfind$'))
+async def go_back_find(client, callback_query):
     await callback_query.message.delete()
     await find_files(client, callback_query.message)
+
+
+@Client.on_callback_query(filters.regex('^closefind$'))
+async def close_find(client, callback_query):
+    await callback_query.message.delete()
+    await callback_query.answer("🧐 Closing Find Files")
+
 
 
         
