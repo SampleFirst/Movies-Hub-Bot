@@ -295,9 +295,10 @@ async def find_files(bot, message):
 
     if results:
         result_message = f'{len(results)} files found matching the search query "{search_query}" in the database:\n\n'
-        
     else:
         result_message = f'No files found matching the search query "{search_query}" in the database'
+        await message.reply_text(result_message, quote=True)
+        return
 
     keyboard = InlineKeyboardMarkup(
         [
@@ -341,7 +342,9 @@ async def find_related_files(client, callback_query):
         ]
     )
 
-    await callback_query.message.reply_text(result_message, reply_markup=keyboard)
+    # Hide previous message and inline keyboard buttons
+    await callback_query.message.edit_text(result_message, reply_markup=keyboard)
+    await callback_query.answer()
 
 
 @Client.on_callback_query(filters.regex('^starting_files'))
@@ -369,7 +372,9 @@ async def find_starting_files(client, callback_query):
         ]
     )
 
-    await callback_query.message.reply_text(result_message, reply_markup=keyboard)
+    # Hide previous message and inline keyboard buttons
+    await callback_query.message.edit_text(result_message, reply_markup=keyboard)
+    await callback_query.answer()
 
     
 @Client.on_callback_query(filters.regex('^backmove$'))
