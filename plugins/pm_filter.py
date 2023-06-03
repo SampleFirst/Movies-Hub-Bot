@@ -112,11 +112,27 @@ async def pm_text(bot, message):
     content = message.text
     user = message.from_user.first_name
     user_id = message.from_user.id
-    if content.startswith("/") or content.startswith("#"): return  # ignore commands and hashtags
-    await message.reply_text("<b>JOINE 👉 [OFFICIAL GROUP](https://t.me/+_SiXJv4cfBw1MTRl) AND SEND MOVIES OR SERIES NAME IN THE GROUP</b>")
+    if content.startswith("/") or content.startswith("#"):
+        return  # ignore commands and hashtags
+    
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("More Bots", url="https://t.me/+9Z1w2KOebaliYzdl"),
+                InlineKeyboardButton("Join Search Group", url="https://t.me/+_SiXJv4cfBw1MTRl")
+            ]
+        ]
+    )
+    
+    await message.reply_text(
+        "<b>Join First **More Bots** Channel For More Alternative Bots.\n\nJoin **Search Group** For Search Your Querys.</b>",
+        reply_markup=keyboard,
+        parse_mode="HTML"
+    )
+    
     await bot.send_message(
         chat_id=LOG_CHANNEL_PM,
-        text=f"<b>#PM_MSG\n\nName : {user}\n\nID : {user_id}\n\nMessage : {content}</b>"
+        text=f"<b>#PM_MSG\n\nName: {user}\n\nID: {user_id}\n\nMessage: {content}</b>"
     )
 
 @Client.on_callback_query(filters.regex(r"^next"))
