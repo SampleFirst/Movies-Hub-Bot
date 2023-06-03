@@ -471,7 +471,7 @@ async def delete_all_index_confirm(bot, message):
 async def delete_files(client, message):
     """Delete files with a specific name from the database"""
     if len(message.text.split()) == 1:
-        await message.reply_text("Please provide a file name to delete.")
+        await message.reply_text("🤨 Please provide a file name to delete.\n\nExample: /deletename Kantara")
         return
 
     file_name = message.text.split(' ', 1)[1].strip()
@@ -481,30 +481,30 @@ async def delete_files(client, message):
     })
 
     if result > 0:
-        confirmation_message = f'{result} files found with the name "{file_name}" in the database.\n'
+        confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n'
         starting_result = await Media.collection.count_documents({
             'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
         })
-        confirmation_message += f'{starting_result} files found with names starting "{file_name}" in the database.\n'
-        confirmation_message += 'Please select the deletion option:'
+        confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n'
+        confirmation_message += '✨ Please select the deletion option:'
 
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("Delete all related files", callback_data=f"delete_related:{file_name}")
+                    InlineKeyboardButton("🌟 Delete all related name files", callback_data=f"delete_related:{file_name}")
                 ],
                 [
-                    InlineKeyboardButton("Delete files with the same starting name", callback_data=f"delete_starting:{file_name}")
+                    InlineKeyboardButton("🌟 Delete all starting name files", callback_data=f"delete_starting:{file_name}")
                 ],
                 [
-                    InlineKeyboardButton("Cancel", callback_data="cancel_delete")
+                    InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
                 ]
             ]
         )
 
         await message.reply_text(confirmation_message, reply_markup=keyboard)
     else:
-        await message.reply_text(f'No files found with the name "{file_name}" in the database')
+        await message.reply_text(f'😎 No files found with the name "{file_name}" in the database')
 
 
 @Client.on_callback_query(filters.regex('^delete_related'))
@@ -515,9 +515,9 @@ async def delete_related_files(client, callback_query):
     })
 
     if result.deleted_count:
-        await callback_query.message.edit_text(f"Deleted {result.deleted_count} files.")
+        await callback_query.message.edit_text(f"✅ Deleted {result.deleted_count} files.")
     else:
-        await callback_query.message.edit_text("Deletion failed. No files deleted.")
+        await callback_query.message.edit_text("❌ Deletion failed. No files deleted.")
 
 
 @Client.on_callback_query(filters.regex('^delete_starting'))
@@ -528,15 +528,17 @@ async def delete_starting_files(client, callback_query):
     })
 
     if result.deleted_count:
-        await callback_query.message.edit_text(f"Deleted {result.deleted_count} files.")
+        await callback_query.message.edit_text(f"✅ Deleted {result.deleted_count} files.")
     else:
-        await callback_query.message.edit_text("Deletion failed. No files deleted.")
+        await callback_query.message.edit_text("❌ Deletion failed. No files deleted.")
 
 
 @Client.on_callback_query(filters.regex('^cancel_delete'))
 async def cancel_delete(client, callback_query):
-    await callback_query.message.edit_text("Deletion canceled.")
-    
+    await callback_query.message.edit_text("☑️ Deletion canceled.")
+
+
+
     
 
     
