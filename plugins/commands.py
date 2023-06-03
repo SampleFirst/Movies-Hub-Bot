@@ -276,6 +276,12 @@ async def channel_info(bot, message):
         os.remove(file)
 
         
+@Client.on_callback_query(filters.regex('^findfiles'))
+async def go_back_find(client, callback_query):
+    await callback_query.message.edit_text("✨ Please provide a name.\n\nExample: /findfiles Kantara.")
+    await callback_query.answer()
+
+
 @Client.on_message(filters.command('findfiles') & filters.user(ADMINS))
 async def find_files(bot, message):
     """Find files in the database based on search criteria"""
@@ -309,7 +315,7 @@ async def find_files(bot, message):
                 InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:{search_query}")
             ],
             [
-                InlineKeyboardButton("🔚 Close", callback_data="closefind")
+                InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
             ]
         ]
     )
@@ -337,7 +343,10 @@ async def find_related_files(client, callback_query):
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("🔙 Back", callback_data="backfind")
+                InlineKeyboardButton("🔙 Back", callback_data="findfiles")
+            ],
+            [
+                InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
             ]
         ]
     )
@@ -367,7 +376,10 @@ async def find_starting_files(client, callback_query):
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("🔙 Back", callback_data="backfind")
+                InlineKeyboardButton("🔙 Back", callback_data="findfiles")
+            ],
+            [
+                InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
             ]
         ]
     )
@@ -377,18 +389,10 @@ async def find_starting_files(client, callback_query):
     await callback_query.answer()
 
 
-@Client.on_callback_query(filters.regex('^backfind$'))
-async def go_back_find(client, callback_query):
-    await callback_query.message.delete()
-    await find_files(client, callback_query.message)
-
-
-@Client.on_callback_query(filters.regex('^closefind$'))
-async def close_find(client, callback_query):
-    await callback_query.message.delete()
-    await callback_query.answer("🧐 Closing Find Files")
-
-
+@Client.on_callback_query(filters.regex('^cancel_find'))
+async def cancel_find(client, callback_query):
+    await callback_query.message.edit_text("☑️ Find canceled.")
+    await callback_query.answer()
 
         
     
