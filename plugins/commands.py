@@ -337,9 +337,7 @@ async def find_related_files(client, callback_query):
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("🔙 Back", callback_data="findfiles")
-            ],
-            [
+                InlineKeyboardButton("🔙 Back", callback_data=f"back_files:{search_query}"),
                 InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
             ]
         ]
@@ -370,9 +368,7 @@ async def find_starting_files(client, callback_query):
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("🔙 Back", callback_data="findfiles")
-            ],
-            [
+                InlineKeyboardButton("🔙 Back", callback_data=f"back_files:{search_query}"),
                 InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
             ]
         ]
@@ -382,21 +378,35 @@ async def find_starting_files(client, callback_query):
     await callback_query.message.edit_text(result_message, reply_markup=keyboard)
     await callback_query.answer()
 
+ 
+@Client.on_callback_query(filters.regex('^back_files:'))
+async def back_files(bot, callback_query):
+    # Extract the search query from the callback data
+    search_query = callback_query.data.split(':')[1]
+
+    # Build the original query message
+    result_message = f'{len(results)} files found matching the search query "{search_query}" in the database:\n\n'
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("🌟 Find Related Name Files", callback_data=f"related_files:{search_query}")
+            ],
+            [
+                InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:{search_query}")
+            ],
+            [
+                InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
+            ]
+        ]
+    )
+
+    await callback_query.edit_message_text(result_message, reply_markup=keyboard)  
+    
 
 @Client.on_callback_query(filters.regex('^cancel_find'))
 async def cancel_find(client, callback_query):
     await callback_query.message.edit_text("☑️ Find canceled.")
     await callback_query.answer()
-
-
-@Client.on_callback_query(filters.regex('^findfiles'))
-async def back_to_find_files(client, callback_query):
-    search_query = callback_query.data.split(":", 1)[1]
-    await find_files(client, search_query)
-    await callback_query.answer()
-
-
-
 
 
 
