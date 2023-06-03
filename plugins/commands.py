@@ -337,7 +337,7 @@ async def find_related_files(client, callback_query):
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("🔙 Back", callback_data=f"back_files:{search_query}"),
+                InlineKeyboardButton("🔙 Back", callback_data="findfiles"),
                 InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
             ]
         ]
@@ -368,7 +368,7 @@ async def find_starting_files(client, callback_query):
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("🔙 Back", callback_data=f"back_files:{search_query}"),
+                InlineKeyboardButton("🔙 Back", callback_data="findfiles"),
                 InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")
             ]
         ]
@@ -379,13 +379,21 @@ async def find_starting_files(client, callback_query):
     await callback_query.answer()
 
  
-@Client.on_callback_query(filters.regex('^back_files:'))
-async def back_files(bot, callback_query):
-    # Extract the search query from the callback data
+@app.on_callback_query(filters.regex('^findfiles:'))
+async def back_find_files(client, callback_query):
     search_query = callback_query.data.split(':')[1]
 
-    # Build the original query message
-    result_message = f'{len(results)} files found matching the search query "{search_query}" in the database:\n\n'
+    # Reconstruct the original query to display the result count and options
+    query = {
+        'file_name': {"$regex": f".*{re.escape(search_query)}.*", "$options": "i"}
+    }
+    results = await Media.collection.find(query).to_list(length=None)
+
+    if results:
+        result_message = f'{len(results)} files found matching the search query "{search_query}" in the database:\n\n'
+    else:
+        result_message = f'No files found matching the search query "{search_query}" in the database'
+
     keyboard = InlineKeyboardMarkup(
         [
             [
@@ -400,8 +408,7 @@ async def back_files(bot, callback_query):
         ]
     )
 
-    await callback_query.edit_message_text(result_message, reply_markup=keyboard)  
-    
+    await callback_query.edit_message_text(result_message, reply_markup=keyboard)
 
 @Client.on_callback_query(filters.regex('^cancel_find'))
 async def cancel_find(client, callback_query):
