@@ -126,9 +126,8 @@ async def pm_text(bot, message):
     
     await message.reply_text(
         "<b>Join First **More Bots** Channel For More Alternative Bots.\n\nJoin **Search Group** For Search Your Querys.</b>",
-        reply_markup=keyboard,
-        parse_mode="HTML"
-    )
+        reply_markup=keyboard)
+        
     
     await bot.send_message(
         chat_id=LOG_CHANNEL_PM,
