@@ -281,6 +281,10 @@ async def find_files(bot, message):
     """Find files in the database based on search criteria"""
     search_query = " ".join(message.command[1:])  # Extract the search query from the command
 
+    if not search_query:
+        await message.reply_text("✨ Please provide a name.\n\nExample: /findfiles Kantara.")
+        return
+
     # Build the MongoDB query to search for files
     query = {
         'file_name': {"$regex": f".*{re.escape(search_query)}.*", "$options": "i"}
@@ -291,20 +295,20 @@ async def find_files(bot, message):
 
     if results:
         result_message = f'{len(results)} files found matching the search query "{search_query}" in the database:\n\n'
-        for result in results:
-            result_message += f'File ID: {result["_id"]}\n'
-            result_message += f'File Name: {result["file_name"]}\n'
-            result_message += f'File Size: {result["file_size"]}\n\n'
+        
     else:
         result_message = f'No files found matching the search query "{search_query}" in the database'
 
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("Find Related Name Files", callback_data=f"related_files:{search_query}")
+                InlineKeyboardButton("🌟 Find Related Name Files", callback_data=f"related_files:{search_query}")
             ],
             [
-                InlineKeyboardButton("Find Starting Name Files", callback_data=f"starting_files:{search_query}")
+                InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:{search_query}")
+            ],
+            [
+                InlineKeyboardButton("🔚 Close", callback_data="close_data")
             ]
         ]
     )
@@ -329,7 +333,15 @@ async def find_related_files(client, callback_query):
     else:
         result_message = f'No files found with related names to "{search_query}" in the database'
 
-    await callback_query.message.edit_text(result_message)
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("🔙 Back", callback_data="backmove")
+            ]
+        ]
+    )
+
+    await callback_query.message.reply_text(result_message, reply_markup=keyboard)
 
 
 @Client.on_callback_query(filters.regex('^starting_files'))
@@ -349,8 +361,25 @@ async def find_starting_files(client, callback_query):
     else:
         result_message = f'No files found with names starting "{search_query}" in the database'
 
-    await callback_query.message.edit_text(result_message)
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("🔙 Back", callback_data="backmove")
+            ]
+        ]
+    )
 
+    await callback_query.message.reply_text(result_message, reply_markup=keyboard)
+
+    
+@Client.on_callback_query(filters.regex('^backmove$'))
+async def go_back(client, callback_query):
+    await callback_query.message.delete()
+    await find_files(client, callback_query.message)
+
+
+        
+    
 @Client.on_message(filters.command('logs') & filters.user(ADMINS))
 async def log_file(bot, message):
     """Send log file"""
