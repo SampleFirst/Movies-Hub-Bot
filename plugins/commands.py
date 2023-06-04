@@ -580,7 +580,64 @@ async def cancel_delete(client, callback_query):
     await callback_query.message.edit_text("☑️ Deletion canceled.")
 
 
+@Client.on_message(filters.command("deletefiletype") & filters.user(ADMINS))
+async def delete_file_type(bot, message):
+    btn = [
+        [
+            InlineKeyboardButton("File", callback_data="file"),
+            InlineKeyboardButton("Video", callback_data="video"),
+        ],
+        [
+            InlineKeyboardButton("Audio", callback_data="audio"),
+            InlineKeyboardButton("Zip", callback_data="zip"),
+        ],
+        [InlineKeyboardButton("CANCEL", callback_data="cancel")],
+    ]
 
+    await message.reply_text(
+        text="<b>Select the type of files you want to delete!\n\nThis will delete related files from the database.</b>",
+        reply_markup=InlineKeyboardMarkup(btn),
+    )
+
+
+@Client.on_callback_query(filters.regex("^(file|video|audio|zip)$"))
+async def handle_file_type_click(bot, query):
+    file_type = query.data
+    chat_id = query.message.chat.id
+
+    files, next_offset, total = await get_bad_files(file_type, offset=0)
+
+    await query.message.edit_text(
+        text=f"<b>Are you sure you want to delete {total} {file_type}s?</b>",
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("YES", callback_data=f"confirm_{file_type}"), InlineKeyboardButton("CANCEL", callback_data="cancel")]]),
+    )
+    await query.answer()
+
+
+@Client.on_callback_query(filters.regex("^confirm_.*$"))
+async def handle_confirmation_click(bot, query):
+    file_type = query.data.split("_")[1]
+    chat_id = query.message.chat.id
+
+    files, next_offset, total = await get_bad_files(file_type, offset=0)
+
+    k = await bot.send_message(chat_id, text=f"<b>Deleting {total} {file_type}s... Please wait...</b>")
+
+    deleted = 0
+    for file in files:
+        file_ids = file.file_id
+        result = await Media.collection.delete_one({'_id': file_ids})
+        if result.deleted_count:
+            logger.info(f"{file_type.capitalize()} File Found! Successfully deleted from the database.")
+            deleted += 1
+
+    deleted = str(deleted)
+    await k.edit_text(text=f"<b>Successfully deleted {deleted} out of {total} {file_type}s.</b>")
+
+
+@Client.on_callback_query(filters.regex("^cancel$"))
+async def handle_cancel_click(bot, query):
+    await query.message.edit_text(text="<b>Deletion canceled.</b>")
     
 
     
