@@ -17,6 +17,7 @@ import base64
 logger = logging.getLogger(__name__)
 
 BATCH_FILES = {}
+RESULTS_PER_PAGE = 10
 
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
@@ -276,8 +277,9 @@ async def channel_info(bot, message):
         os.remove(file)
 
         
+
 @Client.on_message(filters.command('findfiles') & filters.user(ADMINS))
-async def find_files(bot, message):
+async def find_files(client, message):
     """Find files in the database based on search criteria"""
     search_query = " ".join(message.command[1:])  # Extract the search query from the command
 
@@ -300,118 +302,101 @@ async def find_files(bot, message):
         await message.reply_text(result_message, quote=True)
         return
 
-    # Split the results into pages (maximum 10 results per page)
-    pages = [results[i:i+10] for i in range(0, len(results), 10)]
+    buttons = [
+        [
+            InlineKeyboardButton("🌟 Find Related Name Files", callback_data=f"related_files:1:{search_query}")
+        ],
+        [
+            InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:1:{search_query}")
+        ]
+    ]
 
-    # Store the pages in user's chat_data
-    chat_data = client.chat_data.setdefault(message.chat.id, {})
-    chat_data['search_results'] = pages
-    chat_data['current_page'] = 0
+    keyboard = InlineKeyboardMarkup(buttons)
 
-    # Show the first page of results
-    await show_search_results(bot, message.chat.id)
+    await message.reply_text(result_message, quote=True, reply_markup=keyboard)
 
 
 @Client.on_callback_query(filters.regex('^related_files'))
 async def find_related_files(client, callback_query):
-    search_query = callback_query.data.split(":", 1)[1]
+    data = callback_query.data.split(":")
+    page = int(data[1])
+    search_query = data[2]
     query = {
         'file_name': {"$regex": f".*{re.escape(search_query)}.*", "$options": "i"}
     }
     results = await Media.collection.find(query).to_list(length=None)
 
-    if results:
-        result_message = f'{len(results)} files found with related names to "{search_query}" in the database:\n\n'
-    else:
-        result_message = f'No files found with related names to "{search_query}" in the database'
+    total_results = len(results)
+    num_pages = total_results // RESULTS_PER_PAGE + 1
 
-    await callback_query.message.edit_text(result_message)
+    start_index = (page - 1) * RESULTS_PER_PAGE
+    end_index = start_index + RESULTS_PER_PAGE
+    current_results = results[start_index:end_index]
+
+    result_message = f'{len(current_results)} files found with related names to "{search_query}" in the database:\n\n'
+    for result in current_results:
+        result_message += f'File ID: {result["_id"]}\n'
+        result_message += f'File Name: {result["file_name"]}\n'
+        result_message += f'File Size: {result["file_size"]}\n\n'
+
+    buttons = []
+    if page > 1:
+        buttons.append(InlineKeyboardButton("⬅️ Previous", callback_data=f"related_files:{page-1}:{search_query}"))
+    if page < num_pages:
+        buttons.append(InlineKeyboardButton("➡️ Next", callback_data=f"related_files:{page+1}:{search_query}"))
+
+    buttons.append(InlineKeyboardButton("🔙 Back", callback_data="findfiles"))
+
+    keyboard = InlineKeyboardMarkup([buttons])
+
+    await callback_query.message.edit_text(result_message, reply_markup=keyboard)
     await callback_query.answer()
 
 
 @Client.on_callback_query(filters.regex('^starting_files'))
 async def find_starting_files(client, callback_query):
-    search_query = callback_query.data.split(":", 1)[1]
+    data = callback_query.data.split(":")
+    page = int(data[1])
+    search_query = data[2]
     query = {
         'file_name': {"$regex": f"^{re.escape(search_query)}", "$options": "i"}
     }
     results = await Media.collection.find(query).to_list(length=None)
 
-    if results:
-        result_message = f'{len(results)} files found with names starting "{search_query}" in the database:\n\n'
-    else:
-        result_message = f'No files found with names starting "{search_query}" in the database'
+    total_results = len(results)
+    num_pages = total_results // RESULTS_PER_PAGE + 1
 
-    await callback_query.message.edit_text(result_message)
-    await callback_query.answer()
+    start_index = (page - 1) * RESULTS_PER_PAGE
+    end_index = start_index + RESULTS_PER_PAGE
+    current_results = results[start_index:end_index]
 
-
-@Client.on_callback_query(filters.regex('^next_page'))
-async def show_next_page(client, callback_query):
-    chat_id = callback_query.message.chat.id
-    chat_data = client.chat_data[chat_id]
-    current_page = chat_data['current_page']
-    search_results = chat_data['search_results']
-
-    if current_page < len(search_results) - 1:
-        chat_data['current_page'] += 1
-        await show_search_results(client, chat_id)
-
-
-@Client.on_callback_query(filters.regex('^prev_page'))
-async def show_previous_page(client, callback_query):
-    chat_id = callback_query.message.chat.id
-    chat_data = client.chat_data[chat_id]
-    current_page = chat_data['current_page']
-    search_results = chat_data['search_results']
-
-    if current_page > 0:
-        chat_data['current_page'] -= 1
-        await show_search_results(client, chat_id)
-
-
-@Client.on_callback_query(filters.regex('^home'))
-async def go_to_home(client, callback_query):
-    chat_id = callback_query.message.chat.id
-    chat_data = client.chat_data[chat_id]
-    chat_data['current_page'] = 0
-    await show_search_results(client, chat_id)
-
-
-async def show_search_results(client, chat_id):
-    chat_data = client.chat_data[chat_id]
-    current_page = chat_data['current_page']
-    search_results = chat_data['search_results']
-
-    results = search_results[current_page]
-    result_message = f'Page {current_page + 1} of {len(search_results)}:\n\n'
-
-    for result in results:
+    result_message = f'{len(current_results)} files found with names starting "{search_query}" in the database:\n\n'
+    for result in current_results:
+        result_message += f'File ID: {result["_id"]}\n'
         result_message += f'File Name: {result["file_name"]}\n'
         result_message += f'File Size: {result["file_size"]}\n\n'
 
     buttons = []
+    if page > 1:
+        buttons.append(InlineKeyboardButton("⬅️ Previous", callback_data=f"starting_files:{page-1}:{search_query}"))
+    if page < num_pages:
+        buttons.append(InlineKeyboardButton("➡️ Next", callback_data=f"starting_files:{page+1}:{search_query}"))
 
-    if current_page > 0:
-        buttons.append(InlineKeyboardButton("⬅️ Previous", callback_data="prev_page"))
-    if current_page < len(search_results) - 1:
-        buttons.append(InlineKeyboardButton("➡️ Next", callback_data="next_page"))
-
-    buttons.append(InlineKeyboardButton("🏠 Home", callback_data="home"))
-    buttons.append(InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find"))
+    buttons.append(InlineKeyboardButton("🔙 Back", callback_data="findfiles"))
 
     keyboard = InlineKeyboardMarkup([buttons])
 
-    await client.send_message(chat_id, result_message, reply_markup=keyboard)
+    await callback_query.message.edit_text(result_message, reply_markup=keyboard)
+    await callback_query.answer()
 
-    
-
- 
 
 @Client.on_callback_query(filters.regex('^cancel_find'))
 async def cancel_find(client, callback_query):
     await callback_query.message.edit_text("☑️ Find canceled.")
     await callback_query.answer()
+
+
+
 
 
 
