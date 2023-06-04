@@ -316,8 +316,7 @@ async def handle_file_type_click(bot, query):
 
 
 @Client.on_callback_query(filters.regex("^delete_confirm_(.*)$"))
-async def handle_confirm_file_click(bot, query):
-    chat_id = query.message.chat.id
+async def handle_confirm_file_delete(bot, query):
     file_type = query.matches[0].group(1)
 
     file_types = {
@@ -335,7 +334,7 @@ async def handle_confirm_file_click(bot, query):
 
     total = len(files)
 
-    k = await bot.send_message(chat_id, text=f"<b>Deleting {total} {file_type} files... Please wait...</b>")
+    k = await query.message.reply_text(f"<b>Deleting {total} {file_type} files... Please wait...</b>")
 
     deleted = 0
     for file in files:
@@ -346,8 +345,9 @@ async def handle_confirm_file_click(bot, query):
             deleted += 1
 
     deleted = str(deleted)
-    await k.edit_text(text=f"<b>Successfully deleted {deleted} out of {total} {file_type} files.</b>")            
-            
+    await k.edit_text(f"<b>Successfully deleted {deleted} out of {total} {file_type} files.</b>")
+    await query.answer()
+    
 
 @Client.on_callback_query()
 async def cb_handler(client: Client, query: CallbackQuery):
