@@ -353,8 +353,14 @@ async def handle_confirm_file_delete(bot, query):
 async def handle_callback_query(client, callback_query):
     query = callback_query.data.split(':')
     action = query[0]
-    page = int(query[1])
-    search_query = query[2]
+
+    if len(query) >= 3:
+        page = int(query[1])
+        search_query = query[2]
+    else:
+        # Handle the case when the query doesn't have enough elements
+        await callback_query.message.edit_text("Invalid query", reply_markup=None)
+        return
 
     if action == 'related_files':
         # Build the MongoDB query to search for related files
@@ -401,14 +407,14 @@ async def handle_callback_query(client, callback_query):
             InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:{page+1}:{search_query}")
         ],
         [
-            InlineKeyboardButton("❌ Cancel", callback_data="cancel_find")
+            InlineKeyboardButton("🔙 Back", callback_data="cancel_find")
         ]
     ]
 
     keyboard = InlineKeyboardMarkup(buttons)
 
-    await callback_query.message.reply_text("✨ Please select the option for easier searching:", reply_markup=keyboard)   
-    
+    await callback_query.message.reply_text("✨ Please select the option for easier searching:", reply_markup=keyboard)
+
 
     
 @Client.on_callback_query()
