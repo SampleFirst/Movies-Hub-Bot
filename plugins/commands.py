@@ -284,7 +284,7 @@ async def find_files(client, message):
     search_query = " ".join(message.command[1:])  # Extract the search query from the command
 
     if not search_query:
-        await message.reply_text("✨ Please provide a name.\n\nExample: /findfiles Kantara.")
+        await message.reply_text("✨ Please provide a name.\n\nExample: /findfiles Kantara.", reply_to_message_id=message.message_id)
         return
 
     # Build the MongoDB query to search for files
@@ -295,12 +295,40 @@ async def find_files(client, message):
     # Fetch the matching files from the database
     results = await Media.collection.find(query).to_list(length=None)
 
+    related_files_message = ''
+    starting_files_message = ''
+    no_files_found_message = ''
+    
     if results:
-        result_message = f'{len(results)} files found matching the search query "{search_query}" in the database:\n\n'
+        related_files_message = f'{len(results)} files found matching the search query "{search_query}" in the database:\n\n'
     else:
-        result_message = f'No files found matching the search query "{search_query}" in the database'
-        await message.reply_text(result_message, quote=True)
-        return
+        related_files_message = f'No files found matching the search query "{search_query}" in the database'
+
+    # Build a separate query to find files starting with the search query
+    starting_query = {
+        'file_name': {"$regex": f"^{re.escape(search_query)}.*", "$options": "i"}
+    }
+
+    # Fetch the starting files from the database
+    starting_results = await Media.collection.find(starting_query).to_list(length=None)
+
+    if starting_results:
+        starting_files_message = f'{len(starting_results)} files found starting with "{search_query}" in the database:\n\n'
+    else:
+        starting_files_message = f'No files found starting with "{search_query}" in the database'
+
+    # Build a separate query to find files that do not match the search query
+    not_found_query = {
+        'file_name': {"$not": {"$regex": f".*{re.escape(search_query)}.*", "$options": "i"}}
+    }
+
+    # Fetch the files that do not match the search query from the database
+    not_found_results = await Media.collection.find(not_found_query).to_list(length=None)
+
+    if not_found_results:
+        no_files_found_message = f'{len(not_found_results)} files found not matching the search query "{search_query}" in the database'
+    else:
+        no_files_found_message = f'No files found matching the search query "{search_query}" in the database'
 
     buttons = [
         [
@@ -308,12 +336,17 @@ async def find_files(client, message):
         ],
         [
             InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:1:{search_query}")
+        ],
+        [
+            InlineKeyboardButton("❌ Cancel", callback_data="cancel_find")
         ]
     ]
 
     keyboard = InlineKeyboardMarkup(buttons)
 
-    await message.reply_text(result_message, quote=True, reply_markup=keyboard)
+    await message.reply_text(related_files_message, quote=True)
+    await message.reply_text(starting_files_message, quote=True)
+    await message.reply_text(no_files_found_message, quote=True, reply_markup=keyboard)
 
 
 @Client.on_callback_query(filters.regex('^related_files'))
