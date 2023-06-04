@@ -281,6 +281,73 @@ async def advantage_spoll_choker(bot, query):
             await asyncio.sleep(10)
             await k.delete()
 
+@Client.on_callback_query(filters.regex("^delete_(.*)$"))
+async def handle_file_type_click(bot, query):
+    chat_id = query.message.chat.id
+    file_type = query.matches[0].group(1)
+
+    file_types = {
+        "document": ["doc", "docx"],
+        "video": ["mp4", "avi", "mkv", "mov", "wmv"],
+        "audio": ["mp3", "wav", "aac", "flac"],
+        "image": ["jpg", "png", "gif", "bmp", "svg"],
+        "zip": ["zip", "rar", "tar", "7z"],
+    }
+
+    files = []
+    for ext in file_types[file_type]:
+        ext_files, next_offset, total = await get_bad_files(ext, offset=0)
+        files.extend(ext_files)
+
+    total = len(files)
+
+    await query.message.edit_text(
+        text=f"<b>Are you sure you want to delete {total} {file_type} files?</b>",
+        reply_markup=InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton("YES", callback_data=f"delete_confirm_{file_type}"),
+                    InlineKeyboardButton("CANCEL", callback_data="delete_cancel"),
+                ]
+            ]
+        ),
+    )
+    await query.answer()
+
+
+@Client.on_callback_query(filters.regex("^delete_confirm_(.*)$"))
+async def handle_confirm_file_click(bot, query):
+    chat_id = query.message.chat.id
+    file_type = query.matches[0].group(1)
+
+    file_types = {
+        "document": ["doc", "docx"],
+        "video": ["mp4", "avi", "mkv", "mov", "wmv"],
+        "audio": ["mp3", "wav", "aac", "flac"],
+        "image": ["jpg", "png", "gif", "bmp", "svg"],
+        "zip": ["zip", "rar", "tar", "7z"],
+    }
+
+    files = []
+    for ext in file_types[file_type]:
+        ext_files, next_offset, total = await get_bad_files(ext, offset=0)
+        files.extend(ext_files)
+
+    total = len(files)
+
+    k = await bot.send_message(chat_id, text=f"<b>Deleting {total} {file_type} files... Please wait...</b>")
+
+    deleted = 0
+    for file in files:
+        file_id = file.file_id
+        result = await Media.collection.delete_one({"_id": file_id})
+        if result.deleted_count:
+            logger.info(f"{file_type.capitalize()} Found! Successfully deleted from the database.")
+            deleted += 1
+
+    deleted = str(deleted)
+    await k.edit_text(text=f"<b>Successfully deleted {deleted} out of {total} {file_type} files.</b>")            
+            
 
 @Client.on_callback_query()
 async def cb_handler(client: Client, query: CallbackQuery):
