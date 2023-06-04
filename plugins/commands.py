@@ -602,10 +602,10 @@ async def delete_file_type(bot, message):
 
 @Client.on_callback_query(filters.regex("^delete_(file|video|audio|zip)$"))
 async def handle_file_type_click(bot, query):
-    file_type = query.data.split("_")[1]
     chat_id = query.message.chat.id
+    file_type = query.data.replace("delete_", "")
 
-    files, next_offset, total = await get_bad_files(file_type, offset=0)
+    files, total = await get_bad_files(file_type)
 
     await query.message.edit_text(
         text=f"<b>Are you sure you want to delete {total} {file_type}s?</b>",
@@ -614,21 +614,21 @@ async def handle_file_type_click(bot, query):
     await query.answer()
 
 
-@Client.on_callback_query(filters.regex("^delete_confirm_.*$"))
-async def handle_confirmation_click(bot, query):
-    file_type = query.data.split("_")[2]
+@Client.on_callback_query(filters.regex("^delete_confirm_(file|video|audio|zip)$"))
+async def handle_confirm_file_click(bot, query):
     chat_id = query.message.chat.id
+    file_type = query.data.replace("delete_confirm_", "")
 
-    files, next_offset, total = await get_bad_files(file_type, offset=0)
+    files, total = await get_bad_files(file_type)
 
     k = await bot.send_message(chat_id, text=f"<b>Deleting {total} {file_type}s... Please wait...</b>")
 
     deleted = 0
     for file in files:
-        file_ids = file.file_id
-        result = await Media.collection.delete_one({'_id': file_ids})
+        file_id = file['_id']
+        result = await delete_file(file_id)
         if result.deleted_count:
-            logger.info(f"{file_type.capitalize()} File Found! Successfully deleted from the database.")
+            logger.info(f"{file_type.capitalize()} Found! Successfully deleted from the database.")
             deleted += 1
 
     deleted = str(deleted)
@@ -640,6 +640,18 @@ async def handle_cancel_click(bot, query):
     await query.message.edit_text(text="<b>Deletion canceled.</b>")
 
 
+async def get_bad_files(file_type):
+    # Query the database for files of the specified type
+    collection = db[file_type]
+    files = await collection.find().to_list(length=None)
+    total = len(files)
+    return files, total
+
+
+async def delete_file(file_id):
+    # Delete the file from the corresponding collection in the database
+    result = await db['your_collection_name'].delete_one({'_id': file_id})
+    return result
 
 
 
