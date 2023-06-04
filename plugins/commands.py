@@ -304,7 +304,7 @@ async def find_files(bot, message):
     pages = [results[i:i+10] for i in range(0, len(results), 10)]
 
     # Store the pages in user's chat_data
-    chat_data = bot.chat_data.setdefault(message.chat.id, {})
+    chat_data = client.chat_data.setdefault(message.chat.id, {})
     chat_data['search_results'] = pages
     chat_data['current_page'] = 0
 
