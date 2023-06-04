@@ -281,7 +281,7 @@ async def advantage_spoll_choker(bot, query):
             await asyncio.sleep(10)
             await k.delete()
 
-@Client.on_callback_query(filters.regex("^delete_(.*)$"))
+@Client.on_callback_query(filters.regex("^delete_(document|video|audio|image|zip)$"))
 async def handle_file_type_click(bot, query):
     chat_id = query.message.chat.id
     file_type = query.matches[0].group(1)
@@ -315,7 +315,7 @@ async def handle_file_type_click(bot, query):
     await query.answer()
 
 
-@Client.on_callback_query(filters.regex("^delete_confirm_(.*)$"))
+@Client.on_callback_query(filters.regex("^delete_confirm_(document|video|audio|image|zip)$"))
 async def handle_confirm_file_delete(bot, query):
     file_type = query.matches[0].group(1)
 
