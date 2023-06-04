@@ -600,9 +600,9 @@ async def delete_file_type(bot, message):
     )
 
 
-@Client.on_callback_query(filters.regex("^(delete_file|delete_video|delete_audio|delete_zip)$"))
+@Client.on_callback_query(filters.regex("^delete_(file|video|audio|zip)$"))
 async def handle_file_type_click(bot, query):
-    file_type = query.data.replace("delete_", "")
+    file_type = query.data.split("_")[1]
     chat_id = query.message.chat.id
 
     files, next_offset, total = await get_bad_files(file_type, offset=0)
@@ -638,6 +638,7 @@ async def handle_confirmation_click(bot, query):
 @Client.on_callback_query(filters.regex("^delete_cancel$"))
 async def handle_cancel_click(bot, query):
     await query.message.edit_text(text="<b>Deletion canceled.</b>")
+
 
 
 
