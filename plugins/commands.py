@@ -584,14 +584,17 @@ async def cancel_delete(client, callback_query):
 async def delete_file_type(bot, message):
     btn = [
         [
-            InlineKeyboardButton("File", callback_data="delete_file"),
+            InlineKeyboardButton("Document", callback_data="delete_document"),
             InlineKeyboardButton("Video", callback_data="delete_video"),
         ],
         [
             InlineKeyboardButton("Audio", callback_data="delete_audio"),
-            InlineKeyboardButton("Zip", callback_data="delete_zip"),
+            InlineKeyboardButton("Image", callback_data="delete_image"),
         ],
-        [InlineKeyboardButton("CANCEL", callback_data="delete_cancel")],
+        [
+            InlineKeyboardButton("Zip", callback_data="delete_zip"),
+            InlineKeyboardButton("CANCEL", callback_data="delete_cancel"),
+        ],
     ]
 
     await message.reply_text(
@@ -600,59 +603,9 @@ async def delete_file_type(bot, message):
     )
 
 
-@Client.on_callback_query(filters.regex("^delete_(file|video|audio|zip)$"))
-async def handle_file_type_click(bot, query):
-    chat_id = query.message.chat.id
-    file_type = query.data.replace("delete_", "")
-
-    files, total = await get_bad_files(file_type)
-
-    await query.message.edit_text(
-        text=f"<b>Are you sure you want to delete {total} {file_type}s?</b>",
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("YES", callback_data=f"delete_confirm_{file_type}"), InlineKeyboardButton("CANCEL", callback_data="delete_cancel")]]),
-    )
-    await query.answer()
-
-
-@Client.on_callback_query(filters.regex("^delete_confirm_(file|video|audio|zip)$"))
-async def handle_confirm_file_click(bot, query):
-    chat_id = query.message.chat.id
-    file_type = query.data.replace("delete_confirm_", "")
-
-    files, total = await get_bad_files(file_type)
-
-    k = await bot.send_message(chat_id, text=f"<b>Deleting {total} {file_type}s... Please wait...</b>")
-
-    deleted = 0
-    for file in files:
-        file_id = file['_id']
-        result = await delete_file(file_id)
-        if result.deleted_count:
-            logger.info(f"{file_type.capitalize()} Found! Successfully deleted from the database.")
-            deleted += 1
-
-    deleted = str(deleted)
-    await k.edit_text(text=f"<b>Successfully deleted {deleted} out of {total} {file_type}s.</b>")
-
-
 @Client.on_callback_query(filters.regex("^delete_cancel$"))
 async def handle_cancel_click(bot, query):
     await query.message.edit_text(text="<b>Deletion canceled.</b>")
-
-
-async def get_bad_files(file_type):
-    # Query the database for files of the specified type
-    collection = db[file_type]
-    files = await collection.find().to_list(length=None)
-    total = len(files)
-    return files, total
-
-
-async def delete_file(file_id):
-    # Delete the file from the corresponding collection in the database
-    result = await db['your_collection_name'].delete_one({'_id': file_id})
-    return result
-
 
 
 
