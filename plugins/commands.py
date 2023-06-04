@@ -584,14 +584,14 @@ async def cancel_delete(client, callback_query):
 async def delete_file_type(bot, message):
     btn = [
         [
-            InlineKeyboardButton("File", callback_data="file"),
-            InlineKeyboardButton("Video", callback_data="video"),
+            InlineKeyboardButton("File", callback_data="delete_file"),
+            InlineKeyboardButton("Video", callback_data="delete_video"),
         ],
         [
-            InlineKeyboardButton("Audio", callback_data="audio"),
-            InlineKeyboardButton("Zip", callback_data="zip"),
+            InlineKeyboardButton("Audio", callback_data="delete_audio"),
+            InlineKeyboardButton("Zip", callback_data="delete_zip"),
         ],
-        [InlineKeyboardButton("CANCEL", callback_data="cancel")],
+        [InlineKeyboardButton("CANCEL", callback_data="delete_cancel")],
     ]
 
     await message.reply_text(
@@ -600,23 +600,23 @@ async def delete_file_type(bot, message):
     )
 
 
-@Client.on_callback_query(filters.regex("^(file|video|audio|zip)$"))
+@Client.on_callback_query(filters.regex("^(delete_file|delete_video|delete_audio|delete_zip)$"))
 async def handle_file_type_click(bot, query):
-    file_type = query.data
+    file_type = query.data.replace("delete_", "")
     chat_id = query.message.chat.id
 
     files, next_offset, total = await get_bad_files(file_type, offset=0)
 
     await query.message.edit_text(
         text=f"<b>Are you sure you want to delete {total} {file_type}s?</b>",
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("YES", callback_data=f"confirm_{file_type}"), InlineKeyboardButton("CANCEL", callback_data="cancel")]]),
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("YES", callback_data=f"delete_confirm_{file_type}"), InlineKeyboardButton("CANCEL", callback_data="delete_cancel")]]),
     )
     await query.answer()
 
 
-@Client.on_callback_query(filters.regex("^confirm_.*$"))
+@Client.on_callback_query(filters.regex("^delete_confirm_.*$"))
 async def handle_confirmation_click(bot, query):
-    file_type = query.data.split("_")[1]
+    file_type = query.data.split("_")[2]
     chat_id = query.message.chat.id
 
     files, next_offset, total = await get_bad_files(file_type, offset=0)
@@ -635,10 +635,13 @@ async def handle_confirmation_click(bot, query):
     await k.edit_text(text=f"<b>Successfully deleted {deleted} out of {total} {file_type}s.</b>")
 
 
-@Client.on_callback_query(filters.regex("^cancel$"))
+@Client.on_callback_query(filters.regex("^delete_cancel$"))
 async def handle_cancel_click(bot, query):
     await query.message.edit_text(text="<b>Deletion canceled.</b>")
-    
+
+
+
+
 
     
 @Client.on_message(filters.command('settings'))
