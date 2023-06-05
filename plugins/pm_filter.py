@@ -806,7 +806,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         await query.message.edit_text(
             text=f"<b>Successfully deleted {deleted} {file_type.capitalize()} files.</b>",
             reply_markup=InlineKeyboardMarkup(btn)
-
+        )
     elif query.data == "cancel_deletefiles":
         await query.message.reply_text("<b>☑️ File deletion canceled.</b>")
 
