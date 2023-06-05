@@ -284,8 +284,9 @@ async def find_files(client, message):
     search_query = " ".join(message.command[1:])  # Extract the search query from the command
 
     if not search_query:
-        await message.reply_text("✨ Please provide a name.\n\nExample: /findfiles Kantara.")
+        await callback_query.message.edit_text("✨ Please provide a name.\n\nExample: /findfiles Kantara.")
         return
+
 
     # Build the MongoDB query to search for files
     query = {
@@ -295,28 +296,32 @@ async def find_files(client, message):
     # Fetch the matching files from the database
     results = await Media.collection.find(query).to_list(length=None)
 
-    if results:
-        result_message = f'✨ {len(results)} files found matching the search query "{search_query}" in the database:\n\n'
+    if len(results) > 0:
+        confirmation_message = f'✨ {len(results)} files found matching the search query "{search_query}" in the database:\n\n'
+        starting_query = {
+            'file_name': {"$regex": f"^{re.escape(search_query)}", "$options": "i"}
+        }
+        starting_results = await Media.collection.find(starting_query).to_list(length=None)
+        confirmation_message += f'✨ {len(starting_results)} files found starting with "{search_query}" in the database.\n\n'
+        confirmation_message += '✨ Please select the option for easier searching:'
+        
+        keyboard = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton("🌟 Find Related Name Files", callback_data=f"related_files:1:{search_query}")
+                ],
+                [
+                    InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:1:{search_query}")
+                ],
+                [
+                    InlineKeyboardButton("❌ Cancel", callback_data="cancel")
+                ]
+            ]
+        )
+
+        await message.reply_text(confirmation_message, reply_markup=keyboard)
     else:
-        result_message = f'✨ No files found matching the search query "{search_query}" in the database'
-        await message.reply_text(result_message, quote=True)
-        return
-
-    buttons = [
-        [
-            InlineKeyboardButton("🌟 Find Related Name Files", callback_data=f"related_files:1:{search_query}")
-        ],
-        [
-            InlineKeyboardButton("🌟 Find Starting Name Files", callback_data=f"starting_files:1:{search_query}")
-        ],
-        [
-            InlineKeyboardButton("❌ Cancel", callback_data="cancel_find")
-        ]
-    ]
-
-    keyboard = InlineKeyboardMarkup(buttons)
-
-    await message.reply_text(result_message, quote=True, reply_markup=keyboard)
+        await message.reply_text(f'😎 No files found matching the search query "{search_query}" in the database')
 
 
 @Client.on_callback_query(filters.regex('^related_files'))
