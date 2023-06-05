@@ -354,7 +354,7 @@ async def find_related_files(client, callback_query):
     if page < num_pages:
         buttons.append(InlineKeyboardButton("➡️ Next", callback_data=f"related_files:{page+1}:{search_query}"))
 
-    buttons.append(InlineKeyboardButton("🔚 Cancel", callback_data=f"cencel_find"))
+    buttons.append(InlineKeyboardButton("🔚 Cancel", callback_data=f"cancel_find"))
 
     # Create button groups with two buttons each
     button_groups = [buttons[i:i + 2] for i in range(0, len(buttons), 2)]
@@ -395,7 +395,7 @@ async def find_starting_files(client, callback_query):
     if page < num_pages:
         buttons.append(InlineKeyboardButton("➡️ Next", callback_data=f"related_files:{page+1}:{search_query}"))
 
-    buttons.append(InlineKeyboardButton("🔚 Cancel", callback_data=f"cencel_find"))
+    buttons.append(InlineKeyboardButton("🔚 Cancel", callback_data=f"cancel_find"))
 
     # Create button groups with two buttons each
     button_groups = [buttons[i:i + 2] for i in range(0, len(buttons), 2)]
