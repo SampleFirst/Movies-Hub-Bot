@@ -672,7 +672,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="home_deletefiles")
                 ]
             ]
-            await query.message.reply_text(
+            await query.message.edit_text(
                 text=f"<b>✨ {total} PreDVD files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
@@ -691,7 +691,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="home_deletefiles")
                 ]
             ]
-            await query.message.reply_text(
+            await query.message.edit_text(
                 text=f"<b>✨ {total} CamRip files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
@@ -710,7 +710,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="home_deletefiles")
                 ]
             ]
-            await query.message.reply_text(
+            await query.message.edit_text(
                 text=f"<b>✨ {total} HDCam files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
@@ -729,7 +729,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="home_deletefiles")
                 ]
             ]
-            await query.message.reply_text(
+            await query.message.edit_text(
                 text=f"<b>✨ {total} S-Print files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
@@ -748,7 +748,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="home_deletefiles")
                 ]
             ]
-            await query.message.reply_text(
+            await query.message.edit_text(
                 text=f"<b>✨ {total} HDTVrip files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
@@ -766,7 +766,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 logger.info(f'{file_type} File Found! Successfully deleted from the database.')
             deleted += 1
         deleted = str(deleted)
-        await query.message.reply_text(f"<b>Successfully deleted {deleted} {file_type.capitalize()} files.</b>")
+        await query.message.edit_text(f"<b>Successfully deleted {deleted} {file_type.capitalize()} files.</b>")
 
     elif query.data == "cancel_deletefiles":
         await query.message.reply_text("<b>☑️ File deletion canceled.</b>")
