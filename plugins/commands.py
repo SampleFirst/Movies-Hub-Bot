@@ -404,50 +404,6 @@ async def cancel_find(client, callback_query):
     await callback_query.answer()
 
 
-@Client.on_callback_query(filters.regex('^findfiles$'))
-async def handle_find_files_callback(client, callback_query):
-    await callback_query.answer()
-    search_query = " ".join(callback_query.message.text.split()[1:])  # Extract the search query from the message text
-
-    if not search_query:
-        await callback_query.message.edit_text("✨ Please provide a name.\n\nExample: /findfiles Kantara.")
-        return
-
-    # Build the MongoDB query to search for files
-    query = {
-        'file_name': {"$regex": f".*{re.escape(search_query)}.*", "$options": "i"}
-    }
-
-    # Fetch the matching files from the database
-    results = await Media.collection.find(query).to_list(length=None)
-
-    if len(results) > 0:
-        confirmation_message = f'✨ {len(results)} files found matching the search query "{search_query}" in the database:\n\n'
-        starting_query = {
-            'file_name': {"$regex": f"^{re.escape(search_query)}", "$options": "i"}
-        }
-        starting_results = await Media.collection.find(starting_query).to_list(length=None)
-        confirmation_message += f'✨ {len(starting_results)} files found starting with "{search_query}" in the database.\n\n'
-        confirmation_message += '✨ Please select the option for easier searching:'
-
-        keyboard = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton("🌟 Find Related Name Files", callback_data="related_files")
-                ],
-                [
-                    InlineKeyboardButton("🌟 Find Starting Name Files", callback_data="starting_files")
-                ],
-                [
-                    InlineKeyboardButton("❌ Cancel", callback_data="cancel_find")
-                ]
-            ]
-        )
-
-        await callback_query.message.edit_text(confirmation_message, reply_markup=keyboard)
-    else:
-        await callback_query.message.edit_text(f'😎 No files found matching the search query "{search_query}" in the database')
-        
 
 
 
