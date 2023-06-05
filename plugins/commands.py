@@ -354,14 +354,13 @@ async def find_related_files(client, callback_query):
     if page < num_pages:
         buttons.append(InlineKeyboardButton("➡️ Next", callback_data=f"related_files:{page+1}:{search_query}"))
 
-    keyboard = InlineKeyboardMarkup([buttons])
+    buttons.append(InlineKeyboardButton("🔚 Cancel", callback_data=f"cencel_find"))
 
-    home_button = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("🔚 Cencel", callback_data="cancel_find")]]
-    )
+    # Create button groups with two buttons each
+    button_groups = [buttons[i:i + 2] for i in range(0, len(buttons), 2)]
+    keyboard = InlineKeyboardMarkup(button_groups)
 
     await callback_query.message.edit_text(result_message, reply_markup=keyboard)
-    await callback_query.message.reply_text("Select an option:", reply_markup=home_button)
     await callback_query.answer()
 
 
@@ -396,14 +395,13 @@ async def find_starting_files(client, callback_query):
     if page < num_pages:
         buttons.append(InlineKeyboardButton("➡️ Next", callback_data=f"related_files:{page+1}:{search_query}"))
 
-    keyboard = InlineKeyboardMarkup([buttons])
+    buttons.append(InlineKeyboardButton("🔚 Cancel", callback_data=f"cencel_find"))
 
-    home_button = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")]]
-    )
+    # Create button groups with two buttons each
+    button_groups = [buttons[i:i + 2] for i in range(0, len(buttons), 2)]
+    keyboard = InlineKeyboardMarkup(button_groups)
 
     await callback_query.message.edit_text(result_message, reply_markup=keyboard)
-    await callback_query.message.reply_text("Select an option:", reply_markup=home_button)
     await callback_query.answer()
 
  
