@@ -35,6 +35,7 @@ logger.setLevel(logging.ERROR)
 BUTTONS = {}
 SPELL_CHECK = {}
 FILTER_MODE = {}
+back_stack = []
 
 @Client.on_message(filters.command('autofilter') & filters.user(ADMINS))
 async def fil_mod(client, message): 
@@ -676,6 +677,11 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 text=f"<b>✨ {total} PreDVD files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
+            # Save the current page to the back stack
+            back_stack.append({
+                'text': query.message.text,
+                'reply_markup': query.message.reply_markup
+            })
         else:
             await query.message.reply_text("<b>❎ No PreDVD files found for deletion.</b>")
 
@@ -695,6 +701,11 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 text=f"<b>✨ {total} CamRip files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
+            # Save the current page to the back stack
+            back_stack.append({
+                'text': query.message.text,
+                'reply_markup': query.message.reply_markup
+            })
         else:
               await query.message.reply_text("<b>❎ No CamRip files found for deletion.</b>")
 
@@ -714,6 +725,11 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 text=f"<b>✨ {total} HDCam files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
+            # Save the current page to the back stack
+            back_stack.append({
+                'text': query.message.text,
+                'reply_markup': query.message.reply_markup
+            })
         else:
             await query.message.reply_text("<b>❎ No HDCam files found for deletion.</b>")
 
@@ -733,6 +749,11 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 text=f"<b>✨ {total} S-Print files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
+            # Save the current page to the back stack
+            back_stack.append({
+                'text': query.message.text,
+                'reply_markup': query.message.reply_markup
+            })
         else:
             await query.message.reply_text("<b>❎ No S-Print files found for deletion.</b>")
     
@@ -752,6 +773,11 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 text=f"<b>✨ {total} HDTVrip files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
+            # Save the current page to the back stack
+            back_stack.append({
+                'text': query.message.text,
+                'reply_markup': query.message.reply_markup
+            })
         else:
             await query.message.reply_text("<b>❎ No HDTVrip files found for deletion.</b>")
    
@@ -771,7 +797,16 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "cancel_deletefiles":
         await query.message.reply_text("<b>☑️ File deletion canceled.</b>")
 
-
+    elif query.data == "back_deletemenu":
+        # Check if there are any pages in the back stack
+        if back_stack:
+            previous_page = back_stack.pop()
+            await query.message.edit_text(
+                text=previous_page['text'],
+                reply_markup=previous_page['reply_markup']
+            )
+        else:
+            await query.message.edit_text("<b>⚠️ Cannot go back further. You are already on the main menu.</b>")
     
 
     
