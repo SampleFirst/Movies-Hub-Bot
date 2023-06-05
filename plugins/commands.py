@@ -353,7 +353,7 @@ async def find_related_files(client, callback_query):
     if page < num_pages:
         buttons.append(InlineKeyboardButton("➡️ Next", callback_data=f"related_files:{page+1}:{search_query}"))
 
-    buttons.append(InlineKeyboardButton("🔙 Back", callback_data="findfiles"))
+    buttons.append(InlineKeyboardButton("🏠 Home", callback_data="ff1"))
 
     keyboard = InlineKeyboardMarkup([buttons])
 
@@ -390,7 +390,7 @@ async def find_starting_files(client, callback_query):
     if page < num_pages:
         buttons.append(InlineKeyboardButton("➡️ Next", callback_data=f"starting_files:{page+1}:{search_query}"))
 
-    buttons.append(InlineKeyboardButton("🔙 Back", callback_data="findfiles"))
+    buttons.append(InlineKeyboardButton("🏠 Home", callback_data="ff1"))
     
     keyboard = InlineKeyboardMarkup([buttons])
 
