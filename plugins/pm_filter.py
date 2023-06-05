@@ -661,90 +661,137 @@ async def cb_handler(client: Client, query: CallbackQuery):
             protect_content=True if ident == 'checksubp' else False
         )
     elif query.data == "predvd":
-        k = await client.send_message(chat_id=query.message.chat.id, text="<b>Deleting PreDVDs... Please wait...</b>")
-        files, next_offset, total = await get_bad_files(
-                                                  'predvd',
-                                                  offset=0)
-        deleted = 0
-        for file in files:
-            file_ids = file.file_id
-            result = await Media.collection.delete_one({
-                '_id': file_ids,
-            })
-            if result.deleted_count:
-                logger.info('PreDVD File Found ! Successfully deleted from database.')
-            deleted+=1
-        deleted = str(deleted)
-        await k.edit_text(text=f"<b>Successfully deleted {deleted} PreDVD files.</b>")
+         files, next_offset, total = await get_bad_files('predvd', offset=0)
+         if total > 0:
+             confirm_btns = [
+                 [
+                     InlineKeyboardButton("☑️ Confirm Deletion", callback_data="confirm_delete predvd"),
+                     InlineKeyboardButton("❎Cancel", callback_data="cancel_deletefiles")
+                 ],
+                 [
+                     InlineKeyboardButton("🏠 Home", callback_data="home_deletefiles")
+                 ]
+             ]
+             await query.message.reply_text(
+                 text=f"<b>✨ {total} PreDVD files detected. Are you sure you want to delete them?</b>",
+                 reply_markup=InlineKeyboardMarkup(confirm_btns)
+             )
+         else:
+             await query.message.reply_text("<b>❎ No PreDVD files found for deletion.</b>")
 
     elif query.data == "camrip":
-        k = await client.send_message(chat_id=query.message.chat.id, text="<b>Deleting CamRips... Please wait...</b>")
-        files, next_offset, total = await get_bad_files(
-                                                  'camrip',
-                                                  offset=0)
-        deleted = 0
-        for file in files:
-            file_ids = file.file_id
-            result = await Media.collection.delete_one({
-                '_id': file_ids,
-            })
-            if result.deleted_count:
-                logger.info('CamRip File Found ! Successfully deleted from database.')
-            deleted+=1
-        deleted = str(deleted)
-        await k.edit_text(text=f"<b>Successfully deleted {deleted} CamRip files.</b>")
+         files, next_offset, total = await get_bad_files('camrip', offset=0)
+         if total > 0:
+              confirm_btns = [
+                  [
+                      InlineKeyboardButton("☑️ Confirm Deletion", callback_data="confirm_delete camrip"),
+                      InlineKeyboardButton("❎ Cancel", callback_data="cancel_deletefiles")
+                  ],
+                  [
+                      InlineKeyboardButton("🏠 Home", callback_data="home_deletefiles")
+                  ]
+              ]
+              await query.message.reply_text(
+                  text=f"<b>✨ {total} CamRip files detected. Are you sure you want to delete them?</b>",
+                  reply_markup=InlineKeyboardMarkup(confirm_btns)
+              )
+         else:
+             await query.message.reply_text("<b>❎ No CamRip files found for deletion.</b>")
 
     elif query.data == "hdcam":
-        k = await client.send_message(chat_id=query.message.chat.id, text="<b>Deleting HDCams... Please wait...</b>")
-        files, next_offset, total = await get_bad_files(
-                                                  'hdcam',
-                                                  offset=0)
-        deleted = 0
-        for file in files:
-            file_ids = file.file_id
-            result = await Media.collection.delete_one({
-                '_id': file_ids,
-            })
-            if result.deleted_count:
-                logger.info('HDCam File Found ! Successfully deleted from database.')
-            deleted+=1
-        deleted = str(deleted)
-        await k.edit_text(text=f"<b>Successfully deleted {deleted} HDCam files.</b>")
+         files, next_offset, total = await get_bad_files('hdcam', offset=0)
+         if total > 0:
+              confirm_btns = [
+                  [
+                      InlineKeyboardButton("☑️ Confirm Deletion", callback_data="confirm_delete hdcam"),
+                      InlineKeyboardButton("❎ Cancel", callback_data="cancel_deletefiles")
+                  ],
+                  [
+                      InlineKeyboardButton("🏠 Home", callback_data="home_deletefiles")
+                  ]
+              ]
+              await query.message.reply_text(
+                  text=f"<b>✨ {total} HDCam files detected. Are you sure you want to delete them?</b>",
+                  reply_markup=InlineKeyboardMarkup(confirm_btns)
+              )
+          else:
+              await query.message.reply_text("<b>❎ No HDCam files found for deletion.</b>")
 
     elif query.data == "s-print":
-        k = await client.send_message(chat_id=query.message.chat.id, text="<b>Deleting S-Prints... Please wait...</b>")
-        files, next_offset, total = await get_bad_files(
-                                                  's-print',
-                                                  offset=0)
-        deleted = 0
-        for file in files:
-            file_ids = file.file_id
-            result = await Media.collection.delete_one({
-                '_id': file_ids,
-            })
-            if result.deleted_count:
-                logger.info('S-Print File Found ! Successfully deleted from database.')
-            deleted+=1
-        deleted = str(deleted)
-        await k.edit_text(text=f"<b>Successfully deleted {deleted} S-Print files.</b>")
+         files, next_offset, total = await get_bad_files('s-print', offset=0)
+         if total > 0:
+              confirm_btns = [
+                  [
+                      InlineKeyboardButton("☑️ Confirm Deletion", callback_data="confirm_delete s-print"),
+                      InlineKeyboardButton("❎ Cancel", callback_data="cancel_deletefiles")
+                  ],
+                  [
+                      InlineKeyboardButton("🏠 Home", callback_data="home_deletefiles")
+                  ]
+              ]
+              await query.message.reply_text(
+                  text=f"<b>✨ {total} S-Print files detected. Are you sure you want to delete them?</b>",
+                  reply_markup=InlineKeyboardMarkup(confirm_btns)
+              )
+          else:
+              await query.message.reply_text("<b>❎ No S-Print files found for deletion.</b>")
     
     elif query.data == "hdtvrip":
-        k = await client.send_message(chat_id=query.message.chat.id, text="<b>Deleting HDTVRip... Please wait...</b>")
-        files, next_offset, total = await get_bad_files(
-                                                  'hdtvrip',
-                                                  offset=0)
-        deleted = 0
-        for file in files:
-            file_ids = file.file_id
-            result = await Media.collection.delete_one({
-                '_id': file_ids,
-            })
-            if result.deleted_count:
-                logger.info('HDTVRip File Found ! Successfully deleted from database.')
-            deleted+=1
-        deleted = str(deleted)
-        await k.edit_text(text=f"<b>Successfully deleted {deleted} HDTVRip files.</b>")
+         files, next_offset, total = await get_bad_files('hdtvrip', offset=0)
+         if total > 0:
+              confirm_btns = [
+                  [
+                      InlineKeyboardButton("☑️ Confirm Deletion", callback_data="confirm_delete hdtvrip"),
+                      InlineKeyboardButton("❎ Cancel", callback_data="cancel_deletefiles")
+                  ],
+                  [
+                      InlineKeyboardButton("🏠 Home", callback_data="home_deletefiles")
+                  ]
+              ]
+              await query.message.reply_text(
+                  text=f"<b>✨ {total} HDTVrip files detected. Are you sure you want to delete them?</b>",
+                  reply_markup=InlineKeyboardMarkup(confirm_btns)
+              )
+          else:
+              await query.message.reply_text("<b>❎ No HDTVrip files found for deletion.</b>")
     
+    elif query.data.startswith("confirm_delete"):
+         file_type = query.data.split()[1]
+         files, next_offset, total = await get_bad_files(file_type, offset=0)
+         deleted = 0
+         for file in files:
+             file_ids = file.file_id
+             result = await Media.collection.delete_one({'_id': file_ids})
+             if result.deleted_count:
+                  logger.info(f'{file_type} File Found! Successfully deleted from the database.')
+             deleted += 1
+         deleted = str(deleted)
+         await query.message.reply_text(f"<b>Successfully deleted {deleted} {file_type.capitalize()} files.</b>")
+
+    elif query.data == "cancel_deletefiles":
+         await query.message.reply_text("<b>☑️ File deletion canceled.</b>")
+
+
+    elif query.data == "home_deletefiles":
+    # Handle going back to the home page
+    btn = [
+        [
+            InlineKeyboardButton("Delete PreDVDs", callback_data="predvd"),
+            InlineKeyboardButton("Delete CamRips", callback_data="camrip")
+        ],
+        [
+            InlineKeyboardButton("Delete HDCams", callback_data="hdcam"),
+            InlineKeyboardButton("Delete S-Prints", callback_data="s-print")
+        ],
+        [
+            InlineKeyboardButton("Delete HDTVRip", callback_data="hdtvrip"),
+            InlineKeyboardButton("Delete Cancel", callback_data="cancel_delete")
+        ]
+    ]
+    await query.message.edit_text(
+        text="<b>✨ Select the type of files you want to delete!\n\n✨ This will delete 100 files from the database for the selected type.</b>",
+        reply_markup=InlineKeyboardMarkup(btn)
+    )
     
         
     elif query.data == "pages":
