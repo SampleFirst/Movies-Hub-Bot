@@ -810,7 +810,24 @@ async def deletemultiplefiles(bot, message):
         reply_markup=InlineKeyboardMarkup(btn)
     )
 
-
+@Client.on_callback_query(filters.command("home_deletefiles") & filters.user(ADMINS))
+async def handle_home_deletefiles(bot, query):
+    btn = [
+        [
+            InlineKeyboardButton("Delete PreDVDs", callback_data="predvd"),
+            InlineKeyboardButton("Delete CamRips", callback_data="camrip")
+        ],
+        [
+            InlineKeyboardButton("Delete HDCams", callback_data="hdcam"),
+            InlineKeyboardButton("Delete S-Prints", callback_data="s-print")
+        ]
+    ]
+    await query.message.reply_text(
+        text="<b>Select the type of files you want to delete!\n\nThis will delete 100 files from the database for the selected type.</b>",
+        reply_markup=InlineKeyboardMarkup(btn)
+    )
+    
+    
 @Client.on_message(filters.command("send") & filters.user(ADMINS))
 async def send_msg(bot, message):
     if message.reply_to_message:
