@@ -729,7 +729,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         await k.edit_text(text=f"<b>Successfully deleted {deleted} S-Print files.</b>")
     
     
-    elif query.data == "findfiles":
+    elif query.data == "ff1":
         await callback_query.answer()
         search_query = " ".join(callback_query.message.text.split()[1:])  # Extract the search query from the message text
 
