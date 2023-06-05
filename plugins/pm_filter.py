@@ -691,11 +691,11 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="home_deletefiles")
                 ]
             ]
-             await query.message.reply_text(
+            await query.message.reply_text(
                 text=f"<b>✨ {total} CamRip files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
-         else:
+        else:
               await query.message.reply_text("<b>❎ No CamRip files found for deletion.</b>")
 
     elif query.data == "hdcam":
