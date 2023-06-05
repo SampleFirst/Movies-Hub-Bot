@@ -358,7 +358,7 @@ async def find_related_files(client, callback_query):
     keyboard = InlineKeyboardMarkup([buttons])
 
     home_button = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("🏠 Home", callback_data=f"home:{search_query}")]]
+        [[InlineKeyboardButton("🔚 Cencel", callback_data="cancel_find")]]
     )
 
     await callback_query.message.edit_text(result_message, reply_markup=keyboard)
@@ -400,20 +400,14 @@ async def find_starting_files(client, callback_query):
     keyboard = InlineKeyboardMarkup([buttons])
 
     home_button = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("🏠 Home", callback_data=f"home:{search_query}")]]
+        [[InlineKeyboardButton("🔚 Cancel", callback_data="cancel_find")]]
     )
 
     await callback_query.message.edit_text(result_message, reply_markup=keyboard)
     await callback_query.message.reply_text("Select an option:", reply_markup=home_button)
     await callback_query.answer()
 
- @Client.on_callback_query(filters.regex('^home'))
-async def go_back_to_home(client, callback_query):
-    search_query = callback_query.data.split(":")[1]
-    command = f'/findfiles {search_query}'
-    await client.send_message(callback_query.message.chat.id, command)
-    await callback_query.answer()   
-    
+ 
 
 @Client.on_callback_query(filters.regex('^cancel_find'))
 async def cancel_find(client, callback_query):
