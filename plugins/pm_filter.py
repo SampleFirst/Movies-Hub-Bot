@@ -772,8 +772,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
         await query.message.reply_text("<b>☑️ File deletion canceled.</b>")
 
 
-    elif query.data == "home_deletefiles":
-    # Handle going back to the home page
+    @Client.on_callback_query(filters.command("home_deletefiles") & filters.user(ADMINS))
+async def handle_home_deletefiles(bot, query):
     btn = [
         [
             InlineKeyboardButton("Delete PreDVDs", callback_data="predvd"),
@@ -782,16 +782,13 @@ async def cb_handler(client: Client, query: CallbackQuery):
         [
             InlineKeyboardButton("Delete HDCams", callback_data="hdcam"),
             InlineKeyboardButton("Delete S-Prints", callback_data="s-print")
-        ],
-        [
-            InlineKeyboardButton("Delete HDTVRip", callback_data="hdtvrip"),
-            InlineKeyboardButton("Delete Cancel", callback_data="cancel_delete")
         ]
     ]
-    await query.message.edit_text(
-        text="<b>✨ Select the type of files you want to delete!\n\n✨ This will delete 100 files from the database for the selected type.</b>",
+    await query.message.reply_text(
+        text="<b>Select the type of files you want to delete!\n\nThis will delete 100 files from the database for the selected type.</b>",
         reply_markup=InlineKeyboardMarkup(btn)
     )
+
     
         
     elif query.data == "pages":
