@@ -869,27 +869,27 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 reply_markup=previous_page['reply_markup']
             )
         else:
-        # If no previous page, remove the back button and show the original command page
-        btn = [
-            [
-                InlineKeyboardButton("Delete PreDVDs", callback_data="predvd"),
-                InlineKeyboardButton("Delete CamRips", callback_data="camrip")
-            ],
-            [
-                InlineKeyboardButton("Delete HDCams", callback_data="hdcam"),
-                InlineKeyboardButton("Delete S-Prints", callback_data="s-print")
-            ],
-            [
-                InlineKeyboardButton("Delete HDTVRip", callback_data="hdtvrip"),
-                InlineKeyboardButton("Cancel", callback_data="cancel_deletefiles")
+            # If no previous page, remove the back button and show the original command page
+            btn = [
+                [
+                    InlineKeyboardButton("Delete PreDVDs", callback_data="predvd"),
+                    InlineKeyboardButton("Delete CamRips", callback_data="camrip")
+                ],
+                [
+                    InlineKeyboardButton("Delete HDCams", callback_data="hdcam"),
+                    InlineKeyboardButton("Delete S-Prints", callback_data="s-print")
+                ],
+                [
+                    InlineKeyboardButton("Delete HDTVRip", callback_data="hdtvrip"),
+                    InlineKeyboardButton("Cancel", callback_data="cancel_deletefiles")
+                ]
             ]
-        ]
-        await query.message.edit_text(
-            "<b>✨ Select the type of files you want to delete!\n\n✨ This will delete 100 files
+            await query.message.edit_text(
+                "<b>✨ Select the type of files you want to delete!\n\n✨ This will delete 100 files
 
- from the database for the selected type.</b>",
-            reply_markup=InlineKeyboardMarkup(btn)
-        )
+     from the database for the selected type.</b>",
+                reply_markup=InlineKeyboardMarkup(btn)
+           )
     
     
     elif query.data == "pages":
