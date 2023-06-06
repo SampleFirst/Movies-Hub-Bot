@@ -661,6 +661,14 @@ async def cb_handler(client: Client, query: CallbackQuery):
             caption=f_caption,
             protect_content=True if ident == 'checksubp' else False
         )
+    async def send_message_with_back_button(send_message_func, text, reply_markup):
+        back_btn = InlineKeyboardButton("🔙 Back", callback_data="back_deletemenu")
+        if reply_markup.inline_keyboard:
+            reply_markup.inline_keyboard.append([back_btn])
+        else:
+            reply_markup.inline_keyboard = [[back_btn]]
+        await send_message_func(text, reply_markup=reply_markup)   
+        
     elif query.data == "predvd":
         files, next_offset, total = await get_bad_files('predvd', offset=0)
         if total > 0:
@@ -673,17 +681,28 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="back_deletemenu")
                 ]
             ]
-            await query.message.edit_text(
-                text=f"<b>✨ {total} PreDVD files detected. Are you sure you want to delete them?</b>",
+            await send_message_with_back_button(
+                query.message.reply_text,
+                f"<b>✨ {total} PreDVD files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
             # Save the current page to the back stack
             back_stack.append({
-                'text': query.message.text,
+                'text': query.message.caption or query.message.text,
                 'reply_markup': query.message.reply_markup
             })
         else:
-            await query.message.reply_text("<b>❎ No PreDVD files found for deletion.</b>")
+            # Add buttons for going back and canceling
+            btn = [
+                [
+                    InlineKeyboardButton("🔙 Back", callback_data="back_deletemenu"),
+                    InlineKeyboardButton("❎ Cancel", callback_data="cancel_deletefiles")
+                ]
+            ]
+            await query.message.edit_text(
+                "<b>❎ No PreDVD files found for deletion.</b>",
+                reply_markup=InlineKeyboardMarkup(btn)
+            )
 
     elif query.data == "camrip":
         files, next_offset, total = await get_bad_files('camrip', offset=0)
@@ -697,17 +716,28 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="back_deletemenu")
                 ]
             ]
-            await query.message.edit_text(
-                text=f"<b>✨ {total} CamRip files detected. Are you sure you want to delete them?</b>",
+            await send_message_with_back_button(
+                query.message.reply_text,
+                f"<b>✨ {total} CamRip files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
             # Save the current page to the back stack
             back_stack.append({
-                'text': query.message.text,
+                'text': query.message.caption or query.message.text,
                 'reply_markup': query.message.reply_markup
             })
         else:
-              await query.message.reply_text("<b>❎ No CamRip files found for deletion.</b>")
+            # Add buttons for going back and canceling
+            btn = [
+                [
+                    InlineKeyboardButton("🔙 Back", callback_data="back_deletemenu"),
+                    InlineKeyboardButton("❎ Cancel", callback_data="cancel_deletefiles")
+                ]
+            ]
+            await query.message.edit_text(
+                "<b>❎ No CamRip files found for deletion.</b>",
+                reply_markup=InlineKeyboardMarkup(btn)
+            )
 
     elif query.data == "hdcam":
         files, next_offset, total = await get_bad_files('hdcam', offset=0)
@@ -721,17 +751,28 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="back_deletemenu")
                 ]
             ]
-            await query.message.edit_text(
-                text=f"<b>✨ {total} HDCam files detected. Are you sure you want to delete them?</b>",
+            await send_message_with_back_button(
+                query.message.reply_text,
+                f"<b>✨ {total} HDCam files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
             # Save the current page to the back stack
             back_stack.append({
-                'text': query.message.text,
+                'text': query.message.caption or query.message.text,
                 'reply_markup': query.message.reply_markup
             })
         else:
-            await query.message.reply_text("<b>❎ No HDCam files found for deletion.</b>")
+            # Add buttons for going back and canceling
+            btn = [
+                [
+                    InlineKeyboardButton("🔙 Back", callback_data="back_deletemenu"),
+                    InlineKeyboardButton("❎ Cancel", callback_data="cancel_deletefiles")
+                ]
+            ]
+            await query.message.edit_text(
+                "<b>❎ No HDCam files found for deletion.</b>",
+                reply_markup=InlineKeyboardMarkup(btn)
+            )
 
     elif query.data == "s-print":
         files, next_offset, total = await get_bad_files('s-print', offset=0)
@@ -745,17 +786,28 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="back_deletemenu")
                 ]
             ]
-            await query.message.edit_text(
-                text=f"<b>✨ {total} S-Print files detected. Are you sure you want to delete them?</b>",
+            await send_message_with_back_button(
+                query.message.reply_text,
+                f"<b>✨ {total} S-Print files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
             # Save the current page to the back stack
             back_stack.append({
-                'text': query.message.text,
+                'text': query.message.caption or query.message.text,
                 'reply_markup': query.message.reply_markup
             })
         else:
-            await query.message.reply_text("<b>❎ No S-Print files found for deletion.</b>")
+            # Add buttons for going back and canceling
+            btn = [
+                [
+                    InlineKeyboardButton("🔙 Back", callback_data="back_deletemenu"),
+                    InlineKeyboardButton("❎ Cancel", callback_data="cancel_deletefiles")
+                ]
+            ]
+            await query.message.edit_text(
+                "<b>❎ No S-Print files found for deletion.</b>",
+                reply_markup=InlineKeyboardMarkup(btn)
+            )
     
     elif query.data == "hdtvrip":
         files, next_offset, total = await get_bad_files('hdtvrip', offset=0)
@@ -769,17 +821,28 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="back_deletemenu")
                 ]
             ]
-            await query.message.edit_text(
-                text=f"<b>✨ {total} HDTVrip files detected. Are you sure you want to delete them?</b>",
+            await send_message_with_back_button(
+                query.message.reply_text,
+                f"<b>✨ {total} HDTVrip files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
             # Save the current page to the back stack
             back_stack.append({
-                'text': query.message.text,
+                'text': query.message.caption or query.message.text,
                 'reply_markup': query.message.reply_markup
             })
         else:
-            await query.message.reply_text("<b>❎ No HDTVrip files found for deletion.</b>")
+            # Add buttons for going back and canceling
+            btn = [
+                [
+                    InlineKeyboardButton("🔙 Back", callback_data="back_deletemenu"),
+                    InlineKeyboardButton("❎ Cancel", callback_data="cancel_deletefiles")
+                ]
+            ]
+            await query.message.edit_text(
+                "<b>❎ No HDTVrip files found for deletion.</b>",
+                reply_markup=InlineKeyboardMarkup(btn)
+            )
    
     elif query.data.startswith("confirm_delete"):
         file_type = query.data.split()[1]
