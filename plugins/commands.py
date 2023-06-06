@@ -546,27 +546,41 @@ async def delete_files(client, message):
         await message.reply_text(f'😎 No files found with the name "{file_name}" in the database')
 
 
-@Client.on_callback_query(filters.regex('^delete_related'))
-async def delete_related_files(client, callback_query):
+@Client.on_callback_query(filters.regex('^delete_related') | filters.regex('^delete_starting'))
+async def delete_confirmation(client, callback_query):
     file_name = callback_query.data.split(":", 1)[1]
-    result = await Media.collection.delete_many({
-        'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
-    })
+    confirmation_message = f'⚠️ Are you sure you want to delete all files {"related" if callback_query.data.startswith("delete_related") else "starting"} with the name "{file_name}"?'
 
-    if result.deleted_count:
-        await callback_query.message.edit_text(f"✅ Deleted {result.deleted_count} files.")
-    else:
-        await callback_query.message.edit_text("❌ Deletion failed. No files deleted.")
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("🗑 Delete", callback_data=f"confirm_delete:{callback_query.data}")
+            ],
+            [
+                InlineKeyboardButton("🔙 Cancel", callback_data="cancel_delete")
+            ]
+        ]
+    )
+
+    await callback_query.message.edit_text(confirmation_message, reply_markup=keyboard)
 
 
-@Client.on_callback_query(filters.regex('^delete_starting'))
-async def delete_starting_files(client, callback_query):
-    file_name = callback_query.data.split(":", 1)[1]
-    result = await Media.collection.delete_many({
-        'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
-    })
+@Client.on_callback_query(filters.regex('^confirm_delete'))
+async def confirm_delete(client, callback_query):
+    file_name = callback_query.data.split(":", 1)[1].split(":", 1)[1]
+    delete_type = callback_query.data.split(":", 1)[0]
+    result = None
 
-    if result.deleted_count:
+    if delete_type == 'delete_related':
+        result = await Media.collection.delete_many({
+            'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
+        })
+    elif delete_type == 'delete_starting':
+        result = await Media.collection.delete_many({
+            'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
+        })
+
+    if result and result.deleted_count:
         await callback_query.message.edit_text(f"✅ Deleted {result.deleted_count} files.")
     else:
         await callback_query.message.edit_text("❌ Deletion failed. No files deleted.")
