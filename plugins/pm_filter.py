@@ -865,9 +865,11 @@ async def cb_handler(client: Client, query: CallbackQuery):
         if back_stack:
             previous_page = back_stack.pop()
             await query.message.edit_text(
-                text=previous_page['text'],
+                previous_page['text'],
                 reply_markup=previous_page['reply_markup']
             )
+        else:
+            await query.message.edit_text("<b>⚠️ Cannot go back further. You are already on the main menu.</b>")
         
     
     
