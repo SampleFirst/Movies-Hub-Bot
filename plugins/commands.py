@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 BATCH_FILES = {}
 RESULTS_PER_PAGE = 10
+back_stack = []
 
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
@@ -810,23 +811,17 @@ async def deletemultiplefiles(bot, message):
         reply_markup=InlineKeyboardMarkup(btn)
     )
 
-@Client.on_callback_query(filters.command("home_deletefiles") & filters.user(ADMINS))
-async def handle_home_deletefiles(bot, query):
-    btn = [
-        [
-            InlineKeyboardButton("Delete PreDVDs", callback_data="predvd"),
-            InlineKeyboardButton("Delete CamRips", callback_data="camrip")
-        ],
-        [
-            InlineKeyboardButton("Delete HDCams", callback_data="hdcam"),
-            InlineKeyboardButton("Delete S-Prints", callback_data="s-print")
-        ]
-    ]
-    await query.message.reply_text(
-        text="<b>Select the type of files you want to delete!\n\nThis will delete 100 files from the database for the selected type.</b>",
-        reply_markup=InlineKeyboardMarkup(btn)
-    )
+
+async def send_message_with_back_button(send_message_func, text, reply_markup):
+        back_btn = InlineKeyboardButton("🔙 Back", callback_data="back_deletemenu")
+        if reply_markup.inline_keyboard:
+            reply_markup.inline_keyboard.append([back_btn])
+        else:
+            reply_markup.inline_keyboard = [[back_btn]]
+        await send_message_func(text, reply_markup=reply_markup)       
+
     
+            
     
 @Client.on_message(filters.command("send") & filters.user(ADMINS))
 async def send_msg(bot, message):
