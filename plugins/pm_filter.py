@@ -885,11 +885,9 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 ]
             ]
             await query.message.edit_text(
-                "<b>✨ Select the type of files you want to delete!\n\n✨ This will delete 100 files
-
-     from the database for the selected type.</b>",
+                "<b>✨ Select the type of files you want to delete!\n\n✨ This will delete 100 files from the database for the selected type.</b>",
                 reply_markup=InlineKeyboardMarkup(btn)
-           )
+            )
     
     
     elif query.data == "pages":
