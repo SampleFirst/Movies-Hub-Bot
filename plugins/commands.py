@@ -6,7 +6,7 @@ from Script import script
 from pyrogram import Client, filters, enums
 from pyrogram.errors import ChatAdminRequired, FloodWait
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from database.ia_filterdb import Media, get_file_details, unpack_new_file_id
+from database.ia_filterdb import Media, get_file_details, get_file_count, unpack_new_file_id
 from database.users_chats_db import db
 from info import CHANNELS, ADMINS, AUTH_CHANNEL, LOG_CHANNEL, PICS, BATCH_FILE_CAPTION, CUSTOM_FILE_CAPTION, PROTECT_CONTENT, MSG_ALRT, MAIN_CHANNEL
 from utils import get_settings, get_size, is_subscribed, save_group_settings, temp
@@ -276,8 +276,14 @@ async def channel_info(bot, message):
             f.write(text)
         await message.reply_document(file)
         os.remove(file)
-
         
+@Client.on_message(filters.command("filetypes") & filters.user(ADMINS))
+async def filetypes_command(bot, message):
+    file_type_count = await get_file_count()
+    response = "File Type Statistics:\n"
+    for file_type, count in file_type_count.items():
+        response += f"{file_type.capitalize()}: {count}\n"
+    await message.reply(response)       
 
 @Client.on_message(filters.command('findfiles') & filters.user(ADMINS))
 async def find_files(client, message):
