@@ -546,23 +546,27 @@ async def delete_files(client, message):
         await message.reply_text(f'😎 No files found with the name "{file_name}" in the database')
 
 
-@Client.on_callback_query(filters.regex('^delete_related') | filters.regex('^delete_starting'))
-async def delete_confirmation(client, callback_query):
+@Client.on_callback_query(filters.regex('^confirm_delete'))
+async def confirm_delete_files(client, callback_query):
     file_name = callback_query.data.split(":", 1)[1]
-    confirmation_message = f'⚠️ Are you sure you want to delete all files {"related" if callback_query.data.startswith("delete_related") else "starting"} with the name "{file_name}"?'
+    result = await Media.collection.delete_many({
+        'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
+    })
 
-    keyboard = InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton("🗑 Delete", callback_data=f"confirm_delete:{callback_query.data}")
-            ],
-            [
-                InlineKeyboardButton("🔙 Cancel", callback_data="cancel_delete")
-            ]
-        ]
-    )
+    if result.deleted_count:
+        await callback_query.message.edit_text(f"✅ Deleted {result.deleted_count} files.")
+    else:
+        await callback_query.message.edit_text("❌ Deletion failed. No files deleted.")
 
-    await callback_query.message.edit_text(confirmation_message, reply_markup=keyboard)
+    # Check if any files are still present with the given name
+    remaining_files = await Media.collection.count_documents({
+        'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
+    })
+
+    if remaining_files > 0:
+        await callback_query.message.edit_text(f"✅ Deleted {result.deleted_count} files.\n\n"
+                                               f"⚠️ However, {remaining_files} files with the name "
+                                               f'"{file_name}" still exist in the database.')
 
 
 @Client.on_callback_query(filters.regex('^confirm_delete'))
