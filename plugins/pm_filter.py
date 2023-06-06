@@ -876,6 +876,13 @@ async def cb_handler(client: Client, query: CallbackQuery):
         else:
             await query.message.edit_text("<b>⚠️ Cannot go back further. You are already on the main menu.</b>")
     
+    async def send_message_with_back_button(send_message_func, text, reply_markup):
+        back_btn = InlineKeyboardButton("🔙 Back", callback_data="back_deletemenu")
+        if reply_markup.inline_keyboard:
+            reply_markup.inline_keyboard.append([back_btn])
+        else:
+            reply_markup.inline_keyboard = [[back_btn]]
+        await send_message_func(text, reply_markup=reply_markup)       
 
     
         
