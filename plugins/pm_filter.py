@@ -287,7 +287,7 @@ async def handle_file_type_click(bot, query):
     chat_id = query.message.chat.id
     file_type = query.matches[0].group(1)
 
-    file_types = ("document" "video" "audio" "image" "zip")
+    file_types = ("document", "video", "audio", "image", "zip")
 
     files = []
     for ext in file_types[file_type]:
@@ -314,7 +314,7 @@ async def handle_file_type_click(bot, query):
 async def handle_confirm_file_delete(bot, query):
     file_type = query.matches[0].group(1)
 
-    file_types = ["document" "video" "audio" "image" "zip"]
+    file_types = ("document", "video", "audio", "image", "zip")
 
     files = []
     for ext in file_types[file_type]:
