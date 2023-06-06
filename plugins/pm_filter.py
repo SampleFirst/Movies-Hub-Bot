@@ -661,14 +661,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
             caption=f_caption,
             protect_content=True if ident == 'checksubp' else False
         )
-    async def send_message_with_back_button(send_message_func, text, reply_markup):
-        back_btn = InlineKeyboardButton("🔙 Back", callback_data="back_deletemenu")
-        if reply_markup.inline_keyboard:
-            reply_markup.inline_keyboard.append([back_btn])
-        else:
-            reply_markup.inline_keyboard = [[back_btn]]
-        await send_message_func(text, reply_markup=reply_markup)   
-        
     elif query.data == "predvd":
         files, next_offset, total = await get_bad_files('predvd', offset=0)
         if total > 0:
