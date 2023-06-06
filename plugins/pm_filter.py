@@ -673,8 +673,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="back_deletemenu")
                 ]
             ]
-            await send_message_with_back_button(
-                query.message.reply_text,
+            await query.message.reply_text(
                 f"<b>✨ {total} PreDVD files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
@@ -708,8 +707,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="back_deletemenu")
                 ]
             ]
-            await send_message_with_back_button(
-                query.message.reply_text,
+            await query.message.reply_text(
                 f"<b>✨ {total} CamRip files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
@@ -743,8 +741,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="back_deletemenu")
                 ]
             ]
-            await send_message_with_back_button(
-                query.message.reply_text,
+            await query.message.reply_text(
                 f"<b>✨ {total} HDCam files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
@@ -778,8 +775,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="back_deletemenu")
                 ]
             ]
-            await send_message_with_back_button(
-                query.message.reply_text,
+            await query.message.reply_text(
                 f"<b>✨ {total} S-Print files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
@@ -813,8 +809,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     InlineKeyboardButton("🏠 Home", callback_data="back_deletemenu")
                 ]
             ]
-            await send_message_with_back_button(
-                query.message.reply_text,
+            await query.message.reply_text(
                 f"<b>✨ {total} HDTVrip files detected. Are you sure you want to delete them?</b>",
                 reply_markup=InlineKeyboardMarkup(confirm_btns)
             )
