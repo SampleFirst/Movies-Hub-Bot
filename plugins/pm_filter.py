@@ -287,8 +287,14 @@ async def handle_file_type_click(bot, query):
     chat_id = query.message.chat.id
     file_type = query.matches[0].group(1)
 
-    file_types = ["document", "video", "audio", "image", "zip"]
-
+    file_types = {
+        "document": ["doc", "MKV", "MP4"],
+        "video": ["mp4", "avi", "mkv", "mov", "wmv"],
+        "audio": ["mp3", "m4a", "wav", "aac", "flac"],
+        "image": ["jpg", "png", "gif", "bmp", "svg", "JPEG"],
+        "zip": ["zip", "rar", "tar", "7z"],
+    }
+    
     files = []
     for ext in file_types[file_type]:
         ext_files, next_offset, total = await get_bad_files(ext, offset=0)
@@ -314,8 +320,14 @@ async def handle_file_type_click(bot, query):
 async def handle_confirm_file_delete(bot, query):
     file_type = query.matches[0].group(1)
 
-    file_types = ["document", "video", "audio", "image", "zip"]
-
+    file_types = {
+        "document": ["doc", "MKV", "MP4"],
+        "video": ["mp4", "avi", "mkv", "mov", "wmv"],
+        "audio": ["mp3", "m4a", "wav", "aac", "flac"],
+        "image": ["jpg", "png", "gif", "bmp", "svg", "JPEG"],
+        "zip": ["zip", "rar", "tar", "7z"],
+    }
+    
     files = []
     for ext in file_types[file_type]:
         ext_files, next_offset, total = await get_bad_files(ext, offset=0)
