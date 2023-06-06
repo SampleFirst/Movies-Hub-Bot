@@ -634,16 +634,16 @@ async def cancel_delete(client, callback_query):
 async def delete_file_type(bot, message):
     btn = [
         [
-            InlineKeyboardButton("Document", callback_data="delete_document"),
-            InlineKeyboardButton("Video", callback_data="delete_video"),
+            InlineKeyboardButton("Document", callback_data="delete_file_type_document"),
+            InlineKeyboardButton("Video", callback_data="delete_file_type_video"),
         ],
         [
-            InlineKeyboardButton("Audio", callback_data="delete_audio"),
-            InlineKeyboardButton("Image", callback_data="delete_image"),
+            InlineKeyboardButton("Audio", callback_data="delete_file_type_audio"),
+            InlineKeyboardButton("Image", callback_data="delete_file_type_image"),
         ],
         [
-            InlineKeyboardButton("Zip", callback_data="delete_zip"),
-            InlineKeyboardButton("CANCEL", callback_data="delete_cancel"),
+            InlineKeyboardButton("Zip", callback_data="delete_file_type_zip"),
+            InlineKeyboardButton("CANCEL", callback_data="delete_file_type_cancel"),
         ],
     ]
 
@@ -653,11 +653,129 @@ async def delete_file_type(bot, message):
     )
 
 
-@Client.on_callback_query(filters.regex("^delete_cancel$"))
-async def handle_cancel_click(bot, query):
-    await query.message.edit_text(text="<b>Deletion canceled.</b>")
+@Client.on_callback_query(filters.regex("delete_file_type_document"))
+async def delete_file_type_document(bot, callback_query):
+    await callback_query.answer()
+    
+    # Logic for checking the number of document files in the database
+    file_type = "document"
+    file_count = get_file_count(file_type)
+    
+    await callback_query.message.edit_text(f"Are you sure you want to delete {file_count} document files?\n\n"
+        "<b>WARNING: This action cannot be undone!</b>",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("YES", callback_data=f"confirm_delete_{file_type}_yes")],
+            [InlineKeyboardButton("BACK", callback_data="delete_file_type_back"),
+             InlineKeyboardButton("CANCEL", callback_data="delete_file_type_cancel")],
+        ])
+    )
+    
+    
+@Client.on_callback_query(filters.regex("delete_file_type_video"))
+async def delete_file_type_video(bot, callback_query):
+    await callback_query.answer()
+    
+    # Logic for checking the number of document files in the database
+    file_type = "video"
+    file_count = get_file_count(file_type)
+    
+    await callback_query.message.edit_text(f"Are you sure you want to delete {file_count} document files?\n\n"
+        "<b>WARNING: This action cannot be undone!</b>",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("YES", callback_data=f"confirm_delete_{file_type}_yes")],
+            [InlineKeyboardButton("BACK", callback_data="delete_file_type_back"),
+             InlineKeyboardButton("CANCEL", callback_data="delete_file_type_cancel")],
+        ])
+    )    
+    
+@Client.on_callback_query(filters.regex("delete_file_type_audio"))
+async def delete_file_type_audio(bot, callback_query):
+    await callback_query.answer()
+    
+    # Logic for checking the number of document files in the database
+    file_type = "audio"
+    file_count = get_file_count(file_type)
+    
+    await callback_query.message.edit_text(f"Are you sure you want to delete {file_count} document files?\n\n"
+        "<b>WARNING: This action cannot be undone!</b>",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("YES", callback_data=f"confirm_delete_{file_type}_yes")],
+            [InlineKeyboardButton("BACK", callback_data="delete_file_type_back"),
+             InlineKeyboardButton("CANCEL", callback_data="delete_file_type_cancel")],
+        ])
+    )
+    
+            
+@Client.on_callback_query(filters.regex("delete_file_type_image"))
+async def delete_file_type_image(bot, callback_query):
+    await callback_query.answer()
+    
+    # Logic for checking the number of document files in the database
+    file_type = "image"
+    file_count = get_file_count(file_type)
+    
+    await callback_query.message.edit_text(f"Are you sure you want to delete {file_count} document files?\n\n"
+        "<b>WARNING: This action cannot be undone!</b>",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("YES", callback_data=f"confirm_delete_{file_type}_yes")],
+            [InlineKeyboardButton("BACK", callback_data="delete_file_type_back"),
+             InlineKeyboardButton("CANCEL", callback_data="delete_file_type_cancel")],
+        ])
+    )
+    
+    
+@Client.on_callback_query(filters.regex("delete_file_type_zip"))
+async def delete_file_type_zip(bot, callback_query):
+    await callback_query.answer()
+    
+    # Logic for checking the number of document files in the database
+    file_type = "zip"
+    file_count = get_file_count(file_type)
+    
+    await callback_query.message.edit_text(f"Are you sure you want to delete {file_count} document files?\n\n"
+        "<b>WARNING: This action cannot be undone!</b>",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("YES", callback_data=f"confirm_delete_{file_type}_yes")],
+            [InlineKeyboardButton("BACK", callback_data="delete_file_type_back"),
+             InlineKeyboardButton("CANCEL", callback_data="delete_file_type_cancel")],
+        ])
+    )    
+
+@Client.on_callback_query(filters.regex(r"confirm_delete_(\w+)_yes"))
+async def confirm_delete_file_type(bot, callback_query):
+    await callback_query.answer()
+    
+    file_type = callback_query.matches[0].group(1)
+    
+    # Logic for deleting the specific file type from the database
+    delete_files(file_type)
+    
+    await callback_query.message.edit_text(
+        f"{file_type.capitalize()} files deleted successfully!"
+    )
 
 
+@Client.on_callback_query(filters.regex("delete_file_type_back"))
+async def delete_file_type_back(bot, callback_query):
+    await callback_query.answer()
+    
+    # Logic for going back to the previous page
+    await callback_query.message.edit_text("Going back to the previous page...")
+
+
+@Client.on_callback_query(filters.regex("delete_file_type_cancel"))
+async def delete_file_type_cancel(bot, callback_query):
+    await callback_query.answer("Deletion cancelled.")
+    
+
+    def get_file_count(file_type):
+    # Logic for getting the count of files based on the file type from the database
+    # Your code here
+    return 10  # Placeholder value, replace it with the actual count
+
+
+    def delete_files(file_type):
+    # Logic for deleting files of the specific file type from the database
 
     
 @Client.on_message(filters.command('settings'))
