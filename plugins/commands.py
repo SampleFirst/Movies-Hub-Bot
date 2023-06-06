@@ -277,13 +277,7 @@ async def channel_info(bot, message):
         await message.reply_document(file)
         os.remove(file)
         
-@Client.on_message(filters.command("filetypes") & filters.user(ADMINS))
-async def filetypes_command(bot, message):
-    file_type_count = await get_file_count()
-    response = "File Type Statistics:\n"
-    for file_type, count in file_type_count.items():
-        response += f"{file_type.capitalize()}: {count}\n"
-    await message.reply(response)       
+       
 
 @Client.on_message(filters.command('findfiles') & filters.user(ADMINS))
 async def find_files(client, message):
