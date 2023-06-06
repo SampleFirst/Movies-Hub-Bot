@@ -868,8 +868,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 text=previous_page['text'],
                 reply_markup=previous_page['reply_markup']
             )
-        else:
-            await query.message.edit_text("<b>⚠️ Cannot go back further. You are already on the main menu.</b>")
+        
     
     
     elif query.data == "pages":
