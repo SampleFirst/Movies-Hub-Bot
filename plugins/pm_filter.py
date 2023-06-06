@@ -287,13 +287,7 @@ async def handle_file_type_click(bot, query):
     chat_id = query.message.chat.id
     file_type = query.matches[0].group(1)
 
-    file_types = {
-        "document": ["doc", "docx"],
-        "video": ["mp4", "avi", "mkv", "mov", "wmv"],
-        "audio": ["mp3", "wav", "aac", "flac"],
-        "image": ["jpg", "png", "gif", "bmp", "svg"],
-        "zip": ["zip", "rar", "tar", "7z"],
-    }
+    file_types = {"document" "video" "audio" "image" "zip"}
 
     files = []
     for ext in file_types[file_type]:
@@ -320,13 +314,7 @@ async def handle_file_type_click(bot, query):
 async def handle_confirm_file_delete(bot, query):
     file_type = query.matches[0].group(1)
 
-    file_types = {
-        "document": ["doc", "docx"],
-        "video": ["mp4", "avi", "mkv", "mov", "wmv"],
-        "audio": ["mp3", "wav", "aac", "flac"],
-        "image": ["jpg", "png", "gif", "bmp", "svg"],
-        "zip": ["zip", "rar", "tar", "7z"],
-    }
+    file_types = {"document" "video" "audio" "image" "zip"}
 
     files = []
     for ext in file_types[file_type]:
