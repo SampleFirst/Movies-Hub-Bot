@@ -812,15 +812,6 @@ async def deletemultiplefiles(bot, message):
     )
 
 
-async def send_message_with_back_button(send_message_func, text, reply_markup):
-        back_btn = InlineKeyboardButton("🔙 Back", callback_data="back_deletemenu")
-        if reply_markup.inline_keyboard:
-            reply_markup.inline_keyboard.append([back_btn])
-        else:
-            reply_markup.inline_keyboard = [[back_btn]]
-        await send_message_func(text, reply_markup=reply_markup)       
-
-    
             
     
 @Client.on_message(filters.command("send") & filters.user(ADMINS))
