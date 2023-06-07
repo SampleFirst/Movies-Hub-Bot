@@ -506,7 +506,7 @@ async def delete_all_index_confirm(bot, message):
 
         
         
-@Client.on_message(filters.command('deletename') & filters.user(ADMINS))
+@Client.on_message(filters.command('deletename') & filters.user("ADMINS"))
 async def delete_files(client, message):
     """Delete files with a specific name from the database"""
     if len(message.text.split()) == 1:
@@ -515,6 +515,7 @@ async def delete_files(client, message):
 
     file_name = message.text.split(' ', 1)[1].strip()
 
+    # Assume Media is a MongoDB collection
     result = await Media.collection.count_documents({
         'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
     })
@@ -542,7 +543,6 @@ async def delete_files(client, message):
         )
 
         await message.reply_text(confirmation_message, reply_markup=keyboard)
-        back_stack.append(message.chat.id)  # Add current chat ID to the back_stack
     else:
         await message.reply_text(f'😎 No files found with the name "{file_name}" in the database')
 
@@ -562,17 +562,21 @@ async def confirm_delete_related_files(client, callback_query):
             [
                 [
                     InlineKeyboardButton("✅ Yes", callback_data=f"confirm_delete_related:{file_name}"),
-                    InlineKeyboardButton("🔙 Back", callback_data="back")
+                    InlineKeyboardButton("❌ Cancel", callback_data="cancel_delete")
                 ],
                 [
-                    InlineKeyboardButton("❌ Cancel", callback_data="cancel_delete")
+                    InlineKeyboardButton("🏠 Home", callback_data="back_menu")
                 ]
             ]
         )
 
+        # Save the current page to the back stack
+        back_stack[callback_query.message.chat.id] = {
+            'text': callback_query.message.text,
+            'reply_markup': callback_query.message.reply_markup
+        }
+
         await callback_query.message.edit_text(confirmation_message, reply_markup=keyboard)
-        chat_id = callback_query.message.chat.id
-        back_stack.append(chat_id)  # Add current chat ID to the back_stack
     else:
         await callback_query.message.edit_text(f'😎 No files found with the name "{file_name}" in the database')
 
@@ -595,14 +599,18 @@ async def confirm_delete_starting_files(client, callback_query):
                     InlineKeyboardButton("❌ Cancel", callback_data="cancel_delete")
                 ],
                 [
-                    InlineKeyboardButton("🔙 Back", callback_data="cancel_delete")
+                    InlineKeyboardButton("🏠 Home", callback_data="back_menu")
                 ]
             ]
         )
 
+        # Save the current page to the back stack
+        back_stack[callback_query.message.chat.id] = {
+            'text': callback_query.message.text,
+            'reply_markup': callback_query.message.reply_markup
+        }
+
         await callback_query.message.edit_text(confirmation_message, reply_markup=keyboard)
-        chat_id = callback_query.message.chat.id
-        back_stack.append(chat_id)  # Add current chat ID to the back_stack
     else:
         await callback_query.message.edit_text(f'😎 No files found with names starting "{file_name}" in the database')
 
@@ -619,9 +627,7 @@ async def delete_related_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🔙 Back", callback_data="back")
-                ],
-                [
+                    InlineKeyboardButton("🔙 Back", callback_data="back"),
                     InlineKeyboardButton("❌ Cancel", callback_data="cancel_delete")
                 ]
             ]
@@ -630,7 +636,7 @@ async def delete_related_files(client, callback_query):
     else:
         await callback_query.message.edit_text("❌ Deletion failed. No files deleted.")
 
-    back_stack.pop()  # Remove the current chat ID from the back_stack
+    back_stack.pop(callback_query.message.chat.id, None)  # Remove the current chat ID from the back_stack
 
 
 @Client.on_callback_query(filters.regex('^confirm_delete_starting'))
@@ -645,9 +651,7 @@ async def delete_starting_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🔙 Back", callback_data="back")
-                ],
-                [
+                    InlineKeyboardButton("🔙 Back", callback_data="back"),
                     InlineKeyboardButton("❌ Cancel", callback_data="cancel_delete")
                 ]
             ]
@@ -656,31 +660,67 @@ async def delete_starting_files(client, callback_query):
     else:
         await callback_query.message.edit_text("❌ Deletion failed. No files deleted.")
 
-    back_stack.pop()  # Remove the current chat ID from the back_stack
+    back_stack.pop(callback_query.message.chat.id, None)  # Remove the current chat ID from the back_stack
 
 
 @Client.on_callback_query(filters.regex('^cancel_delete'))
 async def cancel_delete(client, callback_query):
     await callback_query.message.edit_text("❌ Deletion canceled. No files deleted.")
-    back_stack.pop()  # Remove the current chat ID from the back_stack
+    back_stack.pop(callback_query.message.chat.id, None)  # Remove the current chat ID from the back_stack
 
 
-@Client.on_callback_query(filters.regex('^back'))
+@Client.on_callback_query(filters.regex('^back_menu'))
 async def go_back(client, callback_query):
     chat_id = callback_query.message.chat.id
 
-    if len(back_stack) > 1 and back_stack[-2] == chat_id:
-        # Go back to the original command page
-        back_stack.pop()  # Remove the current chat ID from the back_stack
-        back_stack.pop()  # Remove the second-last chat ID from the back_stack
-        await callback_query.message.edit_text("⏪ Going back to the original command page...")
-        return
+    if chat_id in back_stack:
+        previous_page = back_stack[chat_id]
+        del back_stack[chat_id]
 
-    if len(back_stack) > 0 and back_stack[-1] == chat_id:
-        # Go back to the previous page
-        back_stack.pop()  # Remove the current chat ID from the back_stack
-        await callback_query.message.edit_text("⏪ Going back...")
-        return
+        await callback_query.message.edit_text(
+            previous_page['text'],
+            reply_markup=previous_page['reply_markup']
+        )
+    else:
+        # Return to the original command page
+        await callback_query.message.edit_text("🔙 Returning to the original command page.")
+
+        file_name = callback_query.message.text.split(' ', 1)[1].strip()
+
+        result = await Media.collection.count_documents({
+            'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
+        })
+
+        if result > 0:
+            confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n'
+            starting_result = await Media.collection.count_documents({
+                'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
+            })
+            confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n'
+            confirmation_message += '✨ Please select the deletion option:'
+
+            keyboard = InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton("🌟 Delete all related name files", callback_data=f"delete_related:{file_name}")
+                    ],
+                    [
+                        InlineKeyboardButton("🌟 Delete all starting name files", callback_data=f"delete_starting:{file_name}")
+                    ],
+                    [
+                        InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
+                    ]
+                ]
+            )
+
+            await callback_query.message.reply_text(confirmation_message, reply_markup=keyboard)
+        else:
+            await callback_query.message.reply_text(f'😎 No files found with the name "{file_name}" in the database')
+
+
+
+
+
 
 
 
