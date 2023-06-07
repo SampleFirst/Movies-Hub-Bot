@@ -693,10 +693,12 @@ async def back_delete_files(client, callback_query):
     else:
         await callback_query.message.edit_text(f'😎 No files found with the name "{file_name}" in the database')
 
-@client.on_callback_query(filters.regex('^cancel_delete'))
+        
+@Client.on_callback_query(filters.regex('^cancel_delete'))
 async def cancel_delete(client, callback_query):
-    await callback_query.message.edit_text("❌ Deletion canceled. No files deleted.")
-
+    await callback_query.message.edit_text("☑️ Deletion canceled.")
+    
+    
 
 @Client.on_message(filters.command("deletefiletype") & filters.user(ADMINS))
 async def delete_file_type(bot, message):
