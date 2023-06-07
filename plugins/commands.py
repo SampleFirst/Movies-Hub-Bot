@@ -520,13 +520,6 @@ async def delete_files(client, message):
     })
 
     if result > 0:
-        confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n'
-        starting_result = await Media.collection.count_documents({
-            'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
-        })
-        confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n'
-        confirmation_message += '✨ Please select the deletion option:'
-
         keyboard = InlineKeyboardMarkup(
             [
                 [
@@ -541,6 +534,13 @@ async def delete_files(client, message):
             ]
         )
 
+        confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n'
+        starting_result = await Media.collection.count_documents({
+            'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
+        })
+        confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n'
+        confirmation_message += '✨ Please select the deletion option:'
+
         await message.reply_text(confirmation_message, reply_markup=keyboard)
     else:
         await message.reply_text(f'😎 No files found with the name "{file_name}" in the database')
@@ -549,13 +549,17 @@ async def delete_files(client, message):
 @Client.on_callback_query(filters.regex('^confirm_delete_related'))
 async def confirm_delete_related_files(client, callback_query):
     file_name = callback_query.data.split(":", 1)[1]
-    confirmation_message = f'⚠️ Are you sure you want to delete all files with the name "{file_name}"?'
+    confirmation_message = f'⚠️ Are you sure you want to delete all files with the name "{file_name}"?\n\n' \
+                           f'This action cannot be undone.'
 
     keyboard = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton("✅ Yes", callback_data=f"delete_related:{file_name}"),
-                InlineKeyboardButton("🏠 Home", callback_data="back_menu")
+                InlineKeyboardButton("🔙 Back", callback_data="back_confirm_delete_related")
+            ],
+            [
+                InlineKeyboardButton("🏠 Home", callback_data="home")
             ]
         ]
     )
@@ -566,18 +570,23 @@ async def confirm_delete_related_files(client, callback_query):
 @Client.on_callback_query(filters.regex('^confirm_delete_starting'))
 async def confirm_delete_starting_files(client, callback_query):
     file_name = callback_query.data.split(":", 1)[1]
-    confirmation_message = f'⚠️ Are you sure you want to delete all files with names starting "{file_name}"?'
+    confirmation_message = f'⚠️ Are you sure you want to delete all files with names starting "{file_name}"?\n\n' \
+                           f'This action cannot be undone.'
 
     keyboard = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton("✅ Yes", callback_data=f"delete_starting:{file_name}"),
-                InlineKeyboardButton("🏠 Home", callback_data="back_menu")
+                InlineKeyboardButton("🔙 Back", callback_data="back_confirm_delete_starting")
+            ],
+            [
+                InlineKeyboardButton("🏠 Home", callback_data="home")
             ]
         ]
     )
 
     await callback_query.message.edit_text(confirmation_message, reply_markup=keyboard)
+
 
 @Client.on_callback_query(filters.regex('^delete_related'))
 async def delete_related_files(client, callback_query):
@@ -591,8 +600,7 @@ async def delete_related_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🔙 Back", callback_data="back_confirm_delete_related"),
-                    InlineKeyboardButton("🏠 Home", callback_data="back_menu")
+                    InlineKeyboardButton("🏠 Home", callback_data="home")
                 ]
             ]
         )
@@ -601,7 +609,7 @@ async def delete_related_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🏠 Home", callback_data="back_menu")
+                    InlineKeyboardButton("🏠 Home", callback_data="home")
                 ]
             ]
         )
@@ -621,8 +629,7 @@ async def delete_starting_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🔙 Back", callback_data="back_confirm_delete_starting"),
-                    InlineKeyboardButton("🏠 Home", callback_data="back_menu")
+                    InlineKeyboardButton("🏠 Home", callback_data="home")
                 ]
             ]
         )
@@ -631,7 +638,7 @@ async def delete_starting_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🏠 Home", callback_data="back_menu")
+                    InlineKeyboardButton("🏠 Home", callback_data="home")
                 ]
             ]
         )
@@ -642,13 +649,17 @@ async def delete_starting_files(client, callback_query):
 @Client.on_callback_query(filters.regex('^back_confirm_delete_related'))
 async def back_confirm_delete_related_files(client, callback_query):
     file_name = callback_query.data.split(":", 1)[1]
-    confirmation_message = f'⚠️ Are you sure you want to delete all files with the name "{file_name}"?'
+    confirmation_message = f'⚠️ Are you sure you want to delete all files with the name "{file_name}"?\n\n' \
+                           f'This action cannot be undone.'
 
     keyboard = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton("✅ Yes", callback_data=f"delete_related:{file_name}"),
-                InlineKeyboardButton("🏠 Home", callback_data="back_menu")
+                InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_related:{file_name}")
+            ],
+            [
+                InlineKeyboardButton("🏠 Home", callback_data="home")
             ]
         ]
     )
@@ -659,66 +670,64 @@ async def back_confirm_delete_related_files(client, callback_query):
 @Client.on_callback_query(filters.regex('^back_confirm_delete_starting'))
 async def back_confirm_delete_starting_files(client, callback_query):
     file_name = callback_query.data.split(":", 1)[1]
-    confirmation_message = f'⚠️ Are you sure you want to delete all files with names starting "{file_name}"?'
+    confirmation_message = f'⚠️ Are you sure you want to delete all files with names starting "{file_name}"?\n\n' \
+                           f'This action cannot be undone.'
 
     keyboard = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton("✅ Yes", callback_data=f"delete_starting:{file_name}"),
-                InlineKeyboardButton("🏠 Home", callback_data="back_menu")
+                InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_starting:{file_name}")
+            ],
+            [
+                InlineKeyboardButton("🏠 Home", callback_data="home")
             ]
         ]
     )
 
     await callback_query.message.edit_text(confirmation_message, reply_markup=keyboard)
-    
-@Client.on_callback_query(filters.regex('^back_menu'))
-async def back_delete_files(client, callback_query):
-    """Delete files with a specific name from the database"""
-    if len(message.text.split()) == 1:
-        await message.reply_text("🤨 Please provide a file name to delete.\n\nExample: /deletename Kantara")
-        return
 
-    file_name = message.text.split(' ', 1)[1].strip()
 
-    result = await Media.collection.count_documents({
-        'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
-    })
+@Client.on_callback_query(filters.regex('^home'))
+async def home_callback(client, callback_query):
+    file_name = callback_query.data.split(":", 1)[1]
+    confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n' \
+                           f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n' \
+                           '✨ Please select the deletion option:'
 
-    if result > 0:
-        confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n'
-        starting_result = await Media.collection.count_documents({
-            'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
-        })
-        confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n'
-        confirmation_message += '✨ Please select the deletion option:'
-
-        keyboard = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
+        [
             [
-                [
-                    InlineKeyboardButton("🌟 Delete all related name files", callback_data=f"confirm_delete_related:{file_name}")
-                ],
-                [
-                    InlineKeyboardButton("🌟 Delete all starting name files", callback_data=f"confirm_delete_starting:{file_name}")
-                ],
-                [
-                    InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
-                ]
+                InlineKeyboardButton("🌟 Delete all related name files", callback_data=f"confirm_delete_related:{file_name}")
+            ],
+            [
+                InlineKeyboardButton("🌟 Delete all starting name files", callback_data=f"confirm_delete_starting:{file_name}")
+            ],
+            [
+                InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
             ]
-        )
+        ]
+    )
 
-        await message.reply_text(confirmation_message, reply_markup=keyboard)
-    else:
-        await message.reply_text(f'😎 No files found with the name "{file_name}" in the database')
-        
-        
+    await callback_query.message.edit_text(confirmation_message, reply_markup=keyboard)
+
+
 @Client.on_callback_query(filters.regex('^cancel_delete'))
-async def cancel_delete(client, callback_query):
-    await callback_query.message.edit_text("☑️ Deletion canceled.")
+async def cancel_delete_callback(client, callback_query):
+    await callback_query.message.edit_text("🔚 Deletion process cancelled.", reply_markup=command_keyboard)
 
 
-                    
+@Client.on_callback_query(filters.regex('^back_menu'))
+async def back_menu_callback(client, callback_query):
+    await callback_query.message.edit_text("🏠 Back to main menu.", reply_markup=command_keyboard)
 
+
+
+
+
+
+        
+        
 
 
 
