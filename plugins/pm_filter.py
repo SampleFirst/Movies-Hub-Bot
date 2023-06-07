@@ -890,6 +890,12 @@ async def cb_handler(client: Client, query: CallbackQuery):
             )
             
     elif query.data == "deletename":
+        if len(message.text.split()) == 1:
+            await message.reply_text("🤨 Please provide a file name to delete.\n\nExample: /deletename Kantara")
+            return
+
+        file_name = message.text.split(' ', 1)[1].strip()
+
         result = await Media.collection.count_documents({
             'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
         })
@@ -919,7 +925,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
             await message.reply_text(confirmation_message, reply_markup=keyboard)
         else:
             await message.reply_text(f'😎 No files found with the name "{file_name}" in the database')
-    
     
     elif query.data == "pages":
         await query.answer()
