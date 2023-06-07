@@ -673,9 +673,27 @@ async def back_confirm_delete_starting_files(client, callback_query):
     await callback_query.message.edit_text(confirmation_message, reply_markup=keyboard)
     
 @Client.on_callback_query(filters.regex('^back_menu'))
-async def delete_back(client, callback_query):
+async def back_delete_files(client, callback_query):
+    """Delete files with a specific name from the database"""
+    if len(message.text.split()) == 1:
+        await message.reply_text("🤨 Please provide a file name to delete.\n\nExample: /deletename Kantara")
+        return
+
+    file_name = message.text.split(' ', 1)[1].strip()
+
     result = await Media.collection.count_documents({
-       keyboard = InlineKeyboardMarkup(
+        'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
+    })
+
+    if result > 0:
+        confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n'
+        starting_result = await Media.collection.count_documents({
+            'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
+        })
+        confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n'
+        confirmation_message += '✨ Please select the deletion option:'
+
+        keyboard = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton("🌟 Delete all related name files", callback_data=f"confirm_delete_related:{file_name}")
@@ -688,13 +706,6 @@ async def delete_back(client, callback_query):
                 ]
             ]
         )
-
-        confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n'
-        starting_result = await Media.collection.count_documents({
-            'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
-        })
-        confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n'
-        confirmation_message += '✨ Please select the deletion option:'
 
         await message.reply_text(confirmation_message, reply_markup=keyboard)
     else:
