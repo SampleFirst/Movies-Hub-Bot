@@ -659,26 +659,22 @@ async def delete_starting_files(client, callback_query):
 
 
 
-@Client.on_callback_query(filters.regex('^deletename$'))
-async def delete_files_callback(client, query):
-    """Handle the callback query for deleting files"""
-    await query.answer()
+@Client.on_callback_query(filters.regex('^deletename'))
+async def back_delete_files(client, callback_query):
+    file_name = callback_query.data.split(":", 1)[1]
 
-    message = query.message
-    user_id = query.from_user.id
-
-    if not is_admin(user_id):
-        await message.reply_text("⛔️ You don't have permission to perform this action.")
-        return
-
-    await message.delete()
-
-    file_name = query.data.split(':')[1]
     result = await Media.collection.count_documents({
         'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
     })
 
     if result > 0:
+        confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n'
+        starting_result = await Media.collection.count_documents({
+            'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
+        })
+        confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n'
+        confirmation_message += '✨ Please select the deletion option:'
+
         keyboard = InlineKeyboardMarkup(
             [
                 [
@@ -693,17 +689,9 @@ async def delete_files_callback(client, query):
             ]
         )
 
-        confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n'
-        starting_result = await Media.collection.count_documents({
-            'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
-        })
-        confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n'
-        confirmation_message += '✨ Please select the deletion option:'
-
-        await client.send_message(query.message.chat.id, confirmation_message, reply_markup=keyboard)
+        await callback_query.message.edit_text(confirmation_message, reply_markup=keyboard)
     else:
-        await client.send_message(query.message.chat.id, f'😎 No files found with the name "{file_name}" in the database')
-
+        await callback_query.message.edit_text(f'😎 No files found with the name "{file_name}" in the database')
 
 @client.on_callback_query(filters.regex('^cancel_delete'))
 async def cancel_delete(client, callback_query):
