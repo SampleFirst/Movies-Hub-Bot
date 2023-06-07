@@ -674,9 +674,6 @@ async def back_confirm_delete_starting_files(client, callback_query):
     
 @Client.on_callback_query(filters.regex('^back_menu'))
 async def delete_back(client, callback_query):
-    await callback_query.message.edit_text("You are back to the previous page.")
-    
-    # Re-displaying the search results
     file_name = callback_query.message.text.split(' ', 1)[1].strip()
 
     result = await Media.collection.count_documents({
@@ -689,7 +686,7 @@ async def delete_back(client, callback_query):
             'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
         })
         confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n'
-        confirmation_message += '✨ Please Reselect the deletion option:'
+        confirmation_message += '✨ Please select the deletion option:'
 
         keyboard = InlineKeyboardMarkup(
             [
@@ -707,7 +704,7 @@ async def delete_back(client, callback_query):
 
         await callback_query.message.reply_text(confirmation_message, reply_markup=keyboard)
     else:
-        await callback_query.message.reply_text(f'😎 No files found with the name "{file_name}" in the database')   
+        await callback_query.message.reply_text(f'😎 No files found with the name "{file_name}" in the database')
         
 @Client.on_callback_query(filters.regex('^cancel_delete'))
 async def cancel_delete(client, callback_query):
