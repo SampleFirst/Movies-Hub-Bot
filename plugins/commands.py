@@ -675,11 +675,7 @@ async def back_confirm_delete_starting_files(client, callback_query):
 @Client.on_callback_query(filters.regex('^back_menu'))
 async def delete_back(client, callback_query):
     result = await Media.collection.count_documents({
-        'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
-    })
-
-    if result > 0:
-        keyboard = InlineKeyboardMarkup(
+       keyboard = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton("🌟 Delete all related name files", callback_data=f"confirm_delete_related:{file_name}")
