@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 BATCH_FILES = {}
 RESULTS_PER_PAGE = 10
-previous_pages = {}
+
 
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
@@ -540,8 +540,6 @@ async def delete_files(client, message):
         confirmation_message += '✨ Please select the deletion option:'
 
         await message.reply_text(confirmation_message, reply_markup=keyboard)
-        # Store the previous page for the user
-        previous_pages[message.from_user.id] = "delete_files"
     else:
         await message.reply_text(f'😎 No files found with the name "{file_name}" in the database')
 
@@ -566,8 +564,7 @@ async def confirm_delete_related_files(client, callback_query):
     )
 
     await callback_query.message.edit_text(confirmation_message, reply_markup=keyboard)
-    # Store the previous page for the user
-    previous_pages[callback_query.from_user.id] = "confirm_delete_related"
+    
 
 
 @Client.on_callback_query(filters.regex('^confirm_delete_starting'))
@@ -590,8 +587,7 @@ async def confirm_delete_starting_files(client, callback_query):
     )
 
     await callback_query.message.edit_text(confirmation_message, reply_markup=keyboard)
-    # Store the previous page for the user
-    previous_pages[callback_query.from_user.id] = "confirm_delete_starting"
+    
 
 
 @Client.on_callback_query(filters.regex('^delete_related'))
@@ -607,7 +603,7 @@ async def delete_related_files(client, callback_query):
             [
                 [
                     InlineKeyboardButton("🏠 Home", callback_data="home"),
-                    InlineKeyboardButton("⬅️ Back", callback_data="back")
+                    InlineKeyboardButton("⬅️ Back", callback_data=f"confirm_delete_related:{file_name}")
                 ],
                 [
                     InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
@@ -620,7 +616,7 @@ async def delete_related_files(client, callback_query):
             [
                 [
                     InlineKeyboardButton("🏠 Home", callback_data="home"),
-                    InlineKeyboardButton("⬅️ Back", callback_data="back")
+                    InlineKeyboardButton("⬅️ Back", callback_data=f"confirm_delete_related:{file_name}")
                 ],
                 [
                     InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
@@ -629,8 +625,7 @@ async def delete_related_files(client, callback_query):
         )
 
     await callback_query.message.edit_text(message_text, reply_markup=keyboard)
-    # Remove the previous page for the user
-    del previous_pages[callback_query.from_user.id]
+    
 
 
 @Client.on_callback_query(filters.regex('^delete_starting'))
@@ -646,7 +641,7 @@ async def delete_starting_files(client, callback_query):
             [
                 [
                     InlineKeyboardButton("🏠 Home", callback_data="home"),
-                    InlineKeyboardButton("⬅️ Back", callback_data="back")
+                    InlineKeyboardButton("⬅️ Back", callback_data=f"confirm_delete_starting:{file_name}")
                 ],
                 [
                     InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
@@ -658,7 +653,7 @@ async def delete_starting_files(client, callback_query):
             [
                 [
                     InlineKeyboardButton("🏠 Home", callback_data="home"),
-                    InlineKeyboardButton("⬅️ Back", callback_data="back")
+                    InlineKeyboardButton("⬅️ Back", callback_data=f"confirm_delete_starting:{file_name}")
                 ],
                 [
                     InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
@@ -669,45 +664,12 @@ async def delete_starting_files(client, callback_query):
         
 
     await callback_query.message.edit_text(message_text, reply_markup=keyboard)
-    # Remove the previous page for the user
-    del previous_pages[callback_query.from_user.id]
-
-
-@Client.on_callback_query(filters.regex('^home'))
-async def home(client, callback_query):
-    await callback_query.answer()
-    await callback_query.message.edit_text("Welcome to the Home page!")
-    # Remove the previous page for the user
-    del previous_pages[callback_query.from_user.id]
-
-
-@Client.on_callback_query(filters.regex('^back'))
-async def back(client, callback_query):
-    await callback_query.answer()
-    user_id = callback_query.from_user.id
-    if user_id in previous_pages:
-        previous_page = previous_pages[user_id]
-        if previous_page == "delete_files":
-            await callback_query.message.edit_text("Returning to delete_files page.")
-            # Perform any necessary actions for the delete_files page
-        elif previous_page == "confirm_delete_related":
-            await callback_query.message.edit_text("Returning to confirm_delete_related page.")
-            # Perform any necessary actions for the confirm_delete_related page
-        elif previous_page == "confirm_delete_starting":
-            await callback_query.message.edit_text("Returning to confirm_delete_starting page.")
-            # Perform any necessary actions for the confirm_delete_starting page
-    else:
-        await callback_query.message.edit_text("No previous page found.")
-    # Remove the previous page for the user
-    del previous_pages[user_id]
-
-
-
     
 
 
 
 
+@
     
 
 
