@@ -554,7 +554,7 @@ async def confirm_delete_related_files(client, callback_query):
         [
             [
                 InlineKeyboardButton("✅ Yes", callback_data=f"delete_related:{file_name}"),
-                InlineKeyboardButton("🏠 Home", callback_data="deletename$")
+                InlineKeyboardButton("🏠 Home", callback_data="deletename")
             ],
             [
                 InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
@@ -575,7 +575,7 @@ async def confirm_delete_starting_files(client, callback_query):
         [
             [
                 InlineKeyboardButton("✅ Yes", callback_data=f"delete_related:{file_name}"),
-                InlineKeyboardButton("🏠 Home", callback_data="deletename$")
+                InlineKeyboardButton("🏠 Home", callback_data="deletename")
             ],
             [
                 InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
@@ -596,27 +596,29 @@ async def delete_related_files(client, callback_query):
     if result.deleted_count:
         message_text = f"✅ Deleted {result.deleted_count} files."
         keyboard = InlineKeyboardMarkup(
+        [
             [
-                [
-                    InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_related:{file_name}")
-                ],
-                [
-                    InlineKeyboardButton("🏠 Home", callback_data="deletename$")
-                ]
+                InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_related:{file_name}"),
+                InlineKeyboardButton("🏠 Home", callback_data="deletename")
+            ],
+            [
+                InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
             ]
-        )
+        ]
+    )
     else:
         message_text = "❌ Deletion failed. No files deleted."
         keyboard = InlineKeyboardMarkup(
+        [
             [
-                [
-                    InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_related:{file_name}")
-                ],
-                [
-                    InlineKeyboardButton("🏠 Home", callback_data="deletename$")
-                ]
+                InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_related:{file_name}"),
+                InlineKeyboardButton("🏠 Home", callback_data="deletename")
+            ],
+            [
+                InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
             ]
-        )
+        ]
+    )
 
     await callback_query.message.edit_text(message_text, reply_markup=keyboard)
 
@@ -631,27 +633,29 @@ async def delete_starting_files(client, callback_query):
     if result.deleted_count:
         message_text = f"✅ Deleted {result.deleted_count} files."
         keyboard = InlineKeyboardMarkup(
+        [
             [
-                [
-                    InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_starting:{file_name}"),
-                
-                
-                    InlineKeyboardButton("🏠 Home", callback_data="deletename$")
-                ]
+                InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_starting:{file_name}"),
+                InlineKeyboardButton("🏠 Home", callback_data="deletename")
+            ],
+            [
+                InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
             ]
-        )
+        ]
+    )
     else:
         message_text = "❌ Deletion failed. No files deleted."
         keyboard = InlineKeyboardMarkup(
+        [
             [
-                [
-                    InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_starting:{file_name}"),
-                
-                
-                    InlineKeyboardButton("🏠 Home", callback_data="deletename$")
-                ]
+                InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_starting:{file_name}"),
+                InlineKeyboardButton("🏠 Home", callback_data="deletename")
+            ],
+            [
+                InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
             ]
-        )
+        ]
+    )
 
     await callback_query.message.edit_text(message_text, reply_markup=keyboard)
 
