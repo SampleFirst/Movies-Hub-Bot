@@ -633,9 +633,9 @@ async def delete_starting_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_starting:{file_name}")
-                ],
-                [
+                    InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_starting:{file_name}"),
+                
+                
                     InlineKeyboardButton("🏠 Home", callback_data="deletename$")
                 ]
             ]
@@ -645,9 +645,9 @@ async def delete_starting_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_starting:{file_name}")
-                ],
-                [
+                    InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_starting:{file_name}"),
+                
+                
                     InlineKeyboardButton("🏠 Home", callback_data="deletename$")
                 ]
             ]
@@ -704,28 +704,10 @@ async def delete_files_callback(client, query):
     else:
         await client.send_message(query.message.chat.id, f'😎 No files found with the name "{file_name}" in the database')
 
-@Client.on_callback_query(filters.regex('^cancel_delete'))
-async def cancel_delete_callback(client, callback_query):
-    await callback_query.message.edit_text("🔚 Deletion process cancelled.", reply_markup=command_keyboard)
 
-
-@Client.on_callback_query(filters.regex('^back_menu'))
-async def back_menu_callback(client, callback_query):
-    await callback_query.message.edit_text("🏠 Back to main menu.", reply_markup=command_keyboard)
-
-
-
-
-
-
-        
-        
-
-
-
-
-
-
+@client.on_callback_query(filters.regex('^cancel_delete'))
+async def cancel_delete(client, callback_query):
+    await callback_query.message.edit_text("❌ Deletion canceled. No files deleted.")
 
 
 @Client.on_message(filters.command("deletefiletype") & filters.user(ADMINS))
