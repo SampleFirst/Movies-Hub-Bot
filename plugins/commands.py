@@ -674,8 +674,6 @@ async def back_confirm_delete_starting_files(client, callback_query):
     
 @Client.on_callback_query(filters.regex('^back_menu'))
 async def delete_back(client, callback_query):
-    file_name = message.text.split(' ', 1)[1].strip()
-
     result = await Media.collection.count_documents({
         'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
     })
