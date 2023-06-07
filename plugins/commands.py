@@ -642,7 +642,7 @@ async def delete_starting_files(client, callback_query):
 @Client.on_callback_query(filters.regex('^back_confirm_delete_related'))
 async def back_confirm_delete_related_files(client, callback_query):
     file_name = callback_query.data.split(":", 1)[1]
-    confirmation_message = f'⚠️ Are you sure you want to delete all files with the name "{file_name}"?\n\n' \ f'This action cannot be undone.'
+    confirmation_message = f'⚠️ Are you sure you want to delete all files with the name "{file_name}"?'
 
     keyboard = InlineKeyboardMarkup(
         [
@@ -659,7 +659,7 @@ async def back_confirm_delete_related_files(client, callback_query):
 @Client.on_callback_query(filters.regex('^back_confirm_delete_starting'))
 async def back_confirm_delete_starting_files(client, callback_query):
     file_name = callback_query.data.split(":", 1)[1]
-    confirmation_message = f'⚠️ Are you sure you want to delete all files with names starting "{file_name}"?\n\n' \ f'This action cannot be undone.'
+    confirmation_message = f'⚠️ Are you sure you want to delete all files with names starting "{file_name}"?'
 
     keyboard = InlineKeyboardMarkup(
         [
