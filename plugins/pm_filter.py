@@ -890,8 +890,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
             )
             
     elif query.data == "deletename":
-        file_name = message.text.split(' ', 1)[1].strip()
-
         result = await Media.collection.count_documents({
             'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
         })
