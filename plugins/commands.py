@@ -343,17 +343,16 @@ async def find_related_files(client, callback_query):
 
     result_message = f'{len(current_results)} files found with related names to "{search_query}" in the database:\n\n'
     for result in current_results:
-        result_message += f'File ID: {result["_id"]}\n'
         result_message += f'File Name: {result["file_name"]}\n'
         result_message += f'File Size: {result["file_size"]}\n\n'
 
     buttons = []
 
     if page > 1:
-        buttons.append(InlineKeyboardButton("⬅️ Previous", callback_data=f"related_files:{page-1}:{search_query}"))
+        buttons.append(InlineKeyboardButton("⬅️ Back", callback_data=f"related_files:{page-1}:{search_query}"))
 
     if page < num_pages:
-        buttons.append(InlineKeyboardButton("➡️ Next", callback_data=f"related_files:{page+1}:{search_query}"))
+        buttons.append(InlineKeyboardButton("Next ➡️", callback_data=f"related_files:{page+1}:{search_query}"))
 
     buttons.append(InlineKeyboardButton("🔚 Cancel", callback_data=f"cancel_find"))
 
@@ -384,17 +383,16 @@ async def find_starting_files(client, callback_query):
 
     result_message = f'{len(current_results)} files found with names starting "{search_query}" in the database:\n\n'
     for result in current_results:
-        result_message += f'File ID: {result["_id"]}\n'
         result_message += f'File Name: {result["file_name"]}\n'
         result_message += f'File Size: {result["file_size"]}\n\n'
 
     buttons = []
 
     if page > 1:
-        buttons.append(InlineKeyboardButton("⬅️ Previous", callback_data=f"related_files:{page-1}:{search_query}"))
+        buttons.append(InlineKeyboardButton("⬅️ Back", callback_data=f"related_files:{page-1}:{search_query}"))
 
     if page < num_pages:
-        buttons.append(InlineKeyboardButton("➡️ Next", callback_data=f"related_files:{page+1}:{search_query}"))
+        buttons.append(InlineKeyboardButton("Next ➡️", callback_data=f"related_files:{page+1}:{search_query}"))
 
     buttons.append(InlineKeyboardButton("🔚 Cancel", callback_data=f"cancel_find"))
 
@@ -556,7 +554,7 @@ async def confirm_delete_related_files(client, callback_query):
         [
             [
                 InlineKeyboardButton("✅ Yes", callback_data=f"delete_related:{file_name}"),
-                InlineKeyboardButton("🏠 Home", callback_data="deletename")
+                InlineKeyboardButton("🏠 Home", callback_data="deletename$")
             ],
             [
                 InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
@@ -577,7 +575,7 @@ async def confirm_delete_starting_files(client, callback_query):
         [
             [
                 InlineKeyboardButton("✅ Yes", callback_data=f"delete_related:{file_name}"),
-                InlineKeyboardButton("🏠 Home", callback_data="deletename")
+                InlineKeyboardButton("🏠 Home", callback_data="deletename$")
             ],
             [
                 InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
@@ -600,10 +598,10 @@ async def delete_related_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🔙 Back", callback_data="confirm_delete_related")
+                    InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_related:{file_name}")
                 ],
                 [
-                    InlineKeyboardButton("🏠 Home", callback_data="deletename")
+                    InlineKeyboardButton("🏠 Home", callback_data="deletename$")
                 ]
             ]
         )
@@ -612,10 +610,10 @@ async def delete_related_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🔙 Back", callback_data="confirm_delete_related")
+                    InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_related:{file_name}")
                 ],
                 [
-                    InlineKeyboardButton("🏠 Home", callback_data="deletename")
+                    InlineKeyboardButton("🏠 Home", callback_data="deletename$")
                 ]
             ]
         )
@@ -635,10 +633,10 @@ async def delete_starting_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🔙 Back", callback_data="confirm_delete_starting")
+                    InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_starting:{file_name}")
                 ],
                 [
-                    InlineKeyboardButton("🏠 Home", callback_data="deletename")
+                    InlineKeyboardButton("🏠 Home", callback_data="deletename$")
                 ]
             ]
         )
@@ -647,10 +645,10 @@ async def delete_starting_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🔙 Back", callback_data="confirm_delete_starting")
+                    InlineKeyboardButton("🔙 Back", callback_data=f"confirm_delete_starting:{file_name}")
                 ],
                 [
-                    InlineKeyboardButton("🏠 Home", callback_data="deletename")
+                    InlineKeyboardButton("🏠 Home", callback_data="deletename$")
                 ]
             ]
         )
