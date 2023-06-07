@@ -659,39 +659,6 @@ async def delete_starting_files(client, callback_query):
 
 
 
-@Client.on_callback_query(filters.regex('^deletename'))
-async def back_delete_files(client, callback_query):
-    file_name = callback_query.data.split(":", 1)[1]
-
-    result = await Media.collection.count_documents({
-        'file_name': {"$regex": f".*{re.escape(file_name)}.*", "$options": "i"}
-    })
-
-    if result > 0:
-        confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n'
-        starting_result = await Media.collection.count_documents({
-            'file_name': {"$regex": f"^{re.escape(file_name)}", "$options": "i"}
-        })
-        confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n'
-        confirmation_message += '✨ Please select the deletion option:'
-
-        keyboard = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton("🌟 Delete all related name files", callback_data=f"confirm_delete_related:{file_name}")
-                ],
-                [
-                    InlineKeyboardButton("🌟 Delete all starting name files", callback_data=f"confirm_delete_starting:{file_name}")
-                ],
-                [
-                    InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
-                ]
-            ]
-        )
-
-        await callback_query.message.edit_text(confirmation_message, reply_markup=keyboard)
-    else:
-        await callback_query.message.edit_text(f'😎 No files found with the name "{file_name}" in the database')
 
         
 @Client.on_callback_query(filters.regex('^cancel_delete'))
