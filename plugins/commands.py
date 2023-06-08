@@ -665,7 +665,7 @@ async def delete_starting_files(client, callback_query):
     
 @Client.on_callback_query(filters.regex('^deletename'))
 async def delete_files(client, callback_query):
-        keyboard = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton("🌟 Delete all related name files", callback_data=f"confirm_delete_related:{file_name}")
@@ -685,12 +685,7 @@ async def delete_files(client, callback_query):
 
         await message.reply_text(confirmation_message, reply_markup=keyboard)
     else:
-        await message.reply_text(f'😎 No files found with the name "{file_name}" in the database') 
-
-
-
-
-    
+        await message.reply_text(f'😎 No files found with the name "{file_name}" in the database')
 
 
         
