@@ -427,9 +427,8 @@ async def find_file_type(_, message):
         ],
     ]
 
-    await app.send_message(
-        chat_id=message.chat.id,
-        text="<b>Select the type of files you want to delete!\n\nThis will delete related files from the database.</b>",
+    await message.reply_text(
+        text="<b>🗑 Select the type of files you want to delete!\n\n🗑 This will delete related files from the database.</b>",
         reply_markup=InlineKeyboardMarkup(btn),
     )
 
