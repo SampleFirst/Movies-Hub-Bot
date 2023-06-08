@@ -325,6 +325,7 @@ async def handle_file_type_click(bot, query):
                 ]
             ]
         )
+     )
                
    await query.answer()
 
