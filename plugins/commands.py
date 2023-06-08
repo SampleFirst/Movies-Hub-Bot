@@ -684,28 +684,28 @@ async def cancel_delete(client, callback_query):
 async def delete_file_type(bot, message):
     btn = [
         [
-            InlineKeyboardButton("Document", callback_data="delete_document"),
-            InlineKeyboardButton("Video", callback_data="delete_video"),
+            InlineKeyboardButton("📄 Document", callback_data="delete_document"),
+            InlineKeyboardButton("🎬 Video", callback_data="delete_video"),
         ],
         [
-            InlineKeyboardButton("Audio", callback_data="delete_audio"),
-            InlineKeyboardButton("Image", callback_data="delete_image"),
+            InlineKeyboardButton("🎵 Audio", callback_data="delete_audio"),
+            InlineKeyboardButton("🖼 Image", callback_data="delete_image"),
         ],
         [
-            InlineKeyboardButton("Zip", callback_data="delete_zip"),
-            InlineKeyboardButton("CANCEL", callback_data="delete_cancel"),
+            InlineKeyboardButton("📦 Zip", callback_data="delete_zip"),
+            InlineKeyboardButton("🔚 Cancel", callback_data="delete_cancel"),
         ],
     ]
 
     await message.reply_text(
-        text="<b>Select the type of files you want to delete!\n\nThis will delete related files from the database.</b>",
+        text="<b>🗑 Select the type of files you want to delete!\n\n🗑 This will delete related files from the database.</b>",
         reply_markup=InlineKeyboardMarkup(btn),
     )
 
 
 @Client.on_callback_query(filters.regex("^delete_cancel$"))
 async def handle_cancel_click(bot, query):
-    await query.message.edit_text(text="<b>Deletion canceled.</b>")
+    await query.message.edit_text(text="<b>✅ Deletion canceled.</b>")
     
     
 
