@@ -679,8 +679,8 @@ async def delete_files(client, callback_query):
             ]
         )
 
-        confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n'
-        confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n'
+        confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n
+        confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n
         confirmation_message += '✨ Please select the deletion option:'
 
         await message.reply_text(confirmation_message, reply_markup=keyboard)
