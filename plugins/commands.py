@@ -411,7 +411,7 @@ async def cancel_find(client, callback_query):
     await callback_query.answer()
 
 @Client.on_message(filters.command("findfiletype") & filters.user(ADMINS))
-async def delete_file_type(_, message):
+async def find_file_type(_, message):
     btn = [
         [
             InlineKeyboardButton("Document", callback_data="find_document"),
