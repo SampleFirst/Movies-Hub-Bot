@@ -953,8 +953,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
 
         await message.reply_text(confirmation_message, reply_markup=keyboard)
     else:
-        await message.reply_text(f'😎 No files found with the name "{file_name}" in the database')
-    
+        await message.reply_text(f'😎 No files found with the name "{file_name}" in the database') 
     
     elif query.data == "pages":
         await query.answer()
