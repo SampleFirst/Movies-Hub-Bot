@@ -324,7 +324,7 @@ async def handle_file_type_click(bot, query):
                    InlineKeyboardButton("🔚 Cancel", callback_data="delete_cancel")
                 ]
             ]
-        )
+        ),
     )     
    await query.answer()
 
