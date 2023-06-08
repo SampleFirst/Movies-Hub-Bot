@@ -1,11 +1,8 @@
 import os
 import asyncio
 import instaloader
-import requests
 from pyrogram import filters, Client
 from pyrogram.types import Message
-from pathlib import Path
-
 
 
 # Create an Instaloader instance
@@ -27,16 +24,10 @@ async def download_instagram_media(client, message: Message):
         os.makedirs(temp_dir, exist_ok=True)
         file_path = os.path.join(temp_dir, "media")
         
-        response = requests.get(media_url, stream=True)
-        response.raise_for_status()
-        
-        with open(file_path, "wb") as file:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    file.write(chunk)
+        loader.download_instagram_url(media_url, file_path)
         
         # Determine the file type
-        file_extension = Path(file_path).suffix
+        file_extension = os.path.splitext(file_path)[1]
         
         # Send the media file as a file in a private message
         if file_extension == ".mp4":
@@ -45,7 +36,7 @@ async def download_instagram_media(client, message: Message):
                 video=file_path,
                 caption="Here's the Instagram reel you requested."
             )
-        elif file_extension == ".jpg" or file_extension == ".jpeg":
+        elif file_extension in [".jpg", ".jpeg"]:
             await client.send_photo(
                 chat_id=message.from_user.id,
                 photo=file_path,
@@ -59,4 +50,3 @@ async def download_instagram_media(client, message: Message):
         
     except Exception as e:
         await message.reply(f"Error: {str(e)}")
-
