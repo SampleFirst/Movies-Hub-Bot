@@ -434,59 +434,7 @@ async def delete_file_type(_, message):
     )
 
 
-@Client.on_callback_query()
-async def process_callback_query(_, callback_query: CallbackQuery):
-    query = callback_query.data
-
-    if query == "find_document":
-        total_files = file_database.get("Document")
-        if total_files is not None:
-            await callback_query.message.edit_text(
-                f"<b>Total files saved for Document: {total_files}</b>"
-            )
-        else:
-            await callback_query.message.edit_text("Invalid file type selected!")
-
-    elif query == "find_video":
-        total_files = file_database.get("Video")
-        if total_files is not None:
-            await callback_query.message.edit_text(
-                f"<b>Total files saved for Video: {total_files}</b>"
-            )
-        else:
-            await callback_query.message.edit_text("Invalid file type selected!")
-
-    elif query == "find_audio":
-        total_files = file_database.get("Audio")
-        if total_files is not None:
-            await callback_query.message.edit_text(
-                f"<b>Total files saved for Audio: {total_files}</b>"
-            )
-        else:
-            await callback_query.message.edit_text("Invalid file type selected!")
-
-    elif query == "find_image":
-        total_files = file_database.get("Image")
-        if total_files is not None:
-            await callback_query.message.edit_text(
-                f"<b>Total files saved for Image: {total_files}</b>"
-            )
-        else:
-            await callback_query.message.edit_text("Invalid file type selected!")
-
-    elif query == "find_zip":
-        total_files = file_database.get("Zip")
-        if total_files is not None:
-            await callback_query.message.edit_text(
-                f"<b>Total files saved for Zip: {total_files}</b>"
-            )
-        else:
-            await callback_query.message.edit_text("Invalid file type selected!")
-
-    elif query == "find_cancel":
-        await callback_query.message.edit_text("<b>Operation canceled.</b>")
-
-    await callback_query.answer()    
+ 
 
 
 
