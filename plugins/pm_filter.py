@@ -1036,16 +1036,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         await callback_query.answer()
         await callback_query.message.edit_text("<b>Operation canceled.</b>")
 
-    elif query.startswith("list_"):
-        file_type = query.split("_")[1]
-        # TODO: Implement logic to list files of the specified file type
-        await callback_query.answer("Listing files is not implemented yet!")
-
-    elif query.startswith("delete_"):
-        file_type = query.split("_")[1]
-        # TODO: Implement logic to delete files of the specified file type
-        await callback_query.answer("Deleting files is not implemented yet!")
-     
+    
     elif query.data == "pages":
         await query.answer()
 
