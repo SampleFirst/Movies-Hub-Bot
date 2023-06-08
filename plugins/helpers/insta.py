@@ -4,7 +4,6 @@ import instaloader
 from pyrogram import filters, Client
 from pyrogram.types import Message
 
-
 # Create an Instaloader instance
 loader = instaloader.Instaloader()
 
@@ -15,7 +14,7 @@ async def download_instagram_media(client, message: Message):
     if len(message.command) != 2:
         await message.reply("Invalid command syntax. Usage: /insta [media_url]")
         return
-    
+
     media_url = message.command[1]
 
     try:
@@ -23,12 +22,12 @@ async def download_instagram_media(client, message: Message):
         temp_dir = "temp"
         os.makedirs(temp_dir, exist_ok=True)
         file_path = os.path.join(temp_dir, "media")
-        
-        loader.download_instagram_url(media_url, file_path)
-        
+
+        loader.download([media_url], target=file_path)
+
         # Determine the file type
         file_extension = os.path.splitext(file_path)[1]
-        
+
         # Send the media file as a file in a private message
         if file_extension == ".mp4":
             await client.send_video(
@@ -44,9 +43,9 @@ async def download_instagram_media(client, message: Message):
             )
         else:
             await message.reply("Unsupported media type.")
-        
+
         # Remove the downloaded media file
         os.remove(file_path)
-        
+
     except Exception as e:
         await message.reply(f"Error: {str(e)}")
