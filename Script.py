@@ -1,12 +1,9 @@
 class script(object):
-    START_TXT = """<b>𝙷𝙴𝙻𝙻𝙾 {},
+    START_TXT = """<b>👋 𝙷𝙰𝙸{},
 𝙼𝚈 𝙽𝙰𝙼𝙴 𝙸𝚂 <a href=https://t.me/{}>{}</a>, 𝙸 𝙲𝙰𝙽 𝙿𝚁𝙾𝚅𝙸𝙳𝙴 𝙼𝙾𝚅𝙸𝙴𝚂, 𝙹𝚄𝚂𝚃 𝙰𝙳𝙳 𝙼𝙴 𝚃𝙾 𝚈𝙾𝚄𝚁 𝙶𝚁𝙾𝚄𝙿 𝙰𝙽𝙳 𝙴𝙽𝙹𝙾𝚈</b>"""
     
     HELP_TXT = """<b>𝙷𝙴𝚈 {}
 𝙷𝙴𝚁𝙴 𝙸𝚂 𝚃𝙷𝙴 𝙷𝙴𝙻𝙿 𝙵𝙾𝚁 𝙼𝚈 𝙲𝙾𝙼𝙼𝙰𝙽𝙳𝚂.</b>"""
-
-
-# ⚠️ Please don't change our credits 𝚃𝙷𝙰𝙽𝙺𝚂 𝚃𝙾 & 𝙳𝙴𝚅 👇🏻
 
     ABOUT_TXT = """✯ 𝙼𝚈 𝙽𝙰𝙼𝙴 : {}
 ✯ 𝙲𝚁𝙴𝙰𝚃𝙾𝚁 : <a href=https://t.me/iPepkornBots>iPepkornBots</a>
@@ -16,13 +13,15 @@ class script(object):
 ✯ 𝙱𝙾𝚃 𝚂𝙴𝚁𝚅𝙴𝚁 : 𝙰𝙽𝚈𝚆𝙷𝙴𝚁𝙴
 ✯ 𝙱𝚄𝙸𝙻𝙳 𝚅𝙴𝚁𝚂𝙸𝙾𝙽: v2.0.1 [ 𝙱𝙴𝚃𝙰 ]</b>"""
 
-    SOURCE_TXT = """<b>NOTE:</b>
+    SOURCE_TXT = """➤ 𝐀𝐛𝐨𝐮𝐭: <b>𝗦𝗢𝗨𝗥𝗖𝗘</b>
+    
+<b>NOTE:</b>
 - 𝚂𝙾𝚄𝚁𝙲𝙴 𝙲𝙾𝙳𝙴 𝙽𝙾𝚃 𝙾𝙿𝙴𝙽
-<b>DEVS:</b>
-- 𝙳𝚎𝚟 1<a href=https://t.me/iPepkornBots>𝚒𝙿𝚎𝚙𝚔𝚘𝚛𝚗𝙱𝚘𝚝𝚜</a>
-- 𝙳𝚎𝚟 2<a href=https://t.me/iPapkornUpdate>iPapkornUpdate</a>"""
+<b>JOIN:</b>
+- 𝙹𝙾𝙸𝙽<a href=https://t.me/iPepkornBots>𝙼𝙾𝚁𝙴 𝙱𝙾𝚃𝚂</a>
+- 𝙹𝙾𝙸𝙽<a href=https://t.me/iPapkornUpdate>𝚄𝙿𝙳𝙰𝚃𝙴</a>"""
 
-    MANUELFILTER_TXT = """Help: <b>Filters</b>
+    MANUELFILTER_TXT = """➤ 𝐇𝐞𝐥𝐩: <b>𝗙𝗜𝗟𝗧𝗘𝗥𝗦</b>
 
 <b>- 𝙵𝙸𝙻𝚃𝙴𝚁 𝙸𝚂 𝚃𝙷𝙴 𝙵𝙴𝙰𝚃𝚄𝚁𝙴 𝚆𝙴𝚁𝙴 𝚄𝚂𝙴𝚁𝚂 𝙲𝙰𝙽 𝚂𝙴𝚃 𝙰𝚄𝚃𝙾𝙼𝙰𝚃𝙴𝙳 𝚁𝙴𝙿𝙻𝙸𝙴𝚂 𝙵𝙾𝚁 𝙰 𝙿𝙰𝚁𝚃𝙸𝙲𝚄𝙻𝙰𝚁 𝙺𝙴𝚈𝚆𝙾𝚁𝙳 𝙰𝙽𝙳 𝙴𝙻𝚂𝙰 𝚆𝙸𝙻𝙻 𝚁𝙴𝚂𝙿𝙾𝙽𝙳 𝚆𝙷𝙴𝙽𝙴𝚅𝙴𝚁 𝙰 𝙺𝙴𝚈𝚆𝙾𝚁𝙳 𝙸𝚂 𝙵𝙾𝚄𝙽𝙳 𝚃𝙷𝙴 𝙼𝙴𝚂𝚂𝙰𝙶𝙴</b>
 
@@ -37,7 +36,7 @@ class script(object):
 • /del - <code>delete a specific filter in chat</code>
 • /delall - <code>delete the whole filters in a chat (chat owner only)</code>"""
 
-    BUTTON_TXT = """Help: <b>Buttons</b>
+    BUTTON_TXT = """➤ 𝐇𝐞𝐥𝐩: <b>𝗕𝗨𝗧𝗧𝗢𝗡𝗦</b>
 
 <b>𝚒𝙿𝙰𝙿𝙺𝙾𝚁𝙽 𝚂𝚄𝙿𝙿𝙾𝚁𝚃𝚂 𝙱𝙾𝚃𝙷 𝚄𝚁𝙻 𝙰𝙽𝙳 𝙰𝙻𝙴𝚁𝚃 𝙸𝙽𝙻𝙸𝙽𝙴 𝙱𝚄𝚃𝚃𝙾𝙽𝚂.</b>
 <b>NOTE:</b>
@@ -50,7 +49,7 @@ class script(object):
 <b>Alert buttons:</b>
 <code>[Button Text](buttonalert:This is an alert message)</code>"""
 
-    AUTOFILTER_TXT = """Help: <b>Auto Filter</b>
+    AUTOFILTER_TXT = """➤ 𝐇𝐞𝐥𝐩: <b>𝗔𝗨𝗧𝗢 𝗙𝗜𝗟𝗧𝗘𝗥</b>
 
 <b>NOTE:</b>
 <b>𝟷. 𝙼𝙰𝙺𝙴 𝙼𝙴 𝚃𝙷𝙴 𝙰𝙳𝙼𝙸𝙽 𝙾𝙵 𝚈𝙾𝚄𝚁 𝙲𝙷𝙰𝙽𝙽𝙴𝙻 𝙸𝙵 𝙸𝚃'𝚂 𝙿𝚁𝙸𝚅𝙰𝚃𝙴.
@@ -60,7 +59,7 @@ class script(object):
 <b>★ /autofilter on - 𝙴𝙽𝙰𝙱𝙻𝙴 𝙰𝚄𝚃𝙾 𝙵𝙸𝙻𝚃𝙴𝚁 𝙸𝙽 𝚃𝙷𝙴 𝙶𝚁𝙾𝚄𝙿𝚂.</b>
 <b>★ /autofilter off - 𝙳𝙸𝚂𝙰𝙱𝙻𝙴𝙳 𝙰𝚄𝚃𝙾 𝙵𝙸𝙻𝚃𝙴𝚁 𝙸𝙽 𝚃𝙷𝙴 𝙶𝚁𝙾𝚄𝙿𝚂.</b>"""
 
-    CONNECTION_TXT = """Help: <b>Connections</b>
+    CONNECTION_TXT = """➤ 𝐇𝐞𝐥𝐩: <b>𝗖𝗢𝗡𝗡𝗘𝗖𝗧𝗜𝗢𝗡𝗦</b>
 
 - Used to connect bot to PM for managing filters 
 - it helps to avoid spamming in groups.
@@ -74,7 +73,7 @@ class script(object):
 • /disconnect  - <code>disconnect from a chat</code>
 • /connections - <code>list all your connections</code>"""
 
-    EXTRAMOD_TXT = """Help: <b>Extra Modules</b>
+    EXTRAMOD_TXT = """➤ 𝐇𝐞𝐥𝐩: <b>𝗘𝗫𝗧𝗥𝗔 𝗠𝗢𝗗𝗨𝗟𝗘𝗦</b>
 
 <b>NOTE:</b>
 these are the extra features of Elsa
@@ -91,13 +90,15 @@ these are the extra features of Elsa
 
 <b>𝙲𝙾𝙼𝙼𝙰𝙽𝙳𝚂</b>
 
-⏭️ /song 𝚂𝙾𝙽𝙶 𝙽𝙰𝙼𝙴 
+🎧 /song 𝚂𝙾𝙽𝙶 𝙽𝙰𝙼𝙴 
 
 <b>𝚆𝙾𝚁𝙺𝚂 𝙱𝙾𝚃𝙷 𝙶𝚁𝙾𝚄𝙿 𝙰𝙽𝙳 𝙿𝙼</b>"""
 
     VIDEO_TXT ="""𝙷𝙴𝙻𝙿 𝚈𝙾𝚄 𝚃𝙾 𝙳𝙾𝚆𝙽𝙻𝙾𝙰𝙳 𝚅𝙸𝙳𝙴𝙾 𝙵𝚁𝙾𝙼 𝚈𝙾𝚄𝚃𝚄𝙱𝙴.
+    
 • 𝘜𝘴𝘢𝘨𝘦
 𝘠𝘰𝘶 𝘊𝘢𝘯 𝘋𝘰𝘸𝘯𝘭𝘰𝘢𝘥 𝘈𝘯𝘺 𝘝𝘪𝘥𝘦𝘰 𝘍𝘳𝘰𝘮 𝘠𝘰𝘶𝘵𝘶𝘣𝘦
+
 𝙃𝙤𝙬 𝙏𝙤 𝙐𝙨𝙚
 • 𝘛𝘺𝘱𝘦 /video or /mp4 𝘈𝘯𝘥 (https://youtu.be/example...)
 • 𝘌𝘹𝘢𝘮𝘱𝘭𝘦:
@@ -111,8 +112,10 @@ Translate text to speech
 
     GTRANS_TXT = """➤ 𝐇𝐞𝐥𝐩: 𝖦𝗈𝗈𝗀𝗅𝖾 𝖳𝗋𝖺𝗇𝗌𝗅𝖺𝗍𝖾𝗋
 𝚃𝚑𝚒𝚜 𝚌𝚘𝚖𝚖𝚊𝚗𝚍 𝚑𝚎𝚕𝚙𝚜 𝚢𝚘𝚞 𝚝𝚘 𝚝𝚛𝚊𝚗𝚜𝚕𝚊𝚝𝚎 𝚊 𝚝𝚎𝚡𝚝 𝚝𝚘 𝖺𝗇𝗒 𝚕𝚊𝚗𝚐𝚞𝚊𝚐𝚎𝚜 𝚢𝚘𝚞 𝚠𝚊𝚗𝚝. 𝚃𝚑𝚒𝚜 𝚌𝚘𝚖𝚖𝚊𝚗𝚍 𝚠𝚘𝚛𝚔𝚜 𝚘𝚗 𝚋𝚘𝚝𝚑 𝚙𝚖 𝚊𝚗𝚍 𝚐𝚛𝚘𝚞𝚙 ✯
+
 ➤ 𝐂𝐨𝐦𝐦𝐚𝐧𝐝𝐬 𝐚𝐧𝐝 𝐔𝐬𝐚𝐠𝐞:
 ➪/tr - 𝖳𝗈 𝗍𝗋𝖺𝗇𝗌𝗅𝖺𝗍𝖾𝗋 𝗍𝖾𝗑𝗍𝗌 𝗍𝗈 𝖺 𝗌𝗉𝖾𝖼𝗂𝖿𝖼 𝗅𝖺𝗇𝗀𝗎𝖺𝗀𝖾
+
 ➤ 𝖭𝗈𝗍𝖾:
 𝖶𝗁𝗂𝗅𝖾 𝗎𝗌𝗂𝗇𝗀 /tr 𝗒𝗈𝗎 𝗌𝗁𝗈𝗎𝗅𝖽 𝗌𝗉𝖾𝖼𝗂𝖿𝗒 𝗍𝗁𝖾 𝗅𝖺𝗇𝗀𝗎𝖺𝗀𝖾 𝖼𝗈𝖽𝖾
 ➛𝖤𝗑𝖺𝗆𝗉𝗅𝖾: /𝗍𝗋 𝗆𝗅
@@ -123,7 +126,8 @@ Translate text to speech
     TELE_TXT = """<b>▫️HELP: Telegraph▪️</b>
 Do as you wish with telegra.ph module!
 </b>USAGE:</b>
-✒️ /telegraph - Send me Picture or Vide Under (5MB)
+
+/telegraph - Send me Picture or Vide Under (5MB)
 <b>NOTE:</b>
 • This Command Is Available in goups and pms
 • This Command Can be used by everyone"""
@@ -157,22 +161,23 @@ Helps you to know your ping 🚶🏼‍♂️
 • This commands can be used buy everyone in the groups and bots pm
 • Share us for more features"""
  
-    STICKER_TXT = """<b>𝚈𝙾𝚄 𝙲𝙰𝙽 𝚄𝚂𝙴 𝚃𝙷𝙸𝚂 𝙼𝙾𝙳𝚄𝙻𝙴 𝚃𝙾 𝙵𝙸𝙽𝙳 𝙰𝙽𝚈 𝚂𝚃𝙸𝙲𝙺𝙴𝚁𝚂 𝙸𝙳.</b>
-• 𝐔𝐒𝐀𝐆𝐄
-To Get Sticker ID
- 
-  ⭕ 𝙃𝙤𝙬 𝙏𝙤 𝙐𝙨𝙚
- 
-◉ Reply To Any Sticker [/stickerid]"""
+    STICKER_TXT = """<b>➤ 𝐇𝐞𝐥𝐩: 𝗦𝗧𝗜𝗖𝗞𝗘𝗥</b>
+  
+⚙️ 𝚄𝚂𝙰𝙶𝙴  
+<b>𝚈𝙾𝚄 𝙲𝙰𝙽 𝚄𝚂𝙴 𝚃𝙷𝙸𝚂 𝙼𝙾𝙳𝚄𝙻𝙴 𝚃𝙾 𝙵𝙸𝙽𝙳 𝙰𝙽𝚈 𝚂𝚃𝙸𝙲𝙺𝙴𝚁𝚂 𝙸𝙳.</b>
 
-    FONT_TXT= """⚙️ 𝐔𝐒𝐀𝐆𝐄
+• Reply To Any Sticker [/stickerid]"""
 
-𝐘𝐎𝐔 𝐂𝐀𝐍 𝐔𝐒𝐄 𝐓𝐇𝐈𝐒 𝐌𝐎𝐃𝐔𝐋𝐄 𝐓𝐎 𝐂𝐇𝐀𝐍𝐆𝐄 𝐅𝐎𝐍𝐓 𝐒𝐓𝐘𝐋𝐄 
+    FONT_TXT= """<b>➤ 𝐇𝐞𝐥𝐩: 𝗙𝗢𝗡𝗧</b>
+    
+⚙️ 𝚄𝚂𝙰𝙶𝙴 
+<b>𝚈𝙾𝚄 𝙲𝙰𝙽 𝚄𝚂𝙴 𝚃𝙷𝙸𝚂 𝙼𝙾𝙳𝚄𝙻𝙴 𝚃𝙾 𝙲𝙷𝙰𝙽𝙶𝙴 𝙵𝙾𝙽𝚃 𝚂𝚃𝚈𝙻𝙴</b>
 
 <b>COMMAND</b> : /font your text (optional)
-        <b> Eg:- /font Hello</b>"""
+<b> Eg:- /font Hello</b>"""
         
-    JSON_TXT = """<b>JSON:</b>
+    JSON_TXT = """<b>➤ 𝐇𝐞𝐥𝐩: 𝗝𝗦𝗢𝗡</b>
+    
 Bot returns json for all replied messages with /json or /js
 <b>Features:</b>
 Message Editting JSON
@@ -181,13 +186,16 @@ Group Support
 <b>Note:</b>
 <b>Everyone can use this command , if spaming happens bot will automatically ban you from the group.</b>"""
 
-    WHOIS_TXT ="""<b>WHOIS MODULE</b>
+    WHOIS_TXT ="""<b>➤ 𝐇𝐞𝐥𝐩: 𝗪𝗛𝗢𝗜𝗦 𝗠𝗢𝗗𝗨𝗟𝗘</b>
+    
 Note:- <b>Give a user details</b>
 
-•/whois :-give a user full details 📑"""
+• /whois :-give a user full details 📑"""
 
-    URLSHORT_TXT = """➤ 𝐇𝐞𝐥𝐩: 𝖴𝗋𝗅 𝗌𝗁𝗈𝗋𝗍𝗇𝖾𝗋
+    URLSHORT_TXT = """➤ 𝐇𝐞𝐥𝐩: 𝗨𝗥𝗟 𝗦𝗛𝗢𝗥𝗧𝗘𝗥
+    
 <i><b>𝚃𝚑𝚒𝚜 𝚌𝚘𝚖𝚖𝚊𝚗𝚍 𝚑𝚎𝚕𝚙𝚜 𝚢𝚘𝚞 𝚝𝚘 𝚜𝚑𝚘𝚛𝚝 𝚊 𝚞𝚛𝚕 </i></b>
+
 ➤ 𝐂𝐨𝐦𝐦𝐚𝐧𝐝𝐬 𝐚𝐧𝐝 𝐔𝐬𝐚𝐠𝐞:
 ➪ /short: <b>𝗎𝗌𝖾 𝗍𝗁𝗂𝗌 𝖼𝗈𝗆𝗆𝖺𝗇𝖽 𝗐𝗂𝗍𝗁 𝗒𝗈𝗎𝗋 𝗅𝗂𝗇𝗄 𝗍𝗈 𝗀𝖾𝗍 𝗌𝗁𝗈𝗋𝗍𝖾𝖽 𝗅𝗂𝗇𝗄𝗌</b>
 ➛𝖤𝗑𝖺𝗆𝗉𝗅𝖾:
@@ -227,7 +235,11 @@ This module only works for my admins
 • /delg - <code>To delete a specific global filter</code>
 • /setskip - <code>Skip no of files before indexing</code>
 • /send - <code>Send any message through bot to users. /send (username/userid) reply with message </code>
-• /deletefiles - <code>Delete CamRip and PreDvD files delete from database </code>"""
+• /deletefiles - <code>Delete CamRip, PreDvD, HDCam, S-Print And HDTVRip files delete from database </code>
+• /findfiles - <code>Find Specific File From Database </code>
+• /findfiletype - <code>Find All Related File Type Files Form Database </code>
+• /deletename - <code>Delete Specific File With Names Form Database </code>
+• /deletefiletype - <code>Delete All Files Related File Type From Database </code>"""
     
     STATUS_TXT = """<b>★ 𝚃𝙾𝚃𝙰𝙻 𝙵𝙸𝙻𝙴𝚂: <code>{}</code>
 ★ 𝚃𝙾𝚃𝙰𝙻 𝚄𝚂𝙴𝚁𝚂: <code>{}</code>
@@ -253,7 +265,7 @@ This module only works for my admins
 """
     
     FILE_MSG = """
-<b>Hai 👋 {} </b>😍
+<b>👋 Hai {} </b>
 
 <b>📫 Your File is Ready</b>
 
@@ -262,7 +274,7 @@ This module only works for my admins
 <b>⚙️ Fɪʟᴇ Sɪᴢᴇ</b> : <b>{}</b>
 """
     CHANNEL_CAP = """
-<b>Hai 👋 {}</b> 😍
+<b>👋 Hai {}</b>
 
 <code>{}</code>
 
@@ -272,22 +284,22 @@ This module only works for my admins
 """
     SUR_TXT = """
 <b>
-𝙷𝙴𝙻𝙻𝙾 {},
+👋 𝙷𝙴𝙻𝙻𝙾 {},
 𝙼𝚈 𝙽𝙰𝙼𝙴 𝙸𝚂 <a href=https://t.me/{}>{}</a>, 𝙸 𝙲𝙰𝙽 𝙿𝚁𝙾𝚅𝙸𝙳𝙴 𝙼𝙾𝚅𝙸𝙴𝚂, 𝙹𝚄𝚂𝚃 𝙰𝙳𝙳 𝙼𝙴 𝚃𝙾 𝚈𝙾𝚄𝚁 𝙶𝚁𝙾𝚄𝙿 𝙰𝙽𝙳 𝙴𝙽𝙹𝙾𝚈 
 </b>
 """
 
     IMDB_TEMPLATE_TXT = """
-<b>🔖 ᴛɪᴛʟᴇ :<a href={url}>{title}</a>
+<b>🎬 ᴛɪᴛʟᴇ :<a href={url}>{title}</a>
 
 🎭 ɢᴇɴʀᴇs : {genres}
 🎖 ʀᴀᴛɪɴɢ : <a href={url}/ratings>{rating}</a> / 10 (ʙᴀsᴇᴅ ᴏɴ {votes} ᴜsᴇʀ ʀᴀᴛɪɴɢ.)
 
 📆 ʏᴇᴀʀ : {release_date}
-🗞 ʟᴀɴɢᴜᴀɢᴇ : {languages}
+🔤 ʟᴀɴɢᴜᴀɢᴇ : {languages}
 🌎 ᴄᴏᴜɴᴛʀʏ : {countries}
 
-©{message.chat.title}</b>
+{message.chat.title}</b>
 """
 
     CUSTOM_FILE_CAPTION = """<b>📂Fɪʟᴇɴᴀᴍᴇ : {file_name}</b>"""
@@ -298,11 +310,11 @@ This module only works for my admins
 ⏰Tɪᴍᴇ : <code>{}</code>
 🌐 Tɪᴍᴇᴢᴏɴᴇ : <code>Asia/Kolkata</code></b>"""
 
-    MELCOW_ENG = """<b>Hᴇʟʟᴏ {} 😍, Aɴᴅ Wᴇʟᴄᴏᴍᴇ Tᴏ {} Gʀᴏᴜᴘ ❤️"""
+    MELCOW_ENG = """<b>👋 Hᴇʟʟᴏ {}, Aɴᴅ Wᴇʟᴄᴏᴍᴇ Tᴏ {} Gʀᴏᴜᴘ"""
 
-    ALRT_TXT = """ᴛʜɪꜱ ɪꜱ ɴᴏᴛ ꜰᴏʀ ʏᴏʏ ꜱɪʀ"""
+    ALRT_TXT = """ᴛʜɪs ɪs ɴᴏᴛ ғᴏʀ ʏᴏᴜ sɪʀ"""
 
-    OLD_ALRT_TXT = """𝐘𝐨𝐮 𝐚𝐫𝐞 𝐮𝐬𝐢𝐧𝐠 𝐨𝐧𝐞 𝐨𝐟 𝐦𝐲 𝐨𝐥𝐝 𝐦𝐞𝐬𝐬𝐚𝐠𝐞𝐬, 𝐩𝐥𝐞𝐚𝐬𝐞 𝐬𝐞𝐧𝐝 𝐭𝐡𝐞 𝐫𝐞𝐪𝐮𝐞𝐬𝐭 𝐚𝐠𝐚𝐢𝐧 """
+    OLD_ALRT_TXT = """ʏᴏᴜ ᴀʀᴇ ᴜsɪɴɢ ᴏɴᴇ ᴏғ ᴍʏ ᴏʟᴅ ᴍᴇssᴀɢᴇs, ᴘʟᴇᴀsᴇ sᴇɴᴅ ᴛʜᴇ ʀᴇǫᴜᴇsᴛ ᴀɢᴀɪɴ..."""
 
     TOP_ALRT_MSG = """♻️ ᴄʜᴇᴄᴋɪɴɢ ꜰɪʟᴇ ᴏɴ ᴍʏ ᴅᴀᴛᴀʙᴀꜱᴇ... ♻️"""
 
