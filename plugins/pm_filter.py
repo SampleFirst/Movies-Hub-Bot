@@ -915,15 +915,15 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "back_deletefiletype":
         btn = [
             [
-                InlineKeyboardButton("📝 Doc", callback_data="delete_document"),
+                InlineKeyboardButton("📄 Document", callback_data="delete_document"),
                 InlineKeyboardButton("🎬 Video", callback_data="delete_video"),
             ],
             [
                 InlineKeyboardButton("🎵 Audio", callback_data="delete_audio"),
-                InlineKeyboardButton("📸 Image", callback_data="delete_image"),
+                InlineKeyboardButton("🖼 Image", callback_data="delete_image"),
             ],
             [
-                InlineKeyboardButton("📤 Zip", callback_data="delete_zip"),
+                InlineKeyboardButton("📦 Zip", callback_data="delete_zip"),
                 InlineKeyboardButton("🔚 Cancel", callback_data="delete_cancel"),
             ],
         ]
