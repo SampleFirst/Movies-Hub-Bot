@@ -288,17 +288,27 @@ async def handle_file_type_click(bot, query):
     file_type = query.matches[0].group(1)
 
     file_types = {
-        "document": ["doc", "MKV", "MP4"],
+        "document": ["pdf", "doc", "docx", "txt"],
         "video": ["mp4", "avi", "mkv", "mov", "wmv"],
         "audio": ["mp3", "m4a", "wav", "aac", "flac"],
-        "image": ["jpg", "png", "gif", "bmp", "svg", "JPEG"],
+        "image": ["jpg", "png", "gif", "bmp", "svg", "jpeg"],
         "zip": ["zip", "rar", "tar", "7z"],
     }
-    
+
     files = []
-    for ext in file_types[file_type]:
-        ext_files, next_offset, total = await get_bad_files(ext, offset=0)
-        files.extend(ext_files)
+    if file_type == "document":
+        document_extensions = []
+        for ext in file_types[file_type]:
+            if ext.isalpha():
+                document_extensions.append(ext)
+        
+        for ext in document_extensions:
+            ext_files, next_offset, total = await get_bad_files(ext, offset=0)
+            files.extend(ext_files)
+    else:
+        for ext in file_types[file_type]:
+            ext_files, next_offset, total = await get_bad_files(ext, offset=0)
+            files.extend(ext_files)
 
     total = len(files)
 
@@ -307,13 +317,16 @@ async def handle_file_type_click(bot, query):
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("YES", callback_data=f"delete_confirm_{file_type}"),
-                    InlineKeyboardButton("CANCEL", callback_data="delete_cancel"),
+                    InlineKeyboardButton("🗑 Delete", callback_data=f"delete_confirm_{file_type}"),
+                    InlineKeyboardButton("🏠 Homel", callback_data="back_deletefiletype"),
+                ],
+                [
+                   InlineKeyboardButton("🔚 Cancel", callback_data="delete_cancel")
                 ]
             ]
-        ),
-    )
-    await query.answer()
+        )
+               
+   await query.answer()
 
 
 @Client.on_callback_query(filters.regex("^delete_confirm_(document|video|audio|image|zip)$"))
@@ -321,17 +334,27 @@ async def handle_confirm_file_delete(bot, query):
     file_type = query.matches[0].group(1)
 
     file_types = {
-        "document": ["doc", "MKV", "MP4"],
+        "document": ["pdf", "doc", "docx", "txt"],
         "video": ["mp4", "avi", "mkv", "mov", "wmv"],
         "audio": ["mp3", "m4a", "wav", "aac", "flac"],
-        "image": ["jpg", "png", "gif", "bmp", "svg", "JPEG"],
+        "image": ["jpg", "png", "gif", "bmp", "svg", "jpeg"],
         "zip": ["zip", "rar", "tar", "7z"],
     }
-    
+
     files = []
-    for ext in file_types[file_type]:
-        ext_files, next_offset, total = await get_bad_files(ext, offset=0)
-        files.extend(ext_files)
+    if file_type == "document":
+        document_extensions = []
+        for ext in file_types[file_type]:
+            if ext.isalpha():
+                document_extensions.append(ext)
+        
+        for ext in document_extensions:
+            ext_files, next_offset, total = await get_bad_files(ext, offset=0)
+            files.extend(ext_files)
+    else:
+        for ext in file_types[file_type]:
+            ext_files, next_offset, total = await get_bad_files(ext, offset=0)
+            files.extend(ext_files)
 
     total = len(files)
 
@@ -888,7 +911,26 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 "<b>✨ Select the type of files you want to delete!\n\n✨ This will delete 100 files from the database for the selected type.</b>",
                 reply_markup=InlineKeyboardMarkup(btn)
             )
-            
+        
+    elif query.data == "back_deletefiletype":
+        btn = [
+            [
+                InlineKeyboardButton("Document", callback_data="delete_document"),
+                InlineKeyboardButton("Video", callback_data="delete_video"),
+            ],
+            [
+                InlineKeyboardButton("Audio", callback_data="delete_audio"),
+                InlineKeyboardButton("Image", callback_data="delete_image"),
+            ],
+            [
+                InlineKeyboardButton("Zip", callback_data="delete_zip"),
+                InlineKeyboardButton("CANCEL", callback_data="delete_cancel"),
+            ],
+        ]
+        await message.reply_text(
+            text="<b>🗑 Select the type of files you want to delete!\n\n🗑 This will delete related files from the database.</b>",
+            reply_markup=InlineKeyboardMarkup(btn),
+        )     
     
     elif query.data == "pages":
         await query.answer()
