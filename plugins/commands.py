@@ -410,7 +410,83 @@ async def cancel_find(client, callback_query):
     await callback_query.message.edit_text("☑️ Find canceled.")
     await callback_query.answer()
 
+@Client.on_message(filters.command("findfiletype") & filters.user(ADMINS))
+async def delete_file_type(_, message):
+    btn = [
+        [
+            InlineKeyboardButton("Document", callback_data="find_document"),
+            InlineKeyboardButton("Video", callback_data="find_video"),
+        ],
+        [
+            InlineKeyboardButton("Audio", callback_data="find_audio"),
+            InlineKeyboardButton("Image", callback_data="find_image"),
+        ],
+        [
+            InlineKeyboardButton("Zip", callback_data="find_zip"),
+            InlineKeyboardButton("CANCEL", callback_data="find_cancel"),
+        ],
+    ]
 
+    await app.send_message(
+        chat_id=message.chat.id,
+        text="<b>Select the type of files you want to delete!\n\nThis will delete related files from the database.</b>",
+        reply_markup=InlineKeyboardMarkup(btn),
+    )
+
+
+@Client.on_callback_query()
+async def process_callback_query(_, callback_query: CallbackQuery):
+    query = callback_query.data
+
+    if query == "find_document":
+        total_files = file_database.get("Document")
+        if total_files is not None:
+            await callback_query.message.edit_text(
+                f"<b>Total files saved for Document: {total_files}</b>"
+            )
+        else:
+            await callback_query.message.edit_text("Invalid file type selected!")
+
+    elif query == "find_video":
+        total_files = file_database.get("Video")
+        if total_files is not None:
+            await callback_query.message.edit_text(
+                f"<b>Total files saved for Video: {total_files}</b>"
+            )
+        else:
+            await callback_query.message.edit_text("Invalid file type selected!")
+
+    elif query == "find_audio":
+        total_files = file_database.get("Audio")
+        if total_files is not None:
+            await callback_query.message.edit_text(
+                f"<b>Total files saved for Audio: {total_files}</b>"
+            )
+        else:
+            await callback_query.message.edit_text("Invalid file type selected!")
+
+    elif query == "find_image":
+        total_files = file_database.get("Image")
+        if total_files is not None:
+            await callback_query.message.edit_text(
+                f"<b>Total files saved for Image: {total_files}</b>"
+            )
+        else:
+            await callback_query.message.edit_text("Invalid file type selected!")
+
+    elif query == "find_zip":
+        total_files = file_database.get("Zip")
+        if total_files is not None:
+            await callback_query.message.edit_text(
+                f"<b>Total files saved for Zip: {total_files}</b>"
+            )
+        else:
+            await callback_query.message.edit_text("Invalid file type selected!")
+
+    elif query == "find_cancel":
+        await callback_query.message.edit_text("<b>Operation canceled.</b>")
+
+    await callback_query.answer()    
 
 
 
