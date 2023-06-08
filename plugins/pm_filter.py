@@ -326,7 +326,7 @@ async def handle_file_type_click(bot, query):
             ]
         ),
     )     
-   await query.answer()
+    await query.answer()
 
 
 @Client.on_callback_query(filters.regex("^delete_confirm_(document|video|audio|image|zip)$"))
