@@ -663,7 +663,29 @@ async def delete_starting_files(client, callback_query):
 
     await callback_query.message.edit_text(message_text, reply_markup=keyboard)
     
+@Client.on_callback_query(filters.regex('^deletename'))
+async def delete_files(client, callback_query):
+        keyboard = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton("🌟 Delete all related name files", callback_data=f"confirm_delete_related:{file_name}")
+                ],
+                [
+                    InlineKeyboardButton("🌟 Delete all starting name files", callback_data=f"confirm_delete_starting:{file_name}")
+                ],
+                [
+                    InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
+                ]
+            ]
+        )
 
+        confirmation_message = f'✨ {result} files found with the name "{file_name}" in the database.\n\n'
+        confirmation_message += f'✨ {starting_result} files found with names starting "{file_name}" in the database.\n\n'
+        confirmation_message += '✨ Please select the deletion option:'
+
+        await message.reply_text(confirmation_message, reply_markup=keyboard)
+    else:
+        await message.reply_text(f'😎 No files found with the name "{file_name}" in the database') 
 
 
 
