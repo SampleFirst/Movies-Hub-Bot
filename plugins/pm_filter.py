@@ -931,7 +931,125 @@ async def cb_handler(client: Client, query: CallbackQuery):
             "<b>🗑 Select the type of files you want to delete!\n\n🗑 This will delete related files from the database.</b>",
             reply_markup=InlineKeyboardMarkup(btn),
         )     
-    
+        
+    elif query == "find_document":
+        total_files = file_database.get("Document")
+        if total_files is not None:
+            await callback_query.answer()
+            await callback_query.message.edit_text(
+                f"<b>Total files saved for Document: {total_files}</b>"
+            )
+
+            await callback_query.message.reply_text(
+                "Choose an action:",
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [InlineKeyboardButton("List", callback_data="list_document")],
+                        [InlineKeyboardButton("Delete", callback_data="delete_document")],
+                    ]
+                ),
+            )
+        else:
+            await callback_query.answer("Invalid file type selected!", show_alert=True)
+
+    elif query == "find_video":
+        total_files = file_database.get("Video")
+        if total_files is not None:
+            await callback_query.answer()
+            await callback_query.message.edit_text(
+                f"<b>Total files saved for Video: {total_files}</b>"
+            )
+
+            await callback_query.message.reply_text(
+                "Choose an action:",
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [InlineKeyboardButton("List", callback_data="list_video")],
+                        [InlineKeyboardButton("Delete", callback_data="delete_video")],
+                    ]
+                ),
+            )
+        else:
+            await callback_query.answer("Invalid file type selected!", show_alert=True)
+
+    elif query == "find_audio":
+        total_files = file_database.get("Audio")
+        if total_files is not None:
+            await callback_query.answer()
+            await callback_query.message.edit_text(
+                f"<b>Total files saved for Audio: {total_files}</b>"
+            )
+
+            await callback_query.message.reply_text(
+                "Choose an action:",
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [InlineKeyboardButton("List", callback_data="list_audio")],
+                        [InlineKeyboardButton("Delete", callback_data="delete_audio")],
+                    ]
+                ),
+            )
+        else:
+            await callback_query.answer("Invalid file type selected!", show_alert=True)
+
+    elif query == "find_image":
+        total_files = file_database.get("Image")
+        if total_files is not None:
+            await callback_query.answer()
+            await callback_query.message.edit_text(
+                f"<b>Total files saved for Image: {total_files}</b>"
+            )
+
+            await callback_query.message.reply_text(
+                "Choose an action:",
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [InlineKeyboardButton("List", callback_data="list_image")],
+                        [InlineKeyboardButton("Delete", callback_data="delete_image")],
+                    ]
+                ),
+            )
+        else:
+            await callback_query.answer("Invalid file type selected!", show_alert=True)
+
+    elif query == "find_zip":
+        total_files = file_database.get("Zip")
+        if total_files is not None:
+            await callback_query.answer()
+            await callback_query.message.edit_text(
+                f"<b>Total files saved for Zip: {total_files}</b>"
+            )
+
+            await callback_query.message.reply_text(
+                "Choose an action:",
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [InlineKeyboardButton("List", callback_data="list_zip")],
+                        [InlineKeyboardButton("Delete", callback_data="delete_zip")],
+                    ]
+                ),
+            )
+        else:
+            await callback_query.answer("Invalid file type selected!", show_alert=True)
+
+    elif query == "find_cancel":
+        await callback_query.answer()
+        await callback_query.message.edit_text("<b>Operation canceled.</b>")
+
+    elif query.startswith("list_"):
+        file_type = query.split("_")[1]
+        # TODO: Implement logic to list files of the specified file type
+        await callback_query.answer("Listing files is not implemented yet!")
+
+    elif query.startswith("delete_"):
+        file_type = query.split("_")[1]
+        # TODO: Implement logic to delete files of the specified file type
+        await callback_query.answer("Deleting files is not implemented yet!")
+
+        else:
+        await callback_query.answer("Invalid action selected!", show_alert=True)
+        
+        
     
     elif query.data == "pages":
         await query.answer()
