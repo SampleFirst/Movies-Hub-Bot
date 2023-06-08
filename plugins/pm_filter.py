@@ -1045,11 +1045,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         file_type = query.split("_")[1]
         # TODO: Implement logic to delete files of the specified file type
         await callback_query.answer("Deleting files is not implemented yet!")
-
-    else:
-        await callback_query.answer("Invalid action selected!", show_alert=True)    
-        
-    
+     
     elif query.data == "pages":
         await query.answer()
 
