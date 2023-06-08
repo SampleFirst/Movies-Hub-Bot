@@ -285,8 +285,7 @@ async def find_files(client, message):
     search_query = " ".join(message.command[1:])  # Extract the search query from the command
 
     if not search_query:
-        return await message.reply("✨ Please provide a name.\n\nExample: /findfiles Kantara.")
-
+        return await message.reply('✨ Please provide a name.\n\nExample: /findfiles Kantara.', quote=True)
 
     # Build the MongoDB query to search for files
     query = {
