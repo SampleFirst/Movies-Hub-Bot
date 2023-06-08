@@ -554,10 +554,9 @@ async def confirm_delete_related_files(client, callback_query):
         [
             [
                 InlineKeyboardButton("✅ Yes", callback_data=f"delete_related:{file_name}"),
-                InlineKeyboardButton("🏠 Home", callback_data="home")
+                InlineKeyboardButton("🏠 Home", callback_data="deletename")
             ],
             [    
-                InlineKeyboardButton("⬅️ Back", callback_data="back"),
                 InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
             ]
         ]
@@ -577,10 +576,9 @@ async def confirm_delete_starting_files(client, callback_query):
         [
             [
                 InlineKeyboardButton("✅ Yes", callback_data=f"delete_related:{file_name}"),
-                InlineKeyboardButton("🏠 Home", callback_data="home")
+                InlineKeyboardButton("🏠 Home", callback_data="deletename")
             ],
             [    
-                InlineKeyboardButton("⬅️ Back", callback_data="back"),
                 InlineKeyboardButton("🔚 Cancel", callback_data="cancel_delete")
             ]
         ]
@@ -602,7 +600,7 @@ async def delete_related_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🏠 Home", callback_data="home"),
+                    InlineKeyboardButton("🏠 Home", callback_data="deletename"),
                     InlineKeyboardButton("⬅️ Back", callback_data=f"confirm_delete_related:{file_name}")
                 ],
                 [
@@ -615,7 +613,7 @@ async def delete_related_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🏠 Home", callback_data="home"),
+                    InlineKeyboardButton("🏠 Home", callback_data="deletename"),
                     InlineKeyboardButton("⬅️ Back", callback_data=f"confirm_delete_related:{file_name}")
                 ],
                 [
@@ -640,7 +638,7 @@ async def delete_starting_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🏠 Home", callback_data="home"),
+                    InlineKeyboardButton("🏠 Home", callback_data="deletename"),
                     InlineKeyboardButton("⬅️ Back", callback_data=f"confirm_delete_starting:{file_name}")
                 ],
                 [
@@ -652,7 +650,7 @@ async def delete_starting_files(client, callback_query):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("🏠 Home", callback_data="home"),
+                    InlineKeyboardButton("🏠 Home", callback_data="deletename"),
                     InlineKeyboardButton("⬅️ Back", callback_data=f"confirm_delete_starting:{file_name}")
                 ],
                 [
