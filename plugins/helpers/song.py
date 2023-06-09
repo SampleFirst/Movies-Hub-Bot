@@ -166,29 +166,27 @@ async def insta_post(client, message: Message):
         await message.reply("Please provide a valid Instagram post URL.")
         return
 
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0;Win64) AppleWebkit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36"
-    }
-
-    response = requests.get(url, headers=headers)
-
-    if response.status_code != 200:
-        await message.reply("Unable to fetch the Instagram post. Please check the URL and try again.")
-        return
-
     try:
-        shortcode = url.split("/")[-2]
-        json_url = f"https://www.instagram.com/p/{shortcode}/?__a=1"
-        data = requests.get(json_url, headers=headers).json()
-        video_url = data["graphql"]["shortcode_media"]["video_url"]
-        image_url = data["graphql"]["shortcode_media"]["display_url"]
-        title = data["graphql"]["shortcode_media"]["edge_media_to_caption"]["edges"][0]["node"]["text"]
-        thumbnail_name = f"thumbnail_{shortcode}.jpg"
-        wget.download(image_url, thumbnail_name)
+        loader = instaloader.Instaloader()
+        loader.download_post(url, target=f"./downloads")  # Download the post to the 'downloads' directory
 
-        await message.reply_video(video_url, caption=title, thumb=thumbnail_name)
+        post_id = url.split("/")[-2]
+        video_path = f"./downloads/{post_id}/{post_id}.mp4"
+        image_path = f"./downloads/{post_id}/{post_id}.jpg"
+        caption_path = f"./downloads/{post_id}/{post_id}.txt"
 
-        os.remove(thumbnail_name)
+        caption = ""
+        if os.path.exists(caption_path):
+            with open(caption_path, 'r') as f:
+                caption = f.read()
+
+        await message.reply_video(video_path, caption=caption, thumb=image_path)
+
+        # Clean up downloaded files
+        os.remove(video_path)
+        os.remove(image_path)
+        os.remove(caption_path)
+        os.rmdir(f"./downloads/{post_id}")
     except Exception as e:
         await message.reply("Failed to download the Instagram post. Please try again later.")
         print(str(e))
