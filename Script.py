@@ -261,6 +261,7 @@ This module only works for my admins
     LOG_TEXT_P = """#𝐍𝐞𝐰𝐔𝐬𝐞𝐫
 ᚛› 𝐈𝐃 - <code>{}</code>
 ᚛› 𝐍𝐚𝐦𝐞 - {}
+᚛› 𝐓𝐨𝐭𝐚𝐥 - {}
 @iPopkonBot
 """
     
