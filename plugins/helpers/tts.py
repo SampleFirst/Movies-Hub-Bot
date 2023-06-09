@@ -7,7 +7,6 @@ from gtts import gTTS
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
-
 def convert(text):
     audio = BytesIO()
     i = Translator().translate(text, dest="en")
@@ -17,13 +16,12 @@ def convert(text):
     tts.write_to_fp(audio)
     return audio
 
-
 @Client.on_message(filters.command("tts"))
 async def text_to_speech(_, message: Message):
     if not message.reply_to_message:
-        return await message.reply_text("Reply to some text ffs.")
+        return await message.reply_text("ʀᴇᴘʟʏ ᴛᴏ sᴏᴍᴇ ᴛᴇxᴛ ғғs.")
     if not message.reply_to_message.text:
-        return await message.reply_text("Reply to some text ffs.")
+        return await message.reply_text("ʀᴇᴘʟʏ ᴛᴏ sᴏᴍᴇ ᴛᴇxᴛ ғғs.")
     m = await message.reply_text("Processing")
     text = message.reply_to_message.text
     try:
