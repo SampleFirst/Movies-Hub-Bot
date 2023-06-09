@@ -4,6 +4,7 @@ import os
 import requests
 import aiohttp
 import yt_dlp
+import instaloader
 import asyncio
 import math
 import time
@@ -156,3 +157,40 @@ async def vsong(client, message: Message):
     for files in (sedlyf, file_stark):
         if files and os.path.exists(files):
             os.remove(files)
+
+            
+@Client.on_message(filters.command(["insta"]))
+async def insta_post(client, message: Message):
+    url = get_text(message)
+    if not url:
+        await message.reply("Please provide a valid Instagram post URL.")
+        return
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0;Win64) AppleWebkit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36"
+    }
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        await message.reply("Unable to fetch the Instagram post. Please check the URL and try again.")
+        return
+
+    try:
+        shortcode = url.split("/")[-2]
+        json_url = f"https://www.instagram.com/p/{shortcode}/?__a=1"
+        data = requests.get(json_url, headers=headers).json()
+        video_url = data["graphql"]["shortcode_media"]["video_url"]
+        image_url = data["graphql"]["shortcode_media"]["display_url"]
+        title = data["graphql"]["shortcode_media"]["edge_media_to_caption"]["edges"][0]["node"]["text"]
+        thumbnail_name = f"thumbnail_{shortcode}.jpg"
+        wget.download(image_url, thumbnail_name)
+
+        await message.reply_video(video_url, caption=title, thumb=thumbnail_name)
+
+        os.remove(thumbnail_name)
+    except Exception as e:
+        await message.reply("Failed to download the Instagram post. Please try again later.")
+        print(str(e))
+
+                        
