@@ -1,5 +1,5 @@
 class script(object):
-    START_TXT = """<b>👋 𝙷𝙰𝙸{},
+    START_TXT = """<b>👋 𝙷𝙴𝙻𝙻𝙾 {},
 𝙼𝚈 𝙽𝙰𝙼𝙴 𝙸𝚂 <a href=https://t.me/{}>{}</a>, 𝙸 𝙲𝙰𝙽 𝙿𝚁𝙾𝚅𝙸𝙳𝙴 𝙼𝙾𝚅𝙸𝙴𝚂, 𝙹𝚄𝚂𝚃 𝙰𝙳𝙳 𝙼𝙴 𝚃𝙾 𝚈𝙾𝚄𝚁 𝙶𝚁𝙾𝚄𝙿 𝙰𝙽𝙳 𝙴𝙽𝙹𝙾𝚈</b>"""
     
     HELP_TXT = """<b>𝙷𝙴𝚈 {}
@@ -212,11 +212,7 @@ Note:- <b>Give a user details</b>
 5. /luck or /cownd - 𝚂𝙿𝙸𝙽 𝙰𝙽𝙳 𝚃𝚁𝚈 𝚈𝙾𝚄𝚁 𝙻𝚄𝙲𝙺"""
 
     ADMIN_TXT = """Help: <b>Admin mods</b>
-
-<b>NOTE:</b>
-This module only works for my admins
-
-<b>Commands and Usage:</b>
+<b>Admin Commands and Usage:</b>
 • /logs - <code>to get the rescent errors</code>
 • /stats - <code>to get status of files in db.</code>
 • /delete - <code>to delete a specific file from db.</code>
