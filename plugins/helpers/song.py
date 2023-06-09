@@ -159,36 +159,61 @@ async def vsong(client, message: Message):
             os.remove(files)
 
             
-@Client.on_message(filters.command(["insta"]))
+            
+            
+            
+def download_instagram_post(url: str) -> str:
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0;Win64) AppleWebkit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36"
+    }
+    
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code != 200:
+        return "Unable to fetch the Instagram post. Please check the URL and try again."
+    
+    try:
+        shortcode = url.split("/")[-2]
+        json_url = f"https://www.instagram.com/p/{shortcode}/?__a=1"
+        data = requests.get(json_url, headers=headers).json()
+        
+        if "graphql" not in data or "shortcode_media" not in data["graphql"]:
+            return "Invalid Instagram post. Please check the URL and try again."
+        
+        media = data["graphql"]["shortcode_media"]
+        if media["is_video"]:
+            video_url = media["video_url"]
+            return video_url
+        else:
+            image_url = media["display_url"]
+            return image_url
+    except Exception as e:
+        return f"Failed to download the Instagram post. Error: {str(e)}"
+
+app = Client("instagram_post_saver")
+
+@app.on_message(filters.command(["insta"]))
 async def insta_post(client, message: Message):
-    url = get_text(message)
+    url = " ".join(message.command[1:])
+    
     if not url:
         await message.reply("Please provide a valid Instagram post URL.")
         return
+    
+    file_url = download_instagram_post(url)
+    
+    if file_url.startswith("Unable") or file_url.startswith("Invalid") or file_url.startswith("Failed"):
+        await message.reply(file_url)
+        return
+    
+    file_name = file_url.split("/")[-1]
+    
+    await client.send_chat_action(message.chat.id, "upload_document")
+    await message.reply_document(file_url, caption=f"Downloaded from Instagram: [{file_name}]({url})")
+    
+    # Delete the temporary downloaded file
+    os.remove(file_name)
 
-    try:
-        loader = instaloader.Instaloader()
-        loader.download_post(url, target=f"./downloads")  # Download the post to the 'downloads' directory
 
-        post_id = url.split("/")[-2]
-        video_path = f"./downloads/{post_id}/{post_id}.mp4"
-        image_path = f"./downloads/{post_id}/{post_id}.jpg"
-        caption_path = f"./downloads/{post_id}/{post_id}.txt"
-
-        caption = ""
-        if os.path.exists(caption_path):
-            with open(caption_path, 'r') as f:
-                caption = f.read()
-
-        await message.reply_video(video_path, caption=caption, thumb=image_path)
-
-        # Clean up downloaded files
-        os.remove(video_path)
-        os.remove(image_path)
-        os.remove(caption_path)
-        os.rmdir(f"./downloads/{post_id}")
-    except Exception as e:
-        await message.reply("Failed to download the Instagram post. Please try again later.")
-        print(str(e))
 
                         
