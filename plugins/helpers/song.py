@@ -4,7 +4,6 @@ import os
 import requests
 import aiohttp
 import yt_dlp
-import instaloader
 import asyncio
 import math
 import time
@@ -37,7 +36,7 @@ def song(client, message):
     for i in message.command[1:]:
         query += ' ' + str(i)
     print(query)
-    m = message.reply("**ѕєαrchíng чσur ѕσng...!**")
+    m = message.reply("**sᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ sᴏɴɢ...**")
     ydl_opts = {"format": "bestaudio[ext=m4a]"}
     try:
         results = YoutubeSearch(query, max_results=1).to_dict()
@@ -57,11 +56,11 @@ def song(client, message):
 
     except Exception as e:
         m.edit(
-            "**𝙵𝙾𝚄𝙽𝙳 𝙽𝙾𝚃𝙷𝙸𝙽𝙶 𝙿𝙻𝙴𝙰𝚂𝙴 𝙲𝙾𝚁𝚁𝙴𝙲𝚃 𝚃𝙷𝙴 𝚂𝙿𝙴𝙻𝙻𝙸𝙽𝙶 𝙾𝚁 𝚂𝙴𝙰𝚁𝙲𝙷 𝙰𝙽𝚈 𝙾𝚃𝙷𝙴𝚁 𝚂𝙾𝙽𝙶**"
+            "**ғᴏᴜɴᴅ ɴᴏᴛʜɪɴɢ ᴘʟᴇᴀsᴇ ᴄᴏʀʀᴇᴄᴛ ᴛʜᴇ sᴘᴇʟʟɪɴɢ ᴏʀ sᴇᴀʀᴄʜ ᴀɴʏ ᴏᴛʜᴇʀ sᴏɴɢ...**"
         )
         print(str(e))
         return
-    m.edit("**dσwnlσαdíng чσur ѕσng...!**")
+    m.edit("**ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ʏᴏᴜʀ sᴏɴɢ...**")
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(link, download=False)
@@ -101,10 +100,10 @@ async def vsong(client, message: Message):
     urlissed = get_text(message)
 
     pablo = await client.send_message(
-        message.chat.id, f"**𝙵𝙸𝙽𝙳𝙸𝙽𝙶 𝚈𝙾𝚄𝚁 𝚅𝙸𝙳𝙴𝙾** `{urlissed}`"
+        message.chat.id, f"**sᴇᴀʀᴄʜɪɴɢ ʏᴏᴜʀ ᴠɪᴅᴇᴏ...** `{urlissed}`"
     )
     if not urlissed:
-        await pablo.edit("Invalid Command Syntax Please Check help Menu To Know More!")
+        await pablo.edit("ɪɴᴠᴀʟɪᴅ ᴄᴏᴍᴍᴀɴᴅ sʏɴᴛᴀx ᴘʟᴇᴀsᴇ ᴄʜᴇᴄᴋ ʜᴇʟᴘ ᴍᴇɴᴜ ᴛᴏ ᴋɴᴏᴡ ᴍᴏʀᴇ!")
         return
 
     search = SearchVideos(f"{urlissed}", offset=1, mode="dict", max_results=1)
@@ -134,7 +133,7 @@ async def vsong(client, message: Message):
         with YoutubeDL(opts) as ytdl:
             ytdl_data = ytdl.extract_info(url, download=True)
     except Exception as e:
-        await event.edit(event, f"**𝙳𝚘𝚠𝚗𝚕𝚘𝚊𝚍 𝙵𝚊𝚒𝚕𝚎𝚍 𝙿𝚕𝚎𝚊𝚜𝚎 𝚃𝚛𝚢 𝙰𝚐𝚊𝚒𝚗..♥️** \n**Error :** `{str(e)}`")
+        await event.edit(event, f"**ᴅᴏᴡɴʟᴏᴀᴅ ғᴀɪʟᴇᴅ ᴘʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ...** \n**Error :** `{str(e)}`")
         return
     c_time = time.time()
     file_stark = f"{ytdl_data['id']}.mp4"
@@ -157,63 +156,5 @@ async def vsong(client, message: Message):
     for files in (sedlyf, file_stark):
         if files and os.path.exists(files):
             os.remove(files)
-
             
-            
-            
-            
-def download_instagram_post(url: str) -> str:
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0;Win64) AppleWebkit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36"
-    }
     
-    response = requests.get(url, headers=headers)
-    
-    if response.status_code != 200:
-        return "Unable to fetch the Instagram post. Please check the URL and try again."
-    
-    try:
-        shortcode = url.split("/")[-2]
-        json_url = f"https://www.instagram.com/p/{shortcode}/?__a=1"
-        data = requests.get(json_url, headers=headers).json()
-        
-        if "graphql" not in data or "shortcode_media" not in data["graphql"]:
-            return "Invalid Instagram post. Please check the URL and try again."
-        
-        media = data["graphql"]["shortcode_media"]
-        if media["is_video"]:
-            video_url = media["video_url"]
-            return video_url
-        else:
-            image_url = media["display_url"]
-            return image_url
-    except Exception as e:
-        return f"Failed to download the Instagram post. Error: {str(e)}"
-
-app = Client("instagram_post_saver")
-
-@app.on_message(filters.command(["insta"]))
-async def insta_post(client, message: Message):
-    url = " ".join(message.command[1:])
-    
-    if not url:
-        await message.reply("Please provide a valid Instagram post URL.")
-        return
-    
-    file_url = download_instagram_post(url)
-    
-    if file_url.startswith("Unable") or file_url.startswith("Invalid") or file_url.startswith("Failed"):
-        await message.reply(file_url)
-        return
-    
-    file_name = file_url.split("/")[-1]
-    
-    await client.send_chat_action(message.chat.id, "upload_document")
-    await message.reply_document(file_url, caption=f"Downloaded from Instagram: [{file_name}]({url})")
-    
-    # Delete the temporary downloaded file
-    os.remove(file_name)
-
-
-
-                        
