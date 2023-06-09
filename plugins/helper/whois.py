@@ -1,7 +1,3 @@
-
-"""Get info about the replied user
-Syntax: .whois"""
-
 import os
 import time
 from datetime import datetime
@@ -13,15 +9,10 @@ from plugins.helper_functions.cust_p_filters import f_onw_fliter
 from plugins.helper_functions.last_online_hlpr import last_online
 
 
-@Client.on_message(
-    filters.command(["whois", "info"], COMMAND_HAND_LER) &
-    f_onw_fliter
-)
+@Client.on_message(filters.command(["whois", "info"], COMMAND_HAND_LER) & f_onw_fliter)
 async def who_is(client, message):
-    """ extract user information """
-    status_message = await message.reply_text(
-        "Wait Bro Let Me Check 🙂"
-    )
+    status_message = await message.reply_text("Wait Bro, Let Me Check 🙂")
+    
     from_user = None
     from_user_id, _ = extract_user(message)
     try:
@@ -29,8 +20,9 @@ async def who_is(client, message):
     except Exception as error:
         await status_message.edit(str(error))
         return
+    
     if from_user is None:
-        await status_message.edit("no valid user_id / message specified")
+        await status_message.edit("No valid user_id / message specified")
         return
     
     first_name = from_user.first_name or ""
@@ -47,28 +39,20 @@ async def who_is(client, message):
         f"<b>᚛› 𝙸𝚂 𝙰𝙲𝙲𝙾𝚄𝙽𝚃 𝙳𝙴𝙻𝙴𝚃𝙴𝙳 :</b> True\n" if from_user.is_deleted else ""
         f"<b>᚛› 𝙸𝚂 𝚅𝙴𝚁𝙸𝙵𝙸𝙴𝙳 :</b> True" if from_user.is_verified else ""
         f"<b>᚛› 𝙸𝚂 𝚂𝙲𝙰𝙼 :</b> True" if from_user.is_scam else ""
-        # f"<b>Is Fake:</b> True" if from_user.is_fake else ""
         f"<b>᚛› 𝙻𝙰𝚂𝚃 𝚂𝙴𝙴𝙽 :</b> <code>{last_online(from_user)}</code>\n\n"
     )
-
+    
     if message.chat.type in [enums.ChatType.SUPERGROUP, enums.ChatType.CHANNEL]:
         try:
             chat_member_p = await message.chat.get_member(from_user.id)
-            joined_date = datetime.fromtimestamp(
-                chat_member_p.joined_date or time.time()
-            ).strftime("%Y.%m.%d %H:%M:%S")
-            message_out_str += (
-                "<b>Joined on:</b> <code>"
-                f"{joined_date}"
-                "</code>\n"
-            )
+            joined_date = datetime.fromtimestamp(chat_member_p.joined_date or time.time()).strftime("%Y.%m.%d %H:%M:%S")
+            message_out_str += "<b>Joined on:</b> <code>" f"{joined_date}" "</code>\n"
         except UserNotParticipant:
             pass
+    
     chat_photo = from_user.photo
     if chat_photo:
-        local_user_photo = await client.download_media(
-            message=chat_photo.big_file_id
-        )
+        local_user_photo = await client.download_media(message=chat_photo.big_file_id)
         await message.reply_photo(
             photo=local_user_photo,
             quote=True,
@@ -82,4 +66,5 @@ async def who_is(client, message):
             quote=True,
             disable_notification=True
         )
+    
     await status_message.delete()
