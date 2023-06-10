@@ -212,7 +212,11 @@ Note:- <b>Give a user details</b>
 5. /luck or /cownd - 𝚂𝙿𝙸𝙽 𝙰𝙽𝙳 𝚃𝚁𝚈 𝚈𝙾𝚄𝚁 𝙻𝚄𝙲𝙺"""
 
     ADMIN_TXT = """Help: <b>Admin mods</b>
-<b>Admin Commands and Usage:</b>
+
+<b>NOTE:</b>
+This module only works for my admins
+
+<b>Commands and Usage:</b>
 • /logs - <code>to get the rescent errors</code>
 • /stats - <code>to get status of files in db.</code>
 • /delete - <code>to delete a specific file from db.</code>
@@ -231,9 +235,7 @@ Note:- <b>Give a user details</b>
 • /delg - <code>To delete a specific global filter</code>
 • /setskip - <code>Skip no of files before indexing</code>
 • /send - <code>Send any message through bot to users. /send (username/userid) reply with message </code>
-• /deletefiles - <code>Delete CamRip, PreDvD, HDCam, S-Print And HDTVRip files delete from database </code>
-• /findfiles - <code>Find Specific File From Database </code>
-• /findfiletype - <code>Find All Related File Type Files Form Database </code>"""
+• /deletefiles - <code>Delete CamRip and PreDvD files delete from database </code>"""
 
     STATUS_TXT = """<b>★ 𝚃𝙾𝚃𝙰𝙻 𝙵𝙸𝙻𝙴𝚂: <code>{}</code>
 ★ 𝚃𝙾𝚃𝙰𝙻 𝚄𝚂𝙴𝚁𝚂: <code>{}</code>
