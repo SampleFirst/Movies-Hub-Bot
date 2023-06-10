@@ -233,10 +233,8 @@ Note:- <b>Give a user details</b>
 • /send - <code>Send any message through bot to users. /send (username/userid) reply with message </code>
 • /deletefiles - <code>Delete CamRip, PreDvD, HDCam, S-Print And HDTVRip files delete from database </code>
 • /findfiles - <code>Find Specific File From Database </code>
-• /findfiletype - <code>Find All Related File Type Files Form Database </code>
-• /deletename - <code>Delete Specific File With Names Form Database </code>
-• /deletefiletype - <code>Delete All Files Related File Type From Database </code>"""
-    
+• /findfiletype - <code>Find All Related File Type Files Form Database </code>"""
+
     STATUS_TXT = """<b>★ 𝚃𝙾𝚃𝙰𝙻 𝙵𝙸𝙻𝙴𝚂: <code>{}</code>
 ★ 𝚃𝙾𝚃𝙰𝙻 𝚄𝚂𝙴𝚁𝚂: <code>{}</code>
 ★ 𝚃𝙾𝚃𝙰𝙻 𝙲𝙷𝙰𝚃𝚂: <code>{}</code>
@@ -257,7 +255,7 @@ Note:- <b>Give a user details</b>
     LOG_TEXT_P = """#𝐍𝐞𝐰𝐔𝐬𝐞𝐫
 ᚛› 𝐈𝐃 - <code>{}</code>
 ᚛› 𝐍𝐚𝐦𝐞 - {}
-᚛› 𝐓𝐨𝐭𝐚𝐥 - {}
+᚛› 𝐓𝐨𝐭𝐚𝐥 𝐔𝐬𝐞𝐫𝐬 - {}
 @iPopkonBot
 """
     
