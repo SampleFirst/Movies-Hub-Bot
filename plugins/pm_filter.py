@@ -116,24 +116,36 @@ async def pm_text(bot, message):
     if content.startswith("/") or content.startswith("#"):
         return  # ignore commands and hashtags
     
+    update_channel_keyboard = InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton("Join Update Channel", url="https://t.me/+VnG269AYxSM3OGFl")]
+        ]
+    )
+    
+    join_update_channel_message = "<b>Please join the 'Update Channel' to use this bot.</b>"
+    
+    if "update_channel" not in message.from_user.username:
+        await message.reply_text(join_update_channel_message, reply_markup=update_channel_keyboard, quote=True)
+        return
+    
     keyboard = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton("More Bots", url="https://t.me/+9Z1w2KOebaliYzdl"),
-                InlineKeyboardButton("Search Group", url="https://t.me/+_FmlDFAh13FlNTVl")
+                InlineKeyboardButton("Search Group", url="https://t.me/+_SiXJv4cfBw1MTRl")
             ]
         ]
     )
     
     await message.reply_text(
         "<b>Join 'More Bots' Channel For More Alternative Bots.\n\nJoin 'Search Group' For Search Your Querys.\n\nShare And Support</b>",
-        reply_markup=keyboard)
-        
+        reply_markup=keyboard, quote=True)
     
     await bot.send_message(
         chat_id=LOG_CHANNEL_PM,
         text=f"<b>#PM_MSG\n\nName: {user}\n\nID: {user_id}\n\nMessage: {content}</b>"
     )
+
 
 @Client.on_callback_query(filters.regex(r"^next"))
 async def next_page(bot, query):
