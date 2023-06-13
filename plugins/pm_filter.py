@@ -124,7 +124,7 @@ async def pm_text(bot, message):
     
     join_update_channel_message = "<b>Please join the 'Update Channel' to use this bot.</b>"
     
-    if message.from_user.username is None or "update_channel" not in message.from_user.username:
+    if message.from_user.first_name is None or "update_channel" not in message.from_user.first_name:
         await message.reply_text(join_update_channel_message, reply_markup=update_channel_keyboard, quote=True)
         return
     
