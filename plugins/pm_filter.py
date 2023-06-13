@@ -121,7 +121,7 @@ async def pm_text(bot, message):
         [
             [
                 InlineKeyboardButton("More Bots", url="https://t.me/+9Z1w2KOebaliYzdl"),
-                InlineKeyboardButton("Search Group", url="https://t.me/+_SiXJv4cfBw1MTRl")
+                InlineKeyboardButton("Search Group", url="https://t.me/+_FmlDFAh13FlNTVl")
             ]
         ]
     )
@@ -133,9 +133,8 @@ async def pm_text(bot, message):
     )
     
     await bot.send_message(
-        chat_id=LOG_CHANNEL_PM,
-        text=f"<b>#PM_MSG\n\nName: {user}\n\nID: {user_id}\n\nMessage: {content}</b>",
-        quote=True
+        chat_id=LOG_CHANNEL,
+        text=f"<b>#PM_MSG\n\nName : {user}\n\nID : {user_id}\n\nMessage : {content}</b>"
     )
 
 
