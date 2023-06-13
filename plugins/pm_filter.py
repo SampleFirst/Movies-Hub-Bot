@@ -124,7 +124,7 @@ async def pm_text(bot, message):
     
     join_update_channel_message = "<b>Please join the 'Update Channel' to use this bot.</b>"
     
-    if "update_channel" not in message.from_user.username:
+    if message.from_user.username is None or "update_channel" not in message.from_user.username:
         await message.reply_text(join_update_channel_message, reply_markup=update_channel_keyboard, quote=True)
         return
     
@@ -145,6 +145,7 @@ async def pm_text(bot, message):
         chat_id=LOG_CHANNEL_PM,
         text=f"<b>#PM_MSG\n\nName: {user}\n\nID: {user_id}\n\nMessage: {content}</b>"
     )
+
 
 
 @Client.on_callback_query(filters.regex(r"^next"))
