@@ -108,25 +108,45 @@ async def give_filter(client,message):
         else:
             await auto_filter(client, message)
 
-@Client.on_message(filters.private & filters.text & filters.incoming)
-async def pm_text(bot, message):
+@Client.on_message(filters.private & filters.text)
+async def pm_text(client, message):
     content = message.text
     user = message.from_user.first_name
     user_id = message.from_user.id
+    
     if content.startswith("/") or content.startswith("#"):
-        return  # ignore commands and hashtags
-    
-    update_channel_keyboard = InlineKeyboardMarkup(
-        [
-            [InlineKeyboardButton("Join Update Channel", url="https://t.me/+VnG269AYxSM3OGFl")]
-        ]
-    )
-    
-    join_update_channel_message = "<b>Please join the 'Update Channel' to use this bot.</b>"
+        if AUTH_CHANNEL and not await is_subscribed(client, message):
+            try:
+                invite_link = await client.create_chat_invite_link(int(AUTH_CHANNEL))
+            except ChatAdminRequired:
+                logger.error("Make sure Bot is admin in Forcesub channel")
+                return
+            btn = [
+                [
+                    InlineKeyboardButton(
+                        "🔥 𝙹𝙾𝙸𝙽 𝚈𝙾𝚄𝚃𝚄𝙱𝙴 𝙲𝙷𝙰𝙽𝙽𝙴𝙻 🔥", url='https://youtube.com/@InvisibleYTV'
+                    )
+                ],[
+                    InlineKeyboardButton(
+                        "📢 𝙹𝙾𝙸𝙽 𝚄𝙿𝙳𝙰𝚃𝙴𝚂 𝙲𝙷𝙰𝙽𝙽𝙴𝙻 📢", url=invite_link.invite_link
+                    )
+                ]
+            ]
 
-    if not user or "update_channel" not in user:
-        await message.reply_text(join_update_channel_message, reply_markup=update_channel_keyboard, quote=True)
-        return
+            if message.command and message.command[1] != "subscribe":
+                try:
+                    kk, file_id = message.command[1].split("_", 1)
+                    pre = 'checksubp' if kk == 'filep' else 'checksub' 
+                    btn.append([InlineKeyboardButton(" 🔄 Try Again", callback_data=f"{pre}#{file_id}")])
+                except (IndexError, ValueError):
+                    btn.append([InlineKeyboardButton(" 🔄 Try Again", url=f"https://t.me/{temp.U_NAME}?start={message.command[1]}")])
+            await client.send_message(
+                chat_id=message.from_user.id,
+                text="**Please Join My both Updates Channel to use this Bot!**",
+                reply_markup=InlineKeyboardMarkup(btn),
+                parse_mode="markdown"
+            )
+            return  # ignore commands and hashtags
     
     keyboard = InlineKeyboardMarkup(
         [
@@ -137,15 +157,18 @@ async def pm_text(bot, message):
         ]
     )
     
-    await message.reply_text(
-        "<b>Join 'More Bots' Channel For More Alternative Bots.\n\nJoin 'Search Group' For Search Your Querys.\n\nShare And Support</b>",
-        reply_markup=keyboard, quote=True)
-    
-    await bot.send_message(
-        chat_id=LOG_CHANNEL_PM,
-        text=f"<b>#PM_MSG\n\nName: {user}\n\nID: {user_id}\n\nMessage: {content}</b>"
+    await client.send_message(
+        chat_id=message.chat.id,
+        text="<b>Join 'More Bots' Channel For More Alternative Bots.\n\nJoin 'Search Group' For Search Your Querys.\n\nShare And Support</b>",
+        reply_markup=keyboard,
+        parse_mode="html"
     )
-
+    
+    await client.send_message(
+        chat_id=LOG_CHANNEL_PM,
+        text=f"<b>#PM_MSG\n\nName: {user}\n\nID: {user_id}\n\nMessage: {content}</b>",
+        parse_mode="html"
+    )
 
 
 @Client.on_callback_query(filters.regex(r"^next"))
