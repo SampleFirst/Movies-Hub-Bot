@@ -120,32 +120,24 @@ async def pm_text(bot, message):
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("Update Channel", url="https://t.me/+VnG269AYxSM3OGFl"),
+                InlineKeyboardButton("More Bots", url="https://t.me/+9Z1w2KOebaliYzdl"),
+                InlineKeyboardButton("Search Group", url="https://t.me/+_SiXJv4cfBw1MTRl")
             ]
         ]
     )
-    await message.reply_text("<b>Join Update Channel for using the bot</b>", reply_markup=keyboard)
-        
-    else:
-        keyboard = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton("More Bots", url="https://t.me/+9Z1w2KOebaliYzdl"),
-                    InlineKeyboardButton("Search Group", url="https://t.me/+_SiXJv4cfBw1MTRl")
-                ]
-            ]
-        )
     
-        await message.reply_text(
-            "<b>Join 'More Bots' Channel For More Alternative Bots.\n\nJoin 'Search Group' For Search Your Queries.\n\nShare And Support</b>",
-            reply_markup=keyboard
-        )
+    await message.reply_text(
+        "<b>Join 'More Bots' Channel For More Alternative Bots.\n\nJoin 'Search Group' For Search Your Queries.\n\nShare And Support</b>",
+        reply_markup=keyboard,
+        quote=True
+    )
     
     await bot.send_message(
         chat_id=LOG_CHANNEL_PM,
         text=f"<b>#PM_MSG\n\nName: {user}\n\nID: {user_id}\n\nMessage: {content}</b>",
         quote=True
     )
+
 
 
 @Client.on_callback_query(filters.regex(r"^next"))
