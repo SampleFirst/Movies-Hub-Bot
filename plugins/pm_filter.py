@@ -124,28 +124,26 @@ async def pm_text(bot, message):
             ]
         ]
     )
-    
     await message.reply_text("<b>Join Update Channel for using the bot</b>", reply_markup=keyboard)
-    
-    keyboard = InlineKeyboardMarkup(
-        [
+        
+    else:
+        keyboard = InlineKeyboardMarkup(
             [
-                InlineKeyboardButton("More Bots", url="https://t.me/+9Z1w2KOebaliYzdl"),
-                InlineKeyboardButton("Search Group", url="https://t.me/+_SiXJv4cfBw1MTRl")
+                [
+                    InlineKeyboardButton("More Bots", url="https://t.me/+9Z1w2KOebaliYzdl"),
+                    InlineKeyboardButton("Search Group", url="https://t.me/+_SiXJv4cfBw1MTRl")
+                ]
             ]
-        ]
-    )
+        )
     
-    await message.reply_text(
-        "<b>Join 'More Bots' Channel For More Alternative Bots.\n\nJoin 'Search Group' For Search Your Queries.\n\nShare And Support</b>",
-        reply_markup=keyboard
-    )
-    
-    message_parts = content.split()
+        await message.reply_text(
+            "<b>Join 'More Bots' Channel For More Alternative Bots.\n\nJoin 'Search Group' For Search Your Queries.\n\nShare And Support</b>",
+            reply_markup=keyboard
+        )
     
     await bot.send_message(
         chat_id=LOG_CHANNEL_PM,
-        text=f"<b>#PM_MSG\n\nName: {user}\n\nID: {user_id}\n\nMessage: {' '.join(message_parts)}</b>",
+        text=f"<b>#PM_MSG\n\nName: {user}\n\nID: {user_id}\n\nMessage: {content}</b>",
         quote=True
     )
 
