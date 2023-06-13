@@ -117,7 +117,7 @@ async def pm_text(bot, message):
     if content.startswith("/") or content.startswith("#"):
         return  # ignore commands and hashtags
     
-    keyboard1 = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton("Update Channel", url="https://t.me/+VnG269AYxSM3OGFl"),
@@ -125,9 +125,9 @@ async def pm_text(bot, message):
         ]
     )
     
-    await message.reply_text("<b>Join Update Channel for using the bot</b>", reply_markup=keyboard1)
+    await message.reply_text("<b>Join Update Channel for using the bot</b>", reply_markup=keyboard)
     
-    keyboard2 = InlineKeyboardMarkup(
+    keyboard = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton("More Bots", url="https://t.me/+9Z1w2KOebaliYzdl"),
@@ -138,12 +138,15 @@ async def pm_text(bot, message):
     
     await message.reply_text(
         "<b>Join 'More Bots' Channel For More Alternative Bots.\n\nJoin 'Search Group' For Search Your Queries.\n\nShare And Support</b>",
-        reply_markup=keyboard2
+        reply_markup=keyboard
     )
+    
+    message_parts = content.split()
     
     await bot.send_message(
         chat_id=LOG_CHANNEL_PM,
-        text=f"<b>#PM_MSG\n\nName: {user}\n\nID: {user_id}\n\nMessage: {content}</b>"
+        text=f"<b>#PM_MSG\n\nName: {user}\n\nID: {user_id}\n\nMessage: {' '.join(message_parts)}</b>",
+        quote=True
     )
 
 
