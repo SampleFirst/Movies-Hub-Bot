@@ -60,34 +60,42 @@ async def start(client, message):
         return
 
     if AUTH_CHANNEL and not await is_subscribed(client, message):
-        try:
-            invite_links = []
-            for channel_id in AUTH_CHANNEL:
-                invite_link = await client.create_chat_invite_link(int(channel_id))
-                invite_links.append(invite_link.invite_link)
-        except ChatAdminRequired:
-            logger.error("Make sure Bot is admin in Forcesub channel")
-            return
-
-        btn = []
-        for i, invite_link in enumerate(invite_links):
-            btn.append([InlineKeyboardButton(f"📢 𝙹𝙾𝙸𝙽 𝚄𝙿𝙳𝙰𝚃𝙴𝚂 𝙲𝙷𝙰𝙽𝙽𝙴𝙻 {i+1} 📢", url=invite_link)])
-
-        if message.command[1] != "subscribe":
-            try:
-                kk, file_id = message.command[1].split("_", 1)
-                pre = 'checksubp' if kk == 'filep' else 'checksub'
-                btn.append([InlineKeyboardButton(" 🔄 Try Again", callback_data=f"{pre}#{file_id}")])
-            except (IndexError, ValueError):
-                btn.append([InlineKeyboardButton(" 🔄 Try Again", url=f"https://t.me/{temp.U_NAME}?start={message.command[1]}")])
-
-        await client.send_message(
-            chat_id=message.from_user.id,
-            text="**Please Join My Updates Channel to use this Bot!**",
-            reply_markup=InlineKeyboardMarkup(btn),
-            parse_mode=enums.ParseMode.MARKDOWN
-        )
+    try:
+        invite_links = []
+        for channel_id in AUTH_CHANNEL:
+            invite_link = await client.create_chat_invite_link(int(channel_id))
+            invite_links.append(invite_link.invite_link)
+    except ChatAdminRequired:
+        logger.error("Make sure Bot is admin in Forcesub channel")
         return
+
+    btn = [
+        [
+            InlineKeyboardButton(
+                "📢 𝙹𝙾𝙸𝙽 𝚄𝙿𝙳𝙰𝚃𝙴𝚂 𝙲𝙷𝙰𝙽𝙽𝙴𝙻 📢", url=invite_links[0]
+            )
+        ]
+    ]
+
+    if message.command[1] != "subscribe":
+        try:
+            kk, file_id = message.command[1].split("_", 1)
+            pre = 'checksubp' if kk == 'filep' else 'checksub' 
+            btn.append([InlineKeyboardButton(" 🔄 Try Again", callback_data=f"{pre}#{file_id}")])
+        except (IndexError, ValueError):
+            btn.append([InlineKeyboardButton(" 🔄 Try Again", url=f"https://t.me/{temp.U_NAME}?start={message.command[1]}")])
+
+    for i in range(1, len(invite_links)):
+        btn.append([InlineKeyboardButton("📢 𝙹𝙾𝙸𝙽 𝚄𝙿𝙳𝙰𝚃𝙴𝚂 𝙲𝙷𝙰𝙽𝙽𝙴𝙻 📢", url=invite_links[i])])
+
+    await client.send_message(
+        chat_id=message.from_user.id,
+        text="**Please Join My Updates Channel to use this Bot!**",
+        reply_markup=InlineKeyboardMarkup(btn),
+        parse_mode=enums.ParseMode.MARKDOWN
+    )
+    return
+
 
     if len(message.command) == 2 and message.command[1] in ["subscribe", "error", "okay", "help"]:
         buttons = [[
