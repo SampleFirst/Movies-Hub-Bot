@@ -406,6 +406,94 @@ async def find_starting_files(client, callback_query):
     await callback_query.answer()
 
  
+@Client.on_message(filters.command("findzip") & filters.user(ADMINS))
+async def find_zip_command(bot, message):
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("List", callback_data="findzip_list_1"),
+                InlineKeyboardButton("Delete", callback_data="findzip_delete_confirm"),
+            ],
+            [
+                InlineKeyboardButton("Cancel", callback_data="findzip_cancel"),
+            ]
+        ]
+    )
+
+    await message.reply_text(
+        "🔍 Select an action for the found ZIP files:\n\n"
+        "• 'List': Show the list of found files in the database.\n"
+        "• 'Delete': Confirm and delete the found files from the database.\n"
+        "• 'Cancel': Cancel the process.",
+        reply_markup=keyboard,
+        quote=True
+    )
+
+@Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^findzip_list_(\d+)$"))
+async def find_zip_list_callback(bot, callback_query):
+    page_num = int(callback_query.data.split("_")[2])
+    per_page = 10  # Number of files per page
+
+    files = await Media.find({"file_type": "zip"}).to_list(length=None)
+    total_files = len(files)
+    total_pages = (total_files + per_page - 1) // per_page
+
+    start_index = (page_num - 1) * per_page
+    end_index = start_index + per_page
+
+    file_list = ""
+    for file in files[start_index:end_index]:
+        file_name = file["name"]
+        file_size_mb = round(file["size"] / (1024 * 1024), 2)
+        file_list += f"• {file_name} ({file_size_mb} MB)\n"
+
+    if file_list:
+        keyboard = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton("Back", callback_data=f"findzip_list_{page_num - 1}"),
+                    InlineKeyboardButton("Next", callback_data=f"findzip_list_{page_num + 1}"),
+                ]
+            ]
+        )
+
+        text = f"📋 Found ZIP files in the database:\n\n{file_list}"
+        if page_num < total_pages:
+            text += "\n\nUse 'Next' button to view the next page."
+
+        await callback_query.message.edit_text(text, reply_markup=keyboard)
+    else:
+        await callback_query.message.edit_text("❎ No ZIP files found in the database.")
+
+@Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^findzip_delete_confirm$"))
+async def find_zip_delete_callback(bot, callback_query):
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("Yes", callback_data="findzip_delete_yes"),
+                InlineKeyboardButton("Back", callback_data="findzip_list_1"),
+            ]
+        ]
+    )
+
+    await callback_query.message.edit_text(
+        "⚠️ Are you sure you want to delete the found ZIP files from the database?\n\n"
+        "• 'Yes': Confirm and delete the files.\n"
+        "• 'Back': Go back to the list.",
+        reply_markup=keyboard
+    )
+
+@Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^findzip_delete_yes$"))
+async def find_zip_delete_confirm_callback(bot, callback_query):
+    await Media.collection.delete_many({"file_type": "zip"})
+    await callback_query.message.edit_text("🗑️ All found ZIP files have been successfully deleted from the database.")
+
+@Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^findzip_cancel$"))
+async def find_zip_cancel_callback(bot, callback_query):
+    await callback_query.message.edit_text("❌ Process canceled.")
+    await callback_query.answer()
+    
+
 
 @Client.on_message(filters.command("deletefiletype") & filters.user(ADMINS))
 async def delete_file_type_command(bot, message):
