@@ -41,7 +41,7 @@ async def start(client, message):
         return 
     if not await db.is_user_exist(message.from_user.id):
         await db.add_user(message.from_user.id, message.from_user.first_name)
-        total_users = await db.get_total_users()
+        total_users = await db.total_users_count()
         await client.send_message(LOG_CHANNEL, script.LOG_TEXT_P.format(message.from_user.id, message.from_user.mention, total_users))
     if len(message.command) != 2:
         buttons = [[
