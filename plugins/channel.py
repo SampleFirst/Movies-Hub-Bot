@@ -13,7 +13,13 @@ async def media(bot, message):
         if media is not None:
             break
     else:
-        return
+        # Check for zip file
+        media = message.zip
+
+        if media is None:
+            return
+
+        file_type = "zip"
 
     media.file_type = file_type
     media.caption = message.caption
