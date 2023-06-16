@@ -414,12 +414,11 @@ async def delete_file_type_command(bot, message):
         [
             [
                 InlineKeyboardButton("Document", callback_data="delete_filetype_document"),
-            ],
-            [
                 InlineKeyboardButton("Video", callback_data="delete_filetype_video"),
             ],
             [
                 InlineKeyboardButton("Audio", callback_data="delete_filetype_audio"),
+                InlineKeyboardButton("Zip Files", callback_data="delete_filetype_zip"),
             ],
             [
                 InlineKeyboardButton("Cancel", callback_data="deletefiletype_cancel"),
@@ -433,72 +432,21 @@ async def delete_file_type_command(bot, message):
         quote=True,
     )
 
-@Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^delete_filetype_(document|video|audio)$"))
+@Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^delete_filetype_(document|video|audio|zip)$"))
 async def delete_file_type_callback(bot, callback_query):
     """Callback handler for deleting files of a specific type"""
     file_type = callback_query.data.replace("delete_filetype_", "")
 
-    if file_type == "document":
-        sub_keyboard = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton("Documents", callback_data="delete_document"),
-                ],
-                [
-                    InlineKeyboardButton("Zip Files", callback_data="delete_zip"),
-                ],
-                [
-                    InlineKeyboardButton("Back", callback_data="deletefiletype"),
-                ],
-            ]
-        )
-
-        await callback_query.message.edit_text(
-            "Please select the document type you want to delete:",
-            reply_markup=sub_keyboard,
-        )
+    if file_type == "zip":
+        total_files = await Media.count_documents({"file_type": {"$in": [".zip", ".ZIP"]}})
     else:
         total_files = await Media.count_documents({"file_type": file_type})
 
-        if total_files > 0:
-            keyboard = InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton("Delete", callback_data=f"confirm_delete_{file_type}"),
-                    ],
-                    [
-                        InlineKeyboardButton("Back", callback_data="deletefiletype"),
-                    ]
-                ]
-            )
-
-            await callback_query.message.edit_text(
-                f"Found {total_files} {file_type}(s) in the database.\n\n"
-                "Please select an action:",
-                reply_markup=keyboard,
-            )
-        else:
-            keyboard = InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton("Back", callback_data="deletefiletype"),
-                        InlineKeyboardButton("Cancel", callback_data="deletefiletype_cancel"),
-                    ]
-                ]
-            )
-
-            await callback_query.message.edit_text(f"No {file_type}s found in the database.", reply_markup=keyboard)
-
-@Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^delete_document$"))
-async def delete_document_callback(bot, callback_query):
-    """Callback handler for deleting document files"""
-    total_documents = await Media.count_documents({"file_type": "document"})
-
-    if total_documents > 0:
+    if total_files > 0:
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("Delete Documents", callback_data="confirm_delete_document"),
+                    InlineKeyboardButton("Delete", callback_data=f"confirm_delete_{file_type}"),
                 ],
                 [
                     InlineKeyboardButton("Back", callback_data="deletefiletype"),
@@ -507,7 +455,7 @@ async def delete_document_callback(bot, callback_query):
         )
 
         await callback_query.message.edit_text(
-            f"Found {total_documents} document(s) in the database.\n\n"
+            f"Found {total_files} {file_type}(s) in the database.\n\n"
             "Please select an action:",
             reply_markup=keyboard,
         )
@@ -521,41 +469,7 @@ async def delete_document_callback(bot, callback_query):
             ]
         )
 
-        await callback_query.message.edit_text("No documents found in the database.", reply_markup=keyboard)
-
-@Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^delete_zip$"))
-async def delete_zip_callback(bot, callback_query):
-    """Callback handler for deleting zip files"""
-    total_zips = await Media.count_documents({"file_type": "zip"})
-
-    if total_zips > 0:
-        keyboard = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton("Delete Zip Files", callback_data="confirm_delete_zip"),
-                ],
-                [
-                    InlineKeyboardButton("Back", callback_data="deletefiletype"),
-                ]
-            ]
-        )
-
-        await callback_query.message.edit_text(
-            f"Found {total_zips} zip file(s) in the database.\n\n"
-            "Please select an action:",
-            reply_markup=keyboard,
-        )
-    else:
-        keyboard = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton("Back", callback_data="deletefiletype"),
-                    InlineKeyboardButton("Cancel", callback_data="deletefiletype_cancel"),
-                ]
-            ]
-        )
-
-        await callback_query.message.edit_text("No zip files found in the database.", reply_markup=keyboard)
+        await callback_query.message.edit_text(f"No {file_type}s found in the database.", reply_markup=keyboard)
 
 @Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^confirm_delete_document$"))
 async def confirm_delete_document_callback(bot, callback_query):
@@ -594,7 +508,7 @@ async def confirm_delete_document_callback(bot, callback_query):
 @Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^confirm_delete_zip$"))
 async def confirm_delete_zip_callback(bot, callback_query):
     """Callback handler for confirming the deletion of zip files"""
-    result = await Media.collection.delete_many({"file_type": "zip"})
+    result = await Media.collection.delete_many({"file_type": {"$in": [".zip", ".ZIP"]}})
 
     if result.deleted_count:
         keyboard = InlineKeyboardMarkup(
@@ -630,6 +544,11 @@ async def delete_file_type_cancel_callback(bot, callback_query):
     """Callback handler for canceling the delete file type operation"""
     await callback_query.message.edit_text("Delete file type operation canceled.")
     await callback_query.answer()
+
+
+    
+
+
 
 
     
