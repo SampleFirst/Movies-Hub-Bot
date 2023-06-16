@@ -438,7 +438,7 @@ async def delete_file_type_callback(bot, callback_query):
     file_type = callback_query.data.replace("delete_filetype_", "")
 
     if file_type == "zip":
-        total_files = await Media.count_documents({"file_type": {"$regex": r"\.zip$", "$options": "i"}})
+        total_files = await Media.count_documents({"file_type": {"$regex": r"(\.zip$)|(\ZIP$)", "$options": "i"}})
     else:
         total_files = await Media.count_documents({"file_type": file_type})
 
@@ -508,7 +508,7 @@ async def confirm_delete_document_callback(bot, callback_query):
 @Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^confirm_delete_zip$"))
 async def confirm_delete_zip_callback(bot, callback_query):
     """Callback handler for confirming the deletion of zip files"""
-    result = await Media.collection.delete_many({"file_type": {"$regex": r"\.zip$", "$options": "i"}})
+    result = await Media.collection.delete_many({"file_type": {"$regex": r"(\.zip$)|(\ZIP$)", "$options": "i"}})
 
     if result.deleted_count:
         keyboard = InlineKeyboardMarkup(
