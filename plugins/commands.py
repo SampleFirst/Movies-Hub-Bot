@@ -716,7 +716,13 @@ async def find_pixels_command(bot, message):
 @Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^findpixels_pixel_(\d+p)_(\d+)$"))
 async def find_pixels_callback(bot, callback_query):
     pixel_resolution = callback_query.data.split("_")[1]
-    page_num = int(callback_query.data.split("_")[2])
+    page_num_data = callback_query.data.split("_")[2]
+
+    if page_num_data.isdigit():
+        page_num = int(page_num_data)
+    else:
+        page_num = 1
+
     per_page = 10  # Number of files per page
 
     # Get all files
@@ -775,7 +781,7 @@ def get_min_file_size(pixel_resolution):
         return 1_000_000  # Set the minimum file size for 720p
     elif pixel_resolution == "1080p":
         return 5_000_000  # Set the minimum file size for 1080p
-    elif pixel_resolution == "4k":
+    elif pixel_resolution == "4K":
         return 10_000_000  # Set the minimum file size for 4K
     else:
         return 0
@@ -788,10 +794,12 @@ def get_max_file_size(pixel_resolution):
         return 5_000_000  # Set the maximum file size for 720p
     elif pixel_resolution == "1080p":
         return 10_000_000  # Set the maximum file size for 1080p
-    elif pixel_resolution == "4k":
+    elif pixel_resolution == "4K":
         return float("inf")  # Set the maximum file size for 4K to infinity
     else:
         return float("inf")
+
+    
     
 
     
