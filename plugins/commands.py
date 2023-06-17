@@ -688,12 +688,12 @@ async def find_pixels_command(bot, message):
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("480p", callback_data="findpixels_pixel_480p_1"),
-                InlineKeyboardButton("720p", callback_data="findpixels_pixel_720p_1"),
+                InlineKeyboardButton("480p", callback_data="findpixels_480p_1"),
+                InlineKeyboardButton("720p", callback_data="findpixels_720p_1"),
             ],
             [
-                InlineKeyboardButton("1080p", callback_data="findpixels_pixel_1080p_1"),
-                InlineKeyboardButton("4K", callback_data="findpixels_pixel_4k_1"),
+                InlineKeyboardButton("1080p", callback_data="findpixels_1080p_1"),
+                InlineKeyboardButton("4K", callback_data="findpixels_4k_1"),
             ],
             [
                 InlineKeyboardButton("Cancel", callback_data="findpixels_cancel"),
@@ -713,65 +713,67 @@ async def find_pixels_command(bot, message):
     )
 
 
-@Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^findpixels_pixel_(\d+p)_(\d+)$"))
-async def find_pixels_callback(bot, callback_query):
-    pixel_resolution = callback_query.data.split("_")[1]
-    page_num_data = callback_query.data.split("_")[2]
+@Client.on_callback_query(filters.regex('^findpixels_'))
+async def handle_find_pixels_callback(client, callback_query):
+    query_parts = callback_query.data.split("_")
+    if query_parts[0] == "findpixels":
+        resolution = query_parts[1]
+        page = int(query_parts[2])
+        search_query = query_parts[3]
+        
+        # Example: query_parts = ['findpixels', '480p', '1', 'example']
+        # resolution = '480p'
+        # page = 1
+        # search_query = 'example'
+        
+        # Perform your database query or any other operations using the resolution and search_query
+        
+        # Example: Fetching results from the database
+        results = await your_database_function(resolution, search_query)
+        
+        # Calculate pagination
+        total_results = len(results)
+        num_pages = total_results // RESULTS_PER_PAGE + 1
 
-    if page_num_data.isdigit():
-        page_num = int(page_num_data)
-    else:
-        page_num = 1
+        # Sort results alphabetically by file name
+        results.sort(key=lambda x: x['file_name'])
 
-    per_page = 10  # Number of files per page
+        # Get the current page's results
+        start_index = (page - 1) * RESULTS_PER_PAGE
+        end_index = start_index + RESULTS_PER_PAGE
+        current_results = results[start_index:end_index]
 
-    # Get all files
-    all_files = await Media.find({}).to_list(length=None)
+        # Prepare the result message
+        result_message = f'{len(current_results)} files found with related names to "{search_query}" in the database:\n\n'
+        for result in current_results:
+            file_size = format_file_size(result['file_size'])
+            result_message += f'File Name: {result["file_name"]}\n'
+            result_message += f'File Size: {file_size}\n\n'
 
-    # Filter files based on pixel resolution and file name
-    files = [file for file in all_files if (
-        file["name"].lower().find(pixel_resolution) != -1 or
-        file["name"].lower().find(pixel_resolution[:-1]) != -1
-    )]
+        # Prepare pagination buttons
+        buttons = []
 
-    total_files = len(files)
-    total_pages = (total_files + per_page - 1) // per_page
+        if page > 1:
+            buttons.append(InlineKeyboardButton("⬅️ Back", callback_data=f"findpixels_{resolution}_{page - 1}_{search_query}"))
 
-    start_index = (page_num - 1) * per_page
-    end_index = start_index + per_page
+        if page < num_pages:
+            buttons.append(InlineKeyboardButton("Next ➡️", callback_data=f"findpixels_{resolution}_{page + 1}_{search_query}"))
 
-    file_list = ""
-    for file in files[start_index:end_index]:
-        file_name = file["name"]
-        file_size_mb = round(file["size"] / (1024 * 1024), 2)
-        file_list += f"• {file_name} ({file_size_mb} MB)\n"
+        buttons.append(InlineKeyboardButton("🔚 Cancel", callback_data="findpixels_cancel"))
 
-    if file_list:
-        keyboard = InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton("Back", callback_data=f"findpixels_pixel_{pixel_resolution}_{page_num - 1}"),
-                    InlineKeyboardButton("Next", callback_data=f"findpixels_pixel_{pixel_resolution}_{page_num + 1}"),
-                ]
-            ]
-        )
+        # Create button groups with two buttons each
+        button_groups = [buttons[i:i + 2] for i in range(0, len(buttons), 2)]
+        keyboard = InlineKeyboardMarkup(button_groups)
 
-        text = f"📋 List of files related to {pixel_resolution} resolution:\n\n{file_list}"
-        if page_num < total_pages:
-            text += "\n\nUse 'Next' button to view the next page."
+        # Edit the message with the results and pagination
+        await callback_query.message.edit_text(result_message, reply_markup=keyboard)
+        await callback_query.answer()
 
-        await callback_query.message.edit_text(text, reply_markup=keyboard)
-    else:
-        await callback_query.message.edit_text(f"❎ No files found related to {pixel_resolution} resolution.")
+    elif query_parts[0] == "findpixels_cancel":
+        # Example: When "Cancel" button is pressed
+        await callback_query.message.edit_text("Process canceled.")
+        await callback_query.answer()
 
-
-@Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^findpixels_cancel$"))
-async def find_pixels_cancel_callback(bot, callback_query):
-    await callback_query.message.edit_text("❌ Process canceled.")
-    await callback_query.answer()
-
-
-    
 
 
 
