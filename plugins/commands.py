@@ -683,6 +683,115 @@ async def delete_file_type_cancel_callback(bot, callback_query):
     await callback_query.answer()
 
 
+@Client.on_message(filters.command("findpixels") & filters.user(ADMINS))
+async def find_pixels_command(bot, message):
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("480p", callback_data="findpixels_pixel_480p_1"),
+                InlineKeyboardButton("720p", callback_data="findpixels_pixel_720p_1"),
+            ],
+            [
+                InlineKeyboardButton("1080p", callback_data="findpixels_pixel_1080p_1"),
+                InlineKeyboardButton("4K", callback_data="findpixels_pixel_4k_1"),
+            ],
+            [
+                InlineKeyboardButton("Cancel", callback_data="findpixels_cancel"),
+            ]
+        ]
+    )
+
+    await message.reply_text(
+        "🔍 Select a pixel resolution to find related files:\n\n"
+        "• '480p': Find files related to 480p resolution.\n"
+        "• '720p': Find files related to 720p resolution.\n"
+        "• '1080p': Find files related to 1080p resolution.\n"
+        "• '4K': Find files related to 4K resolution.\n"
+        "• 'Cancel': Cancel the process.",
+        reply_markup=keyboard,
+        quote=True
+    )
+
+
+@Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^findpixels_pixel_(\d+p)_(\d+)$"))
+async def find_pixels_callback(bot, callback_query):
+    pixel_resolution = callback_query.data.split("_")[1]
+    page_num = int(callback_query.data.split("_")[2])
+    per_page = 10  # Number of files per page
+
+    # Get all files
+    all_files = await Media.find({}).to_list(length=None)
+
+    # Filter files based on pixel resolution and file name
+    files = [file for file in all_files if (
+        file["name"].lower().find(pixel_resolution) != -1 or
+        file["name"].lower().find(pixel_resolution[:-1]) != -1
+    ) and (
+        file["size"] >= get_min_file_size(pixel_resolution) and
+        file["size"] <= get_max_file_size(pixel_resolution)
+    )]
+
+    total_files = len(files)
+    total_pages = (total_files + per_page - 1) // per_page
+
+    start_index = (page_num - 1) * per_page
+    end_index = start_index + per_page
+
+    file_list = ""
+    for file in files[start_index:end_index]:
+        file_name = file["name"]
+        file_size_mb = round(file["size"] / (1024 * 1024), 2)
+        file_list += f"• {file_name} ({file_size_mb} MB)\n"
+
+    if file_list:
+        keyboard = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton("Back", callback_data=f"findpixels_pixel_{pixel_resolution}_{page_num - 1}"),
+                    InlineKeyboardButton("Next", callback_data=f"findpixels_pixel_{pixel_resolution}_{page_num + 1}"),
+                ]
+            ]
+        )
+
+        text = f"📋 List of files related to {pixel_resolution} resolution:\n\n{file_list}"
+        if page_num < total_pages:
+            text += "\n\nUse 'Next' button to view the next page."
+
+        await callback_query.message.edit_text(text, reply_markup=keyboard)
+    else:
+        await callback_query.message.edit_text(f"❎ No files found related to {pixel_resolution} resolution.")
+
+
+@Client.on_callback_query(filters.user(ADMINS) & filters.regex(r"^findpixels_cancel$"))
+async def find_pixels_cancel_callback(bot, callback_query):
+    await callback_query.message.edit_text("❌ Process canceled.")
+    await callback_query.answer()
+
+
+def get_min_file_size(pixel_resolution):
+    if pixel_resolution == "480p":
+        return 0  # Set the minimum file size for 480p
+    elif pixel_resolution == "720p":
+        return 1_000_000  # Set the minimum file size for 720p
+    elif pixel_resolution == "1080p":
+        return 5_000_000  # Set the minimum file size for 1080p
+    elif pixel_resolution == "4k":
+        return 10_000_000  # Set the minimum file size for 4K
+    else:
+        return 0
+
+
+def get_max_file_size(pixel_resolution):
+    if pixel_resolution == "480p":
+        return 1_000_000  # Set the maximum file size for 480p
+    elif pixel_resolution == "720p":
+        return 5_000_000  # Set the maximum file size for 720p
+    elif pixel_resolution == "1080p":
+        return 10_000_000  # Set the maximum file size for 1080p
+    elif pixel_resolution == "4k":
+        return float("inf")  # Set the maximum file size for 4K to infinity
+    else:
+        return float("inf")
     
 
     
