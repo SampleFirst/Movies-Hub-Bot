@@ -732,9 +732,6 @@ async def find_pixels_callback(bot, callback_query):
     files = [file for file in all_files if (
         file["name"].lower().find(pixel_resolution) != -1 or
         file["name"].lower().find(pixel_resolution[:-1]) != -1
-    ) and (
-        file["size"] >= get_min_file_size(pixel_resolution) and
-        file["size"] <= get_max_file_size(pixel_resolution)
     )]
 
     total_files = len(files)
@@ -774,30 +771,10 @@ async def find_pixels_cancel_callback(bot, callback_query):
     await callback_query.answer()
 
 
-def get_min_file_size(pixel_resolution):
-    if pixel_resolution == "480p":
-        return 0  # Set the minimum file size for 480p
-    elif pixel_resolution == "720p":
-        return 1_000_000  # Set the minimum file size for 720p
-    elif pixel_resolution == "1080p":
-        return 5_000_000  # Set the minimum file size for 1080p
-    elif pixel_resolution == "4K":
-        return 10_000_000  # Set the minimum file size for 4K
-    else:
-        return 0
+    
 
 
-def get_max_file_size(pixel_resolution):
-    if pixel_resolution == "480p":
-        return 1_000_000  # Set the maximum file size for 480p
-    elif pixel_resolution == "720p":
-        return 5_000_000  # Set the maximum file size for 720p
-    elif pixel_resolution == "1080p":
-        return 10_000_000  # Set the maximum file size for 1080p
-    elif pixel_resolution == "4K":
-        return float("inf")  # Set the maximum file size for 4K to infinity
-    else:
-        return float("inf")
+
 
     
     
