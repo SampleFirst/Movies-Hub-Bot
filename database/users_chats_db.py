@@ -1,7 +1,5 @@
 import motor.motor_asyncio
 from info import DATABASE_NAME, DATABASE_URI, IMDB, IMDB_TEMPLATE, MELCOW_NEW_USERS, P_TTI_SHOW_OFF, SINGLE_BUTTON, SPELL_CHECK_REPLY, PROTECT_CONTENT, AUTO_DELETE, SHORTLINK_API, SHORTLINK_URL, IS_SHORTLINK
-import pytz
-from datetime import date, datetime
 
 class Database:
     
@@ -13,48 +11,25 @@ class Database:
 
 
     def new_user(self, id, name):
-        tz = pytz.timezone('Asia/Kolkata')  # Define tz here
         return dict(
-            id=id,
-            name=name,
+            id = id,
+            name = name,
             ban_status=dict(
                 is_banned=False,
                 ban_reason="",
             ),
-            timestamp=datetime.now(tz)
         )
 
-    def new_group(self, id, title, username):
-        tz = pytz.timezone('Asia/Kolkata')  # Define tz here
+
+    def new_group(self, id, title):
         return dict(
-            id=id,
-            title=title,
-            username=username,
+            id = id,
+            title = title,
             chat_status=dict(
                 is_disabled=False,
                 reason="",
             ),
-            timestamp=datetime.now(tz)
         )
-
-    async def daily_users_count(self, today):
-        tz = pytz.timezone('Asia/Kolkata')
-        start = tz.localize(datetime.combine(today, datetime.min.time()))
-        end = tz.localize(datetime.combine(today, datetime.max.time()))
-        count = await self.col.count_documents({
-            'timestamp': {'$gte': start, '$lt': end}
-        })
-        return count
-    
-    
-    async def daily_chats_count(self, today):
-        tz = pytz.timezone('Asia/Kolkata')
-        start = tz.localize(datetime.combine(today, datetime.min.time()))
-        end = tz.localize(datetime.combine(today, datetime.max.time()))
-        count = await self.grp.count_documents({
-            'timestamp': {'$gte': start, '$lt': end}
-        })
-        return count
     
     async def add_user(self, id, name):
         user = self.new_user(id, name)
