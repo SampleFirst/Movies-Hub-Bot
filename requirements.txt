@@ -31,7 +31,7 @@ pyshorteners
 countryinfo
 datetime
 pytz
-dnspython
+dnspython==2.3.0
 python-math
 Pillow
 speedtest-cli
