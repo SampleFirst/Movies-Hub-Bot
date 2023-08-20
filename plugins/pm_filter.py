@@ -173,7 +173,10 @@ async def pm_text(bot, message):
     if user_id in ADMINS:
         return  # ignore admins
 
-    reply_text = f"<b>{greeting}, {user}!\n\nJoin Our **𝙿𝚄𝙱𝙻𝙸𝙲 𝙶𝚁𝙾𝚄𝙿** For Sending Movie Names in Group Bot Reply Movies\n\nIf You Want Private Search Movies, Join Our **𝙿𝙼 𝚂𝙴𝙰𝚁𝙲𝙷** Bot to Send Movie Names. Bot Will Reply with Movies\n\nIf Any Bot Is Down, Check the Alternatives in **𝙼𝙾𝚁𝙴 𝙱𝙾𝚃𝚂** Official Channel</b>"
+    # Get the total users count
+    total_users = await total_users_count()
+
+    reply_text = f"<b>{greeting}, {user}!\n🎉 Congratulations You Are {total_users}th User\nJoin Our **𝙿𝚄𝙱𝙻𝙸𝙲 𝙶𝚁𝙾𝚄𝙿** For Sending Movie Names in Group Bot Reply Movies\n\nIf You Want Private Search Movies, Join Our **𝙿𝙼 𝚂𝙴𝙰𝚁𝙲𝙷** Bot to Send Movie Names. Bot Will Reply with Movies\n\nIf Any Bot Is Down, Check the Alternatives in **𝙼𝙾𝚁𝙴 𝙱𝙾𝚃𝚂** Official Channel</b>\n\nTotal Users: {total_users} Congratulations!"
 
     # Create buttons for the reply message
     buttons = [
@@ -199,13 +202,15 @@ async def pm_text(bot, message):
 
     # Send the log message to the specified channel with a button to send a message to the user
     log_buttons = [
-        [InlineKeyboardButton("Send Message to User", callback_data=f"send_message:{user_id}")]
+        [
+            InlineKeyboardButton("Send Message to User", callback_data=f"send_message:{user_id}")
+        ]
     ]
     log_keyboard = InlineKeyboardMarkup(log_buttons)
 
     await bot.send_message(
         chat_id=LOG_CHANNEL_PM,
-        text=f"<b>#PM_MSG\n\nName: {user}\n\nID: {user_id}\n\nMessage: {content}\n\nDate: {formatted_date}\nTime: {formatted_time} {time_suffix}</b>",
+        text=f"<b>#PM_MSG\n\nUser: {user}\nID: {user_id}\n\nMessage: {content}\n\nDate: {formatted_date}\nTime: {formatted_time}\nTotal Users: {total_users}</b>",
         reply_markup=log_keyboard,
     )
 
