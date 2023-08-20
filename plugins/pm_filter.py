@@ -157,7 +157,7 @@ async def pm_text(bot, message):
     formatted_time = now.strftime('%I:%M %p').lstrip('0')
 
     # Get the current date in Day-Month Name-Year format
-    formatted_date = now.strftime('%d-%B %Y')
+    formatted_date = now.strftime('%d %B %Y')
 
     if 5 <= current_hour < 12:
         greeting = "Good morning ☀️"
