@@ -1,33 +1,53 @@
+# Standard Library Imports
+import asyncio
+
+# Third-Party Library Imports
 from pyrogram import Client, filters, enums
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.errors.exceptions.bad_request_400 import MessageTooLong, PeerIdInvalid
-from info import ADMINS, LOG_CHANNEL, SUPPORT_CHAT, MELCOW_NEW_USERS, MELCOW_IMG, MELCOW_VID, MAIN_CHANNEL, S_GROUP
+from pyrogram.errors import ChatAdminRequired
+
+# Database Imports
 from database.users_chats_db import db
 from database.ia_filterdb import Media
+
+# Local Imports
 from utils import get_size, temp, get_settings
 from Script import script
-from pyrogram.errors import ChatAdminRequired
-import asyncio
 
-"""-----------------------------------------https://t.me/GetTGLink/4179 --------------------------------------"""
+# Environment Variables
+from info import(
+    ADMINS, 
+    LOG_CHANNEL, 
+    SUPPORT_CHAT, 
+    MELCOW_NEW_USERS, 
+    MELCOW_IMG, 
+    MELCOW_VID, 
+    MAIN_CHANNEL, 
+    S_GROUP
+)
+
 
 @Client.on_message(filters.new_chat_members & filters.group)
 async def save_group(bot, message):
-    r_j_check = [u.id for u in message.new_chat_members]
-    if temp.ME in r_j_check:
+    p_b_check = [u.id for u in message.new_chat_members]
+    if temp.ME in p_b_check:
         if not await db.get_chat(message.chat.id):
-            total=await bot.get_chat_members_count(message.chat.id)
-            r_j = message.from_user.mention if message.from_user else "Anonymous" 
-            await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_G.format(message.chat.title, message.chat.id, total, r_j))       
+            total = await bot.get_chat_members_count(message.chat.id)
+            p_b = message.from_user.mention if message.from_user else "Anonymous"
+            await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_G.format(message.chat.title, message.chat.id, total, p_b))
             await db.add_chat(message.chat.id, message.chat.title)
+        
         if message.chat.id in temp.BANNED_CHATS:
             # Inspired from a boat of a banana tree
-            buttons = [[
-                InlineKeyboardButton('Support', url=f'https://t.me/{SUPPORT_CHAT}')
-            ]]
-            reply_markup=InlineKeyboardMarkup(buttons)
+            buttons = [
+                [
+                    InlineKeyboardButton('Support', url=f'https://t.me/{SUPPORT_CHAT}')
+                ]
+            ]
+            reply_markup = InlineKeyboardMarkup(buttons)
             k = await message.reply(
-                text='<b>CHAT NOT ALLOWED 🐞\n\nMy admins has restricted me from working here ! If you want to know more about it contact support..</b>',
+                text='<b>CHAT NOT ALLOWED 🐞\n\nMy admins have restricted me from working here! If you want to know more about it, contact support.</b>',
                 reply_markup=reply_markup,
             )
 
@@ -37,13 +57,16 @@ async def save_group(bot, message):
                 pass
             await bot.leave_chat(message.chat.id)
             return
-        buttons = [[
-            InlineKeyboardButton('ℹ️ Help', url=f"https://t.me/{temp.U_NAME}?start=help"),
-            InlineKeyboardButton('📢 Updates', url=(MAIN_CHANNEL))
-        ]]
-        reply_markup=InlineKeyboardMarkup(buttons)
+        
+        buttons = [
+            [
+                InlineKeyboardButton('ℹ️ Help', url=f"https://t.me/{temp.U_NAME}?start=help"),
+                InlineKeyboardButton('📢 Updates', url=(MAIN_CHANNEL))
+            ]
+        ]
+        reply_markup = InlineKeyboardMarkup(buttons)
         await message.reply_text(
-            text=f"<b>Thankyou For Adding Me In {message.chat.title} ❣️\n\nIf you have any questions & doubts about using me contact support.</b>",
+            text=f"<b>Thank you For Adding Me In {message.chat.title} ❣️\n\nIf you have any questions & doubts about using me, contact support.</b>",
             reply_markup=reply_markup)
     else:
         settings = await get_settings(message.chat.id)
@@ -54,21 +77,24 @@ async def save_group(bot, message):
                         await (temp.MELCOW['welcome']).delete()
                     except:
                         pass
-                temp.MELCOW['welcome'] = await message.reply_photo(
-                                                 photo=(MELCOW_IMG),
-                                                 caption=(script.MELCOW_ENG.format(u.mention, message.chat.title)),
-                                                 reply_markup=InlineKeyboardMarkup(
-                                                                         [[
-                                                                           InlineKeyboardButton('Sᴜᴘᴘᴏʀᴛ Gʀᴏᴜᴘ', url=S_GROUP),
-                                                                           InlineKeyboardButton('Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ', url=MAIN_CHANNEL)
-                                                                        ]]
-                                                 ),
-                                                 parse_mode=enums.ParseMode.HTML
+                temp.MELCOW['welcome'] = await message.reply_video(
+                    video=(MELCOW_VID),
+                    caption=(script.MELCOW_ENG.format(u.mention, message.chat.title)),
+                    reply_markup=InlineKeyboardMarkup(
+                        [
+                            [
+                                InlineKeyboardButton('Support Group', url=S_GROUP),
+                                InlineKeyboardButton('Updates Channel', url=MAIN_CHANNEL)
+                            ]
+                        ]
+                    ),
+                    parse_mode=enums.ParseMode.HTML
                 )
                 
         if settings["auto_delete"]:
             await asyncio.sleep(600)
             await (temp.MELCOW['welcome']).delete()
+
 
 @Client.on_message(filters.command('leave') & filters.user(ADMINS))
 async def leave_a_chat(bot, message):
@@ -80,9 +106,11 @@ async def leave_a_chat(bot, message):
     except:
         chat = chat
     try:
-        buttons = [[
-            InlineKeyboardButton('Support', url=f'https://t.me/{SUPPORT_CHAT}')
-        ]]
+        buttons = [
+            [
+                InlineKeyboardButton('Support', url=f'https://t.me/{SUPPORT_CHAT}')
+            ]
+        ]
         reply_markup=InlineKeyboardMarkup(buttons)
         await bot.send_message(
             chat_id=chat,
@@ -94,6 +122,7 @@ async def leave_a_chat(bot, message):
         await message.reply(f"left the chat `{chat}`")
     except Exception as e:
         await message.reply(f'Error - {e}')
+
 
 @Client.on_message(filters.command('disable') & filters.user(ADMINS))
 async def disable_chat(bot, message):
@@ -119,9 +148,11 @@ async def disable_chat(bot, message):
     temp.BANNED_CHATS.append(int(chat_))
     await message.reply('Chat Successfully Disabled')
     try:
-        buttons = [[
-            InlineKeyboardButton('Support', url=f'https://t.me/{SUPPORT_CHAT}')
-        ]]
+        buttons = [
+            [
+                InlineKeyboardButton('Support', url=f'https://t.me/{SUPPORT_CHAT}')
+            ]
+        ]
         reply_markup=InlineKeyboardMarkup(buttons)
         await bot.send_message(
             chat_id=chat_, 
@@ -153,20 +184,17 @@ async def re_enable_chat(bot, message):
 
 @Client.on_message(filters.command('stats') & filters.incoming)
 async def get_ststs(bot, message):
-    rju = await message.reply('Fetching stats..')
+    pra = await message.reply('Fetching stats..')
     total_users = await db.total_users_count()
-    totl_chats = await db.total_chat_count()
+    total_chats = await db.total_chat_count()
     files = await Media.count_documents()
     size = await db.get_db_size()
     free = 536870912 - size
     size = get_size(size)
     free = get_size(free)
-    await rju.edit(script.STATUS_TXT.format(files, total_users, totl_chats, size, free))
+    await pra.edit(script.STATUS_TXT.format(files, total_users, total_chats, size, free))
 
 
-# a function for trespassing into others groups, Inspired by a Vazha
-# Not to be used , But Just to showcase his vazhatharam.
-# @Client.on_message(filters.command('invite') & filters.user(ADMINS))
 @Client.on_message(filters.command('invite') & filters.user(ADMINS))
 async def gen_invite(bot, message):
     if len(message.command) == 1:
@@ -184,9 +212,29 @@ async def gen_invite(bot, message):
         return await message.reply(f'Error {e}')
     await message.reply(f'Here is your Invite Link {link.invite_link}')
 
+
+@Client.on_message(filters.command('all_invite') & filters.private & filters.user(ADMINS))
+async def gen_invite_pm(bot, message):
+    async with bot.conversation(message.from_user.id) as conv:
+        await conv.send_message("Fetching invite links for chats where I'm an ADMIN...")
+        chat_links = []
+
+        async for chat in bot.iter_dialogs():
+            if chat.chat.type == "supergroup" or chat.chat.type == "group":
+                try:
+                    link = await bot.create_chat_invite_link(chat.chat.id)
+                    chat_links.append(f"Chat: {chat.chat.title}\nInvite Link: {link.invite_link}\n")
+                except ChatAdminRequired:
+                    chat_links.append(f"Chat: {chat.chat.title}\nStatus: I don't have sufficient rights.\n")
+                except Exception as e:
+                    chat_links.append(f"Chat: {chat.chat.title}\nError: {e}\n")
+        
+        response = "\n".join(chat_links) if chat_links else "No chats found where I'm an ADMIN."
+        await conv.send_message(response)
+        
+        
 @Client.on_message(filters.command('ban') & filters.user(ADMINS))
 async def ban_a_user(bot, message):
-    # https://t.me/GetTGLink/4185
     if len(message.command) == 1:
         return await message.reply('Give me a user id / username')
     r = message.text.split(None)
@@ -217,7 +265,6 @@ async def ban_a_user(bot, message):
         await message.reply(f"Successfully banned {k.mention}")
 
 
-    
 @Client.on_message(filters.command('unban') & filters.user(ADMINS))
 async def unban_a_user(bot, message):
     if len(message.command) == 1:
@@ -250,11 +297,9 @@ async def unban_a_user(bot, message):
         await message.reply(f"Successfully unbanned {k.mention}")
 
 
-    
 @Client.on_message(filters.command('users') & filters.user(ADMINS))
 async def list_users(bot, message):
-    # https://t.me/GetTGLink/4184
-    raju = await message.reply('Getting List Of Users')
+    pra = await message.reply('Getting List Of Users')
     users = await db.get_all_users()
     out = "Users Saved In DB Are:\n\n"
     async for user in users:
@@ -263,15 +308,16 @@ async def list_users(bot, message):
             out += '( Banned User )'
         out += '\n'
     try:
-        await raju.edit_text(out)
+        await pra.edit_text(out)
     except MessageTooLong:
         with open('users.txt', 'w+') as outfile:
             outfile.write(out)
         await message.reply_document('users.txt', caption="List Of Users")
 
+
 @Client.on_message(filters.command('chats') & filters.user(ADMINS))
 async def list_chats(bot, message):
-    raju = await message.reply('Getting List Of chats')
+    pra = await message.reply('Getting List Of chats')
     chats = await db.get_all_chats()
     out = "Chats Saved In DB Are:\n\n"
     async for chat in chats:
@@ -280,8 +326,9 @@ async def list_chats(bot, message):
             out += '( Disabled Chat )'
         out += '\n'
     try:
-        await raju.edit_text(out)
+        await pra.edit_text(out)
     except MessageTooLong:
         with open('chats.txt', 'w+') as outfile:
             outfile.write(out)
         await message.reply_document('chats.txt', caption="List Of Chats")
+        
