@@ -223,16 +223,15 @@ async def gen_invite_pm(client, message):
     all_chats = await all_chats_cursor.to_list(length=None)  # Convert cursor to a list
 
     for chat in all_chats:
-        if chat['chat_status'] == "supergroup" or chat['chat_status'] == "group":
-            try:
-                link = await client.create_chat_invite_link(chat['id'])
-                chat_links.append(f"Chat: {chat['title']}\nInvite Link: {link.invite_link}\n")
-            except ChatAdminRequired:
-                chat_links.append(f"Chat: {chat['title']}\nStatus: I don't have sufficient rights.\n")
-            except Exception as e:
-                chat_links.append(f"Chat: {chat['title']}\nError: {e}\n")
+        try:
+            link = await client.create_chat_invite_link(chat['id'])
+            chat_links.append(f"Chat: {chat['title']}\nInvite Link: {link.invite_link}\n")
+        except ChatAdminRequired:
+            chat_links.append(f"Chat: {chat['title']}\nStatus: I don't have sufficient rights.\n")
+        except Exception as e:
+            chat_links.append(f"Chat: {chat['title']}\nError: {e}\n")
     
-    response = "\n".join(chat_links) if chat_links else "No chats found where I'm an ADMIN."
+    response = "\n".join(chat_links) if chat_links else "No chats found."
     await message.reply_text(response)
         
         
