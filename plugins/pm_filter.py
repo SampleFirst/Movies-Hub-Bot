@@ -1,41 +1,71 @@
-# Kanged From @TroJanZheX
-# REDIRECT added https://github.com/Joelkb
+# Standard Library Imports
 import asyncio
-import re
 import ast
 import math
 import random
-from pyrogram.errors.exceptions.bad_request_400 import MediaEmpty, PhotoInvalidDimensions, WebpageMediaEmpty
-from Script import script
+import re
+import logging
+
+# Third-Party Library Imports
 import pyrogram
-from database.connections_mdb import active_connection, all_connections, delete_connection, if_active, make_active, \
-    make_inactive
-from info import ADMINS, AUTH_CHANNEL, FILE_CHANNEL, AUTH_USERS, CUSTOM_FILE_CAPTION, NOR_IMG, AUTH_GROUPS, P_TTI_SHOW_OFF, IMDB, \
-    SINGLE_BUTTON, SPELL_CHECK_REPLY, IMDB_TEMPLATE, SPELL_IMG, MSG_ALRT, FILE_FORWARD, MAIN_CHANNEL, LOG_CHANNEL_PM, PICS, SUPPORT_CHAT_ID
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, InputMediaPhoto
 from pyrogram import Client, filters, enums
 from pyrogram.errors import FloodWait, UserIsBlocked, MessageNotModified, PeerIdInvalid
-from utils import get_size, is_subscribed, get_poster, search_gagala, temp, get_settings, save_group_settings, get_shortlink
+from pyrogram.errors.exceptions.bad_request_400 import MediaEmpty, PhotoInvalidDimensions, WebpageMediaEmpty
+
+# Database Imports
+from database.connections_mdb import active_connection, all_connections, delete_connection, if_active, make_active, make_inactive
 from database.users_chats_db import db
 from database.ia_filterdb import Media, get_file_details, get_search_results, get_bad_files
-from database.filters_mdb import (
-    del_all,
-    find_filter,
-    get_filters,
-)
-from database.gfilters_mdb import (
-    find_gfilter,
-    get_gfilters,
-)
-import logging
+from database.filters_mdb import del_all, find_filter, get_filters
+from database.gfilters_mdb import find_gfilter, get_gfilters
 
+# Local Imports
+from Script import script
+from utils import (
+    get_size,
+    is_subscribed,
+    get_poster,
+    search_gagala,
+    temp,
+    get_settings,
+    save_group_settings,
+    get_shortlink
+)
+
+# Environment Variables
+from info import (
+    ADMINS,
+    AUTH_CHANNEL,
+    FILE_CHANNEL,
+    AUTH_USERS,
+    CUSTOM_FILE_CAPTION,
+    NOR_IMG,
+    AUTH_GROUPS,
+    P_TTI_SHOW_OFF,
+    IMDB,
+    SINGLE_BUTTON,
+    SPELL_CHECK_REPLY,
+    IMDB_TEMPLATE,
+    SPELL_IMG,
+    MSG_ALRT,
+    FILE_FORWARD,
+    MAIN_CHANNEL,
+    LOG_CHANNEL_PM,
+    PICS,
+    SUPPORT_CHAT_ID
+)
+
+# Logging Configuration
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 
+# Global Variables
 BUTTONS = {}
 SPELL_CHECK = {}
 FILTER_MODE = {}
 back_stack = []
+
 
 @Client.on_message(filters.command('autofilter') & filters.user(ADMINS))
 async def fil_mod(client, message): 
@@ -113,31 +143,55 @@ async def pm_text(bot, message):
     content = message.text
     user = message.from_user.first_name
     user_id = message.from_user.id
+    now = datetime.datetime.now()
+
+    # Get the current time of day
+    current_hour = now.hour
     
+    if 5 <= current_hour < 12:
+        greeting = "Good morning ☀️"
+    elif 12 <= current_hour < 18:
+        greeting = "Good afternoon 🌤️"
+    elif 18 <= current_hour < 22:
+        greeting = "Good evening 🌇"
+    else:
+        greeting = "Good night 🌙"
+
     if content.startswith("/") or content.startswith("#"):
         return  # ignore commands and hashtags
-    
-    keyboard = InlineKeyboardMarkup(
+    if user_id in ADMINS:
+        return  # ignore admins
+
+    reply_text = f"<b>{greeting}, {user}!\n\nJoin Our **𝙿𝚄𝙱𝙻𝙸𝙲 𝙶𝚁𝙾𝚄𝙿** For Sending Movie Names in Group Bot Reply Movies\n\nIf You Want Private Search Movies, Join Our **𝙿𝙼 𝚂𝙴𝙰𝚁𝙲𝙷** Bot to Send Movie Names. Bot Will Reply with Movies\n\nIf Any Bot Is Down, Check the Alternatives in **𝙼𝙾𝚁𝙴 𝙱𝙾𝚃𝚂** Official Channel</b>"
+
+    # Create buttons for the reply message
+    buttons = [
         [
-            [
-                InlineKeyboardButton("More Bots", url="https://t.me/+9Z1w2KOebaliYzdl"),
-                InlineKeyboardButton("Search Group", url="https://t.me/+_FmlDFAh13FlNTVl")
-            ]
+            InlineKeyboardButton("𝙿𝚄𝙱𝙻𝙸𝙲 𝙶𝚁𝙾𝚄𝙿", url="https://t.me/iPapkornMoviesGroup"),
+            InlineKeyboardButton("𝙿𝙼 𝚂𝙴𝙰𝚁𝙲𝙷", url="https://t.me/iPepkornBot?start")
+        ],
+        [
+            InlineKeyboardButton("𝙼𝙾𝚁𝙴 𝙱𝙾𝚃𝚂", url="https://t.me/iPepkornBots/8")
         ]
-    )
-    
+    ]
+    keyboard = InlineKeyboardMarkup(buttons)
+
+    # Set quote to True
+    quote = True
+
+    # Send the reply message with buttons
     await message.reply_text(
-        "<b>Join 'More Bots' Channel For More Alternative Bots.\n\nJoin 'Search Group' For Search Your Queries.\n\nShare And Support</b>",
+        text=reply_text,
         reply_markup=keyboard,
-        quote=True
+        quote=quote
     )
-    
+
+    # Send the log message to the specified channel
     await bot.send_message(
         chat_id=LOG_CHANNEL_PM,
-        text=f"<b>#PM_MSG\n\nName : {user}\n\nID : {user_id}\n\nMessage : {content}</b>"
+        text=f"<b>#PM_MSG\n\nName: {user}\n\nID: {user_id}\n\nMessage: {content}\n\nDate: {now.strftime('%Y-%m-%d')}\nTime: {now.strftime('%H:%M:%S')}</b>",
+        reply_markup=keyboard,
     )
-
-
 
 @Client.on_callback_query(filters.regex(r"^next"))
 async def next_page(bot, query):
