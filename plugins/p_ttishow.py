@@ -1,5 +1,6 @@
 # Standard Library Imports
 import asyncio
+import math
 
 # Third-Party Library Imports
 from pyrogram import Client, filters, enums
@@ -26,6 +27,9 @@ from info import(
     MAIN_CHANNEL, 
     S_GROUP
 )
+
+# Define a dictionary to keep track of the current page for each user
+user_pages = {}
 
 
 @Client.on_message(filters.new_chat_members & filters.group)
@@ -215,14 +219,24 @@ async def gen_invite(bot, message):
 
 @Client.on_message(filters.command('all_invite') & filters.private & filters.user(ADMINS))
 async def gen_invite_pm(client, message):
+    user_id = message.from_user.id
+    current_page = user_pages.get(user_id, 1)
+
     await message.reply_text("Fetching invite links for chats where I'm an ADMIN...")
+
     chat_links = []
 
     # Retrieve all chats using your method
     all_chats_cursor = await db.get_all_chats()
     all_chats = await all_chats_cursor.to_list(length=None)  # Convert cursor to a list
 
-    for chat in all_chats:
+    num_links_per_page = 10
+    num_pages = math.ceil(len(all_chats) / num_links_per_page)
+
+    start_index = (current_page - 1) * num_links_per_page
+    end_index = start_index + num_links_per_page
+
+    for chat in all_chats[start_index:end_index]:
         try:
             link = await client.create_chat_invite_link(chat['id'])
             chat_links.append(f"Chat: {chat['title']}\nInvite Link: {link.invite_link}\n")
@@ -230,47 +244,41 @@ async def gen_invite_pm(client, message):
             chat_links.append(f"Chat: {chat['title']}\nStatus: I don't have sufficient rights.\n")
         except Exception as e:
             chat_links.append(f"Chat: {chat['title']}\nError: {e}\n")
-    
+
     response = "\n".join(chat_links) if chat_links else "No chats found."
-    await message.reply_text(response)
-    
-    page_size = 5  # Number of chat links to display per page
-    num_pages = (len(chat_links) + page_size - 1) // page_size  # Calculate number of pages
-    
-    page_number = 0
-    while page_number < num_pages:
-        start_index = page_number * page_size
-        end_index = min(start_index + page_size, len(chat_links))
-        
-        page_links = chat_links[start_index:end_index]
-        page_response = "\n".join(page_links)
-        
-        keyboard = []
-        if num_pages > 1:
-            if page_number > 0:
-                keyboard.append([InlineKeyboardButton("Previous Page", callback_data=f"prev_{page_number}")])
-            if page_number < num_pages - 1:
-                keyboard.append([InlineKeyboardButton("Next Page", callback_data=f"next_{page_number}")])
-            
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            await message.reply_text(page_response, reply_markup=reply_markup)
-        else:
-            await message.reply_text(page_response)
-            
-        page_number += 1
+    response += f"\n\nPage {current_page}/{num_pages}"
 
-# Handle callback query for pagination
-@Client.on_callback_query(filters.regex(r'^prev_(\d+)$'))
-async def prev_page(client, callback_query):
-    page_number = int(callback_query.matches[0].group(1))
-    await callback_query.answer()
-    await gen_invite_page(client, callback_query.message, page_number - 1)
+    keyboard = []
 
-@Client.on_callback_query(filters.regex(r'^next_(\d+)$'))
-async def next_page(client, callback_query):
-    page_number = int(callback_query.matches[0].group(1))
-    await callback_query.answer()
-    await gen_invite_page(client, callback_query.message, page_number + 1)
+    if num_pages > 1:
+        if current_page > 1:
+            keyboard.append([InlineKeyboardButton("Previous Page", callback_data="prev_page")])
+
+        if current_page < num_pages:
+            keyboard.append([InlineKeyboardButton("Next Page", callback_data="next_page")])
+
+        keyboard.append([InlineKeyboardButton("Total Page", callback_data="total_page")])
+
+    await message.reply_text(
+        response,
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+@Client.on_callback_query()
+async def handle_pagination_buttons(client, callback_query):
+    user_id = callback_query.from_user.id
+    current_page = user_pages.get(user_id, 1)
+
+    if callback_query.data == "prev_page":
+        user_pages[user_id] = max(current_page - 1, 1)
+    elif callback_query.data == "next_page":
+        user_pages[user_id] = min(current_page + 1, num_pages)
+    elif callback_query.data == "total_page":
+        await callback_query.answer(f"Total Pages: {num_pages}", show_alert=True)
+        return
+
+    await callback_query.message.delete()
+    await gen_invite_pm(client, callback_query.message)
         
         
 @Client.on_message(filters.command('ban') & filters.user(ADMINS))
