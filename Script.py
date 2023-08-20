@@ -214,7 +214,7 @@ Note:- <b>Give a user details</b>
 4. /Goal or /Shoot - 𝚃𝙾 𝙼𝙰𝙺𝙴 𝙰 𝙶𝙾𝙰𝙻 𝙾𝚁 𝚂𝙷𝙾𝙾𝚃
 5. /luck or /cownd - 𝚂𝙿𝙸𝙽 𝙰𝙽𝙳 𝚃𝚁𝚈 𝚈𝙾𝚄𝚁 𝙻𝚄𝙲𝙺"""
 
-    ADMIN_TXT = """Help: <b>Admin mods</b>
+    ADMINMODS_TXT = """Help: <b>Admin mods</b>
 
 <b>NOTE:</b>
 This module only works for my admins
@@ -251,27 +251,17 @@ This module only works for my admins
 𝙵𝙾𝚁 𝚄𝚂𝙸𝙽𝙶 𝚃𝙷𝙴 𝙼𝙾𝙳𝚄𝙻𝙴 𝙹𝚄𝚂𝚃 𝚂𝙴𝙽𝙳 𝚃𝙷𝙴 𝚃𝙴𝚇𝚃 𝙰𝙽𝙳 𝚁𝙴𝙿𝙻𝚈 𝚃𝙾 𝙸𝚃 𝚆𝙸𝚃𝙷 /carbon 𝙲𝙾𝙼𝙼𝙰𝙽𝙳 𝚃𝙷𝙴 𝙱𝙾𝚃 𝚆𝙸𝙻𝙻 𝚁𝙴𝙿𝙻𝚈 𝚆𝙸𝚃𝙷 𝚃𝙷𝙴 𝙲𝙰𝚁𝙱𝙾𝙽 𝙸𝙼𝙰𝙶𝙴"""
 
 
-    LOG_TEXT_G = """👥 #NewGroup
-<b>᚛› Group: {a}</b>
-<b>᚛› Group ID: <code>{b}</code></b>
-<b>᚛› Group UN: @{c}</b>
-<b>᚛› Total Members: <code>{d}</code></b>
-<b>᚛› Total Groups: <code>{e}</code></b>
-<b>᚛› Today Groups: <code>{h}</code></b>
-<b>᚛› Date: <code>{f}</code></b>
-<b>᚛› Time: <code>{g}</code></b>
-<b>᚛› Added By: {j}</b>
-By {i}"""
-
-    LOG_TEXT_P = """👤 #NewUser
-᚛› ID: <code>{a}</code>
-᚛› Name: {b}
-᚛› Username: @{c}
-᚛› Total: {d}
-᚛› Date: <code>{e}</code>
-᚛› Time: <code>{f}</code>
-᚛› Today Users: {g}
-By @{h}"""
+    LOG_TEXT_G = """#𝐍𝐞𝐰𝐆𝐫𝐨𝐮𝐩
+᚛› 𝐆𝐫𝐨𝐮𝐩 ⪼ = {}(<code>{}</code>)
+᚛› 𝐓𝐨𝐭𝐚𝐥 𝐌𝐞𝐦𝐛𝐞𝐫𝐬 ⪼ = <code>{}</code>
+᚛› 𝐀𝐝𝐝𝐞𝐝 𝐁𝐲 ⪼ - {}
+@Movies_Hole_Robot
+"""
+    LOG_TEXT_P = """#𝐍𝐞𝐰𝐔𝐬𝐞𝐫
+᚛› 𝐈𝐃 - <code>{}</code>
+᚛› 𝐍𝐚𝐦𝐞 - {}
+@Movies_Hole_Robot
+"""
     
     FILE_MSG = """
 <b>👋 Hai {} </b>
