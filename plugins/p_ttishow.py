@@ -219,7 +219,8 @@ async def gen_invite_pm(client, message):
     chat_links = []
 
     # Retrieve all chats using your method
-    all_chats = await db.get_all_chats()
+    all_chats_cursor = await db.get_all_chats()
+    all_chats = await all_chats_cursor.to_list(length=None)  # Convert cursor to a list
 
     for chat in all_chats:
         if chat['chat_status'] == "supergroup" or chat['chat_status'] == "group":
