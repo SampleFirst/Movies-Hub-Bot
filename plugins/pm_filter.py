@@ -362,13 +362,10 @@ async def advantage_spoll_choker(bot, query):
             await k.delete()
 
 
-
-    
-
-
-    
 @Client.on_callback_query()
 async def cb_handler(client: Client, query: CallbackQuery):
+    is_admin = query.from_user.id in ADMINS
+    data = query.data
     if query.data == "close_data":
         await query.message.delete()
     elif query.data == "delallconfirm":
@@ -1007,11 +1004,17 @@ async def cb_handler(client: Client, query: CallbackQuery):
         await query.answer("కాపీరైట్ కారణంగా, ఫైల్ ఇక్కడి నుండి 10 నిమిషాల్లో తొలగించబడుతుంది, కనుక దాన్ని ఎక్కడికైనా వెళ్లి డౌన్‌లోడ్ చేసుకోండి!", show_alert=True)
     
     elif query.data == "surprise":
-        btn = [[
-            InlineKeyboardButton('sᴜʀᴘʀɪsᴇ', callback_data='start')
-        ]]
+        btn = [
+            [
+                InlineKeyboardButton('Surprise', callback_data='start')
+            ]
+        ]
         reply_markup=InlineKeyboardMarkup(btn)
-        
+        await client.edit_message_media(
+            query.message.chat.id, 
+            query.message.id, 
+            InputMediaPhoto(random.choice(PICS))
+        )
         await query.message.edit_text(
             text=script.SUR_TXT.format(query.from_user.mention, temp.U_NAME, temp.B_NAME),
             reply_markup=reply_markup,
@@ -1019,27 +1022,64 @@ async def cb_handler(client: Client, query: CallbackQuery):
         )
 
     elif query.data == "start":
-        buttons = [[
-            InlineKeyboardButton('➕️ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘs ➕️', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
-        ],[
-            InlineKeyboardButton('🔍 sᴇᴀʀᴄʜ', switch_inline_query_current_chat=''),
-            InlineKeyboardButton('📢 ᴜᴘᴅᴀᴛᴇ', url='https://t.me/iPapkornUpdate')
-        ],[
-            InlineKeyboardButton('ℹ️ ʜᴇʟᴘ', callback_data='help'),
-            InlineKeyboardButton('😊 ᴀʙᴏᴜᴛ', callback_data='about')
-        ],[
-            InlineKeyboardButton('🔥 ᴊᴏɪɴ ᴡɪᴛʜ ʏᴏᴜᴛᴜʙᴇ 🔥', url='https://youtube.com/@InvisibleYTV')
-        ],[
-            InlineKeyboardButton('ʙᴀᴄᴋ ᴛᴏ sᴛᴀʀᴛ', callback_data='surprise')
-        ]]
-        reply_markup = InlineKeyboardMarkup(buttons)
-        
-        await query.message.edit_text(
-            text=script.START_TXT.format(query.from_user.mention, temp.U_NAME, temp.B_NAME),
-            reply_markup=reply_markup,
-            parse_mode=enums.ParseMode.HTML
-        )
-        await query.answer(MSG_ALRT)
+        if is_admin:
+            admin_buttons = [
+                [
+                    InlineKeyboardButton("➕️ 𝙰𝙳𝙳 𝙼𝙴 𝚃𝙾 𝚈𝙾𝚄𝚁 𝙶𝚁𝙾𝚄𝙿 ➕️", url=f"http://t.me/{temp.U_NAME}?startgroup=true")
+                ],
+                [
+                    InlineKeyboardButton("📊 𝚂𝚃𝙰𝚃𝚄𝚂", callback_data="bot_status"),
+                    InlineKeyboardButton("🔍 𝚂𝙴𝙰𝚁𝙲𝙷", switch_inline_query_current_chat='')
+                ],
+                [
+                    InlineKeyboardButton("ℹ️ 𝙷𝙴𝙻𝙿", callback_data="help"),
+                    InlineKeyboardButton("💫 𝙰𝙱𝙾𝚄𝚃", callback_data="about")
+                ],
+                [
+                    InlineKeyboardButton('🔒 𝙰𝙳𝙼𝙸𝙽 𝚂𝙴𝚃𝚃𝙸𝙽𝙶𝚂 🔒', callback_data='admin_settings')
+                ]
+            ]
+            reply_markup = InlineKeyboardMarkup(admin_buttons)
+            await client.edit_message_media(
+                query.message.chat.id, 
+                query.message.id, 
+                InputMediaPhoto(random.choice(PICS))
+            )
+            await query.message.edit_text(
+                text=script.ADM_TXT.format(query.from_user.mention, temp.U_NAME, temp.B_NAME),
+                reply_markup=reply_markup,
+                parse_mode=enums.ParseMode.HTML
+            )
+            await query.answer(MSG_ALRT)            
+        else:
+            users_buttons = [
+                [
+                    InlineKeyboardButton("➕️ 𝙰𝙳𝙳 𝙼𝙴 𝚃𝙾 𝚈𝙾𝚄𝚁 𝙶𝚁𝙾𝚄𝙿 ➕️", url=f"http://t.me/{temp.U_NAME}?startgroup=true")
+                ],
+                [
+                    InlineKeyboardButton("🤖 𝙼𝙾𝚁𝙴 𝙱𝙾𝚃𝚂", callback_data="bots"),
+                    InlineKeyboardButton("📢 𝚄𝙿𝙳𝙰𝚃𝙴𝚂", url="https://t.me/iPapkornUpdate")
+                ],
+                [
+                    InlineKeyboardButton("ℹ️ 𝙷𝙴𝙻𝙿", callback_data="help"),
+                    InlineKeyboardButton("💫 𝙰𝙱𝙾𝚄𝚃", callback_data="about")
+                ],
+                [
+                    InlineKeyboardButton('🌟 𝙹𝙾𝙸𝙽 𝚆𝙸𝚃𝙷 𝚈𝙾𝚄𝚃𝚄𝙱𝙴 🌟', url=f"https://youtube.com/@InvisibleYTV")
+                ]
+            ]
+            reply_markup = InlineKeyboardMarkup(users_buttons)
+            await client.edit_message_media(
+                query.message.chat.id, 
+                query.message.id, 
+                InputMediaPhoto(random.choice(PICS))
+            )
+            await query.message.edit_text(
+                text=script.START_TXT.format(query.from_user.mention, temp.U_NAME, temp.B_NAME),
+                reply_markup=reply_markup,
+                parse_mode=enums.ParseMode.HTML
+            )
+            await query.answer(MSG_ALRT)
     elif query.data == "help":
         buttons = [[
             InlineKeyboardButton('ᴍᴀɴᴜᴀʟ', callback_data='manuelfilter'),
