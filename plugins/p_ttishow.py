@@ -218,7 +218,7 @@ async def gen_invite_pm(client, message):
     await message.reply_text("Fetching invite links for chats where I'm an ADMIN...")
     chat_links = []
 
-    async for chat in client.iter_dialogs():
+    async for chat in app.iter_dialogs():
         if chat.chat.type == "supergroup" or chat.chat.type == "group":
             try:
                 link = await client.create_chat_invite_link(chat.chat.id)
