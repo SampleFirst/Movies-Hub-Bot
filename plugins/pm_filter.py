@@ -174,7 +174,7 @@ async def pm_text(bot, message):
         return  # ignore admins
 
     # Get the total users count
-    total_users = await total_users_count()
+    total_users = await db.total_users_count()
 
     reply_text = f"<b>{greeting}, {user}!\n🎉 Congratulations You Are {total_users}th User\nJoin Our **𝙿𝚄𝙱𝙻𝙸𝙲 𝙶𝚁𝙾𝚄𝙿** For Sending Movie Names in Group Bot Reply Movies\n\nIf You Want Private Search Movies, Join Our **𝙿𝙼 𝚂𝙴𝙰𝚁𝙲𝙷** Bot to Send Movie Names. Bot Will Reply with Movies\n\nIf Any Bot Is Down, Check the Alternatives in **𝙼𝙾𝚁𝙴 𝙱𝙾𝚃𝚂** Official Channel</b>\n\nTotal Users: {total_users} Congratulations!"
 
