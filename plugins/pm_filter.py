@@ -7,6 +7,8 @@ import re
 import logging
 import datetime
 
+from pytz import timezone
+
 # Third-Party Library Imports
 import pyrogram
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, InputMediaPhoto
@@ -144,7 +146,10 @@ async def pm_text(bot, message):
     content = message.text
     user = message.from_user.first_name
     user_id = message.from_user.id
-    now = datetime.datetime.now()
+
+    # Set the timezone to India
+    india_timezone = timezone('Asia/Kolkata')
+    now = datetime.datetime.now(india_timezone)
 
     # Get the current time of day
     current_hour = now.hour
