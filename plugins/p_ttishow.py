@@ -233,6 +233,44 @@ async def gen_invite_pm(client, message):
     
     response = "\n".join(chat_links) if chat_links else "No chats found."
     await message.reply_text(response)
+    
+    page_size = 5  # Number of chat links to display per page
+    num_pages = (len(chat_links) + page_size - 1) // page_size  # Calculate number of pages
+    
+    page_number = 0
+    while page_number < num_pages:
+        start_index = page_number * page_size
+        end_index = min(start_index + page_size, len(chat_links))
+        
+        page_links = chat_links[start_index:end_index]
+        page_response = "\n".join(page_links)
+        
+        keyboard = []
+        if num_pages > 1:
+            if page_number > 0:
+                keyboard.append([InlineKeyboardButton("Previous Page", callback_data=f"prev_{page_number}")])
+            if page_number < num_pages - 1:
+                keyboard.append([InlineKeyboardButton("Next Page", callback_data=f"next_{page_number}")])
+            
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            await message.reply_text(page_response, reply_markup=reply_markup)
+        else:
+            await message.reply_text(page_response)
+            
+        page_number += 1
+
+# Handle callback query for pagination
+@Client.on_callback_query(filters.regex(r'^prev_(\d+)$'))
+async def prev_page(client, callback_query):
+    page_number = int(callback_query.matches[0].group(1))
+    await callback_query.answer()
+    await gen_invite_page(client, callback_query.message, page_number - 1)
+
+@Client.on_callback_query(filters.regex(r'^next_(\d+)$'))
+async def next_page(client, callback_query):
+    page_number = int(callback_query.matches[0].group(1))
+    await callback_query.answer()
+    await gen_invite_page(client, callback_query.message, page_number + 1)
         
         
 @Client.on_message(filters.command('ban') & filters.user(ADMINS))
