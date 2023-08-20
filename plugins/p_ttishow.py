@@ -218,15 +218,18 @@ async def gen_invite_pm(client, message):
     await message.reply_text("Fetching invite links for chats where I'm an ADMIN...")
     chat_links = []
 
-    async for chat in app.iter_dialogs():
-        if chat.chat.type == "supergroup" or chat.chat.type == "group":
+    # Retrieve all chats using your method
+    all_chats = await db.get_all_chats()
+
+    for chat in all_chats:
+        if chat['chat_status'] == "supergroup" or chat['chat_status'] == "group":
             try:
-                link = await client.create_chat_invite_link(chat.chat.id)
-                chat_links.append(f"Chat: {chat.chat.title}\nInvite Link: {link.invite_link}\n")
+                link = await client.create_chat_invite_link(chat['id'])
+                chat_links.append(f"Chat: {chat['title']}\nInvite Link: {link.invite_link}\n")
             except ChatAdminRequired:
-                chat_links.append(f"Chat: {chat.chat.title}\nStatus: I don't have sufficient rights.\n")
+                chat_links.append(f"Chat: {chat['title']}\nStatus: I don't have sufficient rights.\n")
             except Exception as e:
-                chat_links.append(f"Chat: {chat.chat.title}\nError: {e}\n")
+                chat_links.append(f"Chat: {chat['title']}\nError: {e}\n")
     
     response = "\n".join(chat_links) if chat_links else "No chats found where I'm an ADMIN."
     await message.reply_text(response)
