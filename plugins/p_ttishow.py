@@ -236,6 +236,8 @@ async def gen_invite_pm(client, message):
     start_index = (current_page - 1) * num_links_per_page
     end_index = start_index + num_links_per_page
 
+    buttons = []
+
     for chat in all_chats[start_index:end_index]:
         try:
             chat_id = chat.get('id')  # Retrieve chat ID
@@ -243,20 +245,14 @@ async def gen_invite_pm(client, message):
 
             # Double-check if the chat ID and title are valid
             if chat_id and chat_title:
-                link = await client.create_chat_invite_link(chat_id)
-                chat_links.append(f"Chat: {chat_title}\nInvite Link: {link.invite_link}\n")
+                buttons.append([InlineKeyboardButton(chat_title, callback_data=f"get_link_{chat_id}")])
             else:
                 chat_links.append(f"Invalid chat data.\n")
 
-        except ChatAdminRequired:
-            chat_links.append(f"Chat: {chat_title}\nStatus: I don't have sufficient rights.\n")
         except Exception as e:
             chat_links.append(f"Chat: {chat_title}\nError: {e}\n")
 
-    response = "\n".join(chat_links) if chat_links else "No chats found."
-    response += f"\n\nPage {current_page}/{num_pages}"
-
-    keyboard = []
+    keyboard = buttons
 
     if num_pages > 1:
         if current_page > 1:
@@ -265,28 +261,22 @@ async def gen_invite_pm(client, message):
         if current_page < num_pages:
             keyboard.append([InlineKeyboardButton("Next Page", callback_data="next_page")])
 
-        keyboard.append([InlineKeyboardButton("Total Page", callback_data="total_page")])
-
     await message.reply_text(
-        response,
+        "Select a chat to get the invite link:",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
-@Client.on_callback_query()
-async def handle_pagination_buttons(client, callback_query):
-    user_id = callback_query.from_user.id
-    current_page = user_pages.get(user_id, 1)
 
-    if callback_query.data == "prev_page":
-        user_pages[user_id] = max(current_page - 1, 1)
-    elif callback_query.data == "next_page":
-        user_pages[user_id] = min(current_page + 1, num_pages)
-    elif callback_query.data == "total_page":
-        await callback_query.answer(f"Total Pages: {num_pages}", show_alert=True)
-        return
-
-    await callback_query.message.delete()
-    await gen_invite_pm(client, callback_query.message)
+@Client.on_callback_query(filters.regex(r"^get_link_\d+"))
+async def get_invite_link(client, callback_query):
+    chat_id = int(callback_query.data.split("_")[2])
+    try:
+        link = await client.create_chat_invite_link(chat_id)
+        await callback_query.answer(link.invite_link)
+    except ChatAdminRequired:
+        await callback_query.answer("I don't have sufficient rights.")
+    except Exception as e:
+        await callback_query.answer(f"Error: {e}")
         
         
 @Client.on_message(filters.command('ban') & filters.user(ADMINS))
