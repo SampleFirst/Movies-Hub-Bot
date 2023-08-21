@@ -238,12 +238,20 @@ async def gen_invite_pm(client, message):
 
     for chat in all_chats[start_index:end_index]:
         try:
-            link = await client.create_chat_invite_link(chat['id'])
-            chat_links.append(f"Chat: {chat['title']}\nInvite Link: {link.invite_link}\n")
+            chat_id = chat.get('id')  # Retrieve chat ID
+            chat_title = chat.get('title')  # Retrieve chat title
+
+            # Double-check if the chat ID and title are valid
+            if chat_id and chat_title:
+                link = await client.create_chat_invite_link(chat_id)
+                chat_links.append(f"Chat: {chat_title}\nInvite Link: {link.invite_link}\n")
+            else:
+                chat_links.append(f"Invalid chat data.\n")
+
         except ChatAdminRequired:
-            chat_links.append(f"Chat: {chat['title']}\nStatus: I don't have sufficient rights.\n")
+            chat_links.append(f"Chat: {chat_title}\nStatus: I don't have sufficient rights.\n")
         except Exception as e:
-            chat_links.append(f"Chat: {chat['title']}\nError: {e}\n")
+            chat_links.append(f"Chat: {chat_title}\nError: {e}\n")
 
     response = "\n".join(chat_links) if chat_links else "No chats found."
     response += f"\n\nPage {current_page}/{num_pages}"
