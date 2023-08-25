@@ -394,6 +394,33 @@ async def add_admin(client, message):
         logger.exception(e)
         await message.reply_text("An error occurred. Make sure the bot has the necessary rights.", quote=True)
 
+@Client.on_message(filters.command("add_admin") & filters.private)
+async def add_admin_to_chat(client: Client, message: Message):
+    # Parse input arguments (chat ID and user ID)
+    args = message.text.split()[1:]
+    if len(args) != 2:
+        await message.reply("Invalid arguments! Use the format: /add_admin <chat_id> <user_id>")
+        return
+
+    chat_id, user_id = args
+
+    try:
+        # Get the chat and user objects
+        chat = await client.get_chat(chat_id)
+        user = await client.get_users(int(user_id))
+    except Exception as e:
+        await message.reply(f"Error: {str(e)}")
+        return
+
+    try:
+        # Promote the user to admin in the chat
+        await client.promote_chat_member(chat.id, user.id, can_change_info=True, can_delete_messages=True,
+                                         can_invite_users=True, can_restrict_members=True, can_pin_messages=True,
+                                         can_promote_members=False)
+        await message.reply(f"{user.first_name} has been promoted to admin in {chat.title}")
+    except Exception as e:
+        await message.reply(f"Error promoting {user.first_name}: {str(e)}")
+
 @Client.on_message(filters.command(['findfiles']) & filters.user(ADMINS))
 async def handle_find_files(client, message):
     """Find files in the database based on search criteria"""
