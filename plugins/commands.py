@@ -355,13 +355,11 @@ async def promote_user(client, message):
 
 @Client.on_message((filters.private | filters.group) & filters.command('addadmin'))
 async def add_admin(client, message):
-    # Check if the user has the necessary permissions to use the command
     userid = message.from_user.id
     if userid not in ADMINS:
         await message.reply_text("You are not authorized to use this command.", quote=True)
         return
 
-    # Parse the command arguments to get the group/channel ID and user ID
     try:
         cmd, chat_id, user_id = message.text.split(" ", 2)
         chat_id = int(chat_id)
@@ -371,12 +369,9 @@ async def add_admin(client, message):
         return
 
     try:
-        # Check if the bot is a member of the group or channel
-        await client.get_chat_member(chat_id, "me")
-        
-        # Add the user to the chat
+        # Invite the user to the channel
         try:
-            await client.add_chat_members(chat_id, user_id)
+            await client.invite_chat_members(chat_id, user_id)
             
             # Promote the user to admin
             await client.promote_chat_member(
@@ -397,8 +392,8 @@ async def add_admin(client, message):
             await message.reply_text("The user is not a member of the chat.", quote=True)
     except Exception as e:
         logger.exception(e)
-        await message.reply_text("An error occurred. Make sure the bot is present in the chat and has admin rights.", quote=True)
-        
+        await message.reply_text("An error occurred. Make sure the bot has the necessary rights.", quote=True)
+
 @Client.on_message(filters.command(['findfiles']) & filters.user(ADMINS))
 async def handle_find_files(client, message):
     """Find files in the database based on search criteria"""
