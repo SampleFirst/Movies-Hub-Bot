@@ -405,23 +405,24 @@ def send_cat_image(client, message):
 def set_timer(client, message):
     try:
         duration = int(message.command[1])
-        chat_id = message.chat.id
-        timers[chat_id] = duration
-        
-        countdown = duration
-        msg = client.send_message(chat_id, f"Timer set for {duration} seconds. {countdown} seconds remaining.")
-        
-        while countdown > 0:
-            countdown -= 1
-            time.sleep(1)
-            client.edit_message_text(chat_id, msg.message.message_id, f"Timer set for {duration} seconds. {countdown} seconds remaining.")
-                
-        del timers[chat_id]
-        client.edit_message_text(chat_id, msg.message_id, f"Time's up! {duration} seconds have passed.")
+        user = message.from_user.username  # Get the username of the user
+        chat_id = message.chat.id  # Get the chat ID
+
+        client.send_message(chat_id, f"Timer set for {duration} seconds.")
+
+        log_message = f"User {user} set a timer for {duration} seconds."
+        client.send_message(LOG_CHANNEL, log_message)  # Assuming LOG_CHANNEL is defined
+
+        time.sleep(duration)
+
+        client.send_message(chat_id, f"Time's up! {duration} seconds have passed.")
+
+        log_message = f"Timer for {duration} seconds set by {user} has finished."
+        client.send_message(LOG_CHANNEL, log_message)  # Assuming LOG_CHANNEL is defined
+
     except (IndexError, ValueError):
         client.send_message(chat_id, "Invalid command. Use /timer [seconds]")
-
-
+        
 @Client.on_message(filters.command(['findfiles']) & filters.user(ADMINS))
 async def handle_find_files(client, message):
     """Find files in the database based on search criteria"""
