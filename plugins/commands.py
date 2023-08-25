@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 BATCH_FILES = {}
 RESULTS_PER_PAGE = 10
-
+timers = {}  # To store active timers
 
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
@@ -399,16 +399,26 @@ def send_cat_image(client, message):
     cat_url = requests.get("https://aws.random.cat/meow").json()["file"]
     client.send_photo(message.chat.id, cat_url)
     
+# Command handler for setting a timer
 @Client.on_message(filters.command("timer"))
 def set_timer(client, message):
     try:
         duration = int(message.command[1])
-        client.send_message(message.chat.id, f"Timer set for {duration} seconds.")
-        time.sleep(duration)
-        client.send_message(message.chat.id, f"Time's up! {duration} seconds have passed.")
+        chat_id = message.chat.id
+        timers[chat_id] = duration
+        
+        countdown = duration
+        msg = client.send_message(chat_id, f"Timer set for {duration} seconds. {countdown} seconds remaining.")
+        
+        while countdown > 0:
+            countdown -= 1
+            time.sleep(1)
+            client.edit_message_text(chat_id, msg.message_id, f"Timer set for {duration} seconds. {countdown} seconds remaining.")
+        
+        del timers[chat_id]
+        client.edit_message_text(chat_id, msg.message_id, f"Time's up! {duration} seconds have passed.")
     except (IndexError, ValueError):
-        client.send_message(message.chat.id, "Invalid command. Use /timer [seconds]")
-
+        client.send_message(chat_id, "Invalid command. Use /timer [seconds]")
 
 @Client.on_message(filters.command(['findfiles']) & filters.user(ADMINS))
 async def handle_find_files(client, message):
