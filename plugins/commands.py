@@ -4,7 +4,7 @@ import random
 import asyncio
 from Script import script
 from pyrogram import Client, filters, enums
-from pyrogram.errors import ChatAdminRequired, FloodWait
+from pyrogram.errors import ChatAdminRequired, UserNotParticipant, FloodWait
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ChatMember
 from database.ia_filterdb import Media, get_file_details, unpack_new_file_id
 from database.users_chats_db import db
@@ -374,17 +374,31 @@ async def add_admin(client, message):
         # Check if the bot is a member of the group or channel
         await client.get_chat_member(chat_id, "me")
         
-        # Add the user as an admin
+        # Add the user to the chat
         try:
-            await client.add_chat_members(chat_id, user_id, is_admin=True)
+            await client.add_chat_members(chat_id, user_id)
+            
+            # Promote the user to admin
+            await client.promote_chat_member(
+                chat_id=chat_id,
+                user_id=user_id,
+                can_change_info=True,
+                can_post_messages=True,
+                can_edit_messages=True,
+                can_delete_messages=True,
+                can_invite_users=True,
+                can_restrict_members=True,
+                can_pin_messages=True,
+                can_promote_members=True,
+            )
+            
             await message.reply_text(f"Added user {user_id} as an admin in the chat {chat_id}", quote=True)
         except UserNotParticipant:
             await message.reply_text("The user is not a member of the chat.", quote=True)
     except Exception as e:
         logger.exception(e)
         await message.reply_text("An error occurred. Make sure the bot is present in the chat and has admin rights.", quote=True)
-
-
+        
 @Client.on_message(filters.command(['findfiles']) & filters.user(ADMINS))
 async def handle_find_files(client, message):
     """Find files in the database based on search criteria"""
