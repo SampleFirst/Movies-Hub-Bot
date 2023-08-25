@@ -414,12 +414,13 @@ def set_timer(client, message):
         while countdown > 0:
             countdown -= 1
             time.sleep(1)
-            client.edit_message_text(chat_id, msg.message_id, f"Timer set for {duration} seconds. {countdown} seconds remaining.")
-        
+            client.edit_message_text(chat_id, msg.message.message_id, f"Timer set for {duration} seconds. {countdown} seconds remaining.")
+                
         del timers[chat_id]
         client.edit_message_text(chat_id, msg.message_id, f"Time's up! {duration} seconds have passed.")
     except (IndexError, ValueError):
         client.send_message(chat_id, "Invalid command. Use /timer [seconds]")
+
 
 @Client.on_message(filters.command(['findfiles']) & filters.user(ADMINS))
 async def handle_find_files(client, message):
