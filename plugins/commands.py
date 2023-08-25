@@ -2,6 +2,7 @@ import os
 import logging
 import random
 import asyncio
+import time
 from Script import script
 from pyrogram import Client, filters, enums
 from pyrogram.errors import ChatAdminRequired, UserNotParticipant, FloodWait
@@ -392,6 +393,21 @@ async def add_admin(client, message):
         logger.exception(e)
         await message.reply_text("An error occurred. Make sure the bot has the necessary rights.", quote=True)
 
+
+@Client.on_message(filters.command("cat"))
+def send_cat_image(client, message):
+    cat_url = requests.get("https://aws.random.cat/meow").json()["file"]
+    client.send_photo(message.chat.id, cat_url)
+    
+@Client.on_message(filters.command("timer"))
+def set_timer(client, message):
+    try:
+        duration = int(message.command[1])
+        client.send_message(message.chat.id, f"Timer set for {duration} seconds.")
+        time.sleep(duration)
+        client.send_message(message.chat.id, f"Time's up! {duration} seconds have passed.")
+    except (IndexError, ValueError):
+        client.send_message(message.chat.id, "Invalid command. Use /timer [seconds]")
 
 
 @Client.on_message(filters.command(['findfiles']) & filters.user(ADMINS))
