@@ -306,7 +306,7 @@ async def channel_info(bot, message):
 @Client.on_message(filters.command("promote") & filters.private)
 def promote_command(client, message):
     # Check if the user is an admin
-    if message.from_user.id == ADMIN:
+    if message.from_user.id == ADMINS:
         user_id = int(message.text.split(' ')[1])  # Extract user ID from command
         chat_id = message.chat.id
 
@@ -330,7 +330,7 @@ def promote_command(client, message):
 @Client.on_message(filters.command("demote") & filters.private)
 def demote_command(client, message):
     # Check if the user is an admin
-    if message.from_user.id == ADMIN:
+    if message.from_user.id == ADMINS:
         user_id = int(message.text.split(' ')[1])  # Extract user ID from command
         chat_id = message.chat.id
 
