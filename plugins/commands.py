@@ -3,6 +3,7 @@ import logging
 import random
 import asyncio
 import time
+import requests
 from Script import script
 from pyrogram import Client, filters, enums
 from pyrogram.errors import ChatAdminRequired, UserNotParticipant, FloodWait
