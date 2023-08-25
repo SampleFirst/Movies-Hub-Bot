@@ -429,13 +429,12 @@ def set_timer(client, message):
 async def set_curr_timer(client, message):
     try:
         command_parts = message.text.split(" ")
-        if len(command_parts) != 4:  # Updated to include the timezone
-            await message.reply_text("Invalid command format. Please use: /timer HH:MM AM/PM Timezone")
+        if len(command_parts) != 3:  # Updated to include the time only
+            await message.reply_text("Invalid command format. Please use: /set_timer HH:MM AM/PM")
             return
         
-        time_str = command_parts[1] + " " + command_parts[2] + " " + command_parts[3]
-        timer_time = datetime.strptime(time_str, "%I:%M %p %Z")
-        timer_time = pytz.timezone('Asia/Kolkata').localize(timer_time)  # Adding Indian timezone
+        time_str = command_parts[1] + " " + command_parts[2]
+        timer_time = datetime.strptime(time_str, "%I:%M %p")
         
         current_time = datetime.now(pytz.timezone('Asia/Kolkata'))
         if timer_time <= current_time:
