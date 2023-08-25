@@ -5,7 +5,7 @@ import asyncio
 from Script import script
 from pyrogram import Client, filters, enums
 from pyrogram.errors import ChatAdminRequired, FloodWait
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ChatMember
 from database.ia_filterdb import Media, get_file_details, unpack_new_file_id
 from database.users_chats_db import db
 from info import CHANNELS, ADMINS, AUTH_CHANNEL, LOG_CHANNEL, PICS, BATCH_FILE_CAPTION, CUSTOM_FILE_CAPTION, PROTECT_CONTENT, MSG_ALRT, MAIN_CHANNEL
@@ -302,6 +302,88 @@ async def channel_info(bot, message):
         os.remove(file)
         
        
+# New command to promote users
+@Client.on_message((filters.private | filters.group) & filters.command('promote'))
+async def promote_user(client, message):
+    userid = message.from_user.id if message.from_user else None
+    if not userid:
+        return await message.reply("You are anonymous admin. Use /connect in PM")
+
+    chat_type = message.chat.type
+    if chat_type not in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
+        return await message.reply("This command can only be used in groups or supergroups.")
+
+    group_id = message.chat.id
+    target_user = None
+
+    if len(message.command) != 2:
+        return await message.reply("Usage: /promote <user_id>")
+
+    try:
+        _, user_id = message.command
+        target_user = await client.get_chat_member(group_id, user_id)
+    except Exception as e:
+        logger.exception(e)
+        return await message.reply("Invalid user ID.")
+
+    if target_user.status in [
+        ChatMember.MEMBER,
+        ChatMember.RESTRICTED,
+        ChatMember.LEFT,
+        ChatMember.KICKED,
+    ]:
+        return await message.reply("The specified user is not a member of the group.")
+
+    try:
+        await client.promote_chat_member(
+            chat_id=group_id,
+            user_id=target_user.user.id,
+            can_change_info=True,
+            can_post_messages=True,
+            can_edit_messages=True,
+            can_delete_messages=True,
+            can_invite_users=True,
+            can_restrict_members=True,
+            can_pin_messages=True,
+            can_promote_members=True,
+        )
+        await message.reply(f"Successfully promoted {target_user.user.username or target_user.user.first_name}.")
+    except Exception as e:
+        logger.exception(e)
+        await message.reply("An error occurred while promoting the user.")
+
+
+@Client.on_message((filters.private | filters.group) & filters.command('addadmin'))
+async def add_admin(client, message):
+    # Check if the user has the necessary permissions to use the command
+    userid = message.from_user.id
+    if userid not in ADMINS:
+        await message.reply_text("You are not authorized to use this command.", quote=True)
+        return
+
+    # Parse the command arguments to get the group/channel ID and user ID
+    try:
+        cmd, chat_id, user_id = message.text.split(" ", 2)
+        chat_id = int(chat_id)
+        user_id = int(user_id)
+    except ValueError:
+        await message.reply_text("Invalid command format. Usage: /addadmin <chat_id> <user_id>", quote=True)
+        return
+
+    try:
+        # Check if the bot is a member of the group or channel
+        await client.get_chat_member(chat_id, "me")
+        
+        # Add the user as an admin
+        try:
+            await client.add_chat_members(chat_id, user_id, is_admin=True)
+            await message.reply_text(f"Added user {user_id} as an admin in the chat {chat_id}", quote=True)
+        except UserNotParticipant:
+            await message.reply_text("The user is not a member of the chat.", quote=True)
+    except Exception as e:
+        logger.exception(e)
+        await message.reply_text("An error occurred. Make sure the bot is present in the chat and has admin rights.", quote=True)
+
 
 @Client.on_message(filters.command(['findfiles']) & filters.user(ADMINS))
 async def handle_find_files(client, message):
