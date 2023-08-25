@@ -4,6 +4,7 @@ import random
 import asyncio
 import time
 import requests
+from datetime import datetime
 from Script import script
 from pyrogram import Client, filters, enums
 from pyrogram.errors import ChatAdminRequired, UserNotParticipant, FloodWait
@@ -422,6 +423,33 @@ def set_timer(client, message):
 
     except (IndexError, ValueError):
         client.send_message(chat_id, "Invalid command. Use /timer [seconds]")
+
+@Client.on_message(filters.command('set_timer') & filters.user(ADMINS))
+async def set_curr_timer(client, message):
+    try:
+        command_parts = message.text.split(" ")
+        if len(command_parts) != 3:
+            await message.reply_text("Invalid command format. Please use: /timer HH:MM AM/PM")
+            return
+        
+        time_str = command_parts[1] + " " + command_parts[2]
+        timer_time = datetime.strptime(time_str, "%I:%M %p")
+        
+        current_time = datetime.now()
+        if timer_time <= current_time:
+            await message.reply_text("The specified time is in the past.")
+            return
+        
+        time_difference = (timer_time - current_time).total_seconds()
+        await message.reply_text(f"Timer set for {int(time_difference)} seconds.")
+        
+        # You can implement the timer logic here using asyncio.sleep or any other method
+        await asyncio.sleep(time_difference)
+        
+        await message.reply_text("Timer expired!")
+        
+    except Exception as e:
+        await message.reply_text("An error occurred while setting the timer.")
         
 @Client.on_message(filters.command(['findfiles']) & filters.user(ADMINS))
 async def handle_find_files(client, message):
