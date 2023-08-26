@@ -310,41 +310,35 @@ async def channel_info(bot, message):
         os.remove(file)
         
   # New command to promote users
-@Client.on_message((filters.private | filters.group) & filters.command('pmote'))
+@Client.on_message((filters.private | filters.group) & filters.command('promote'))
 async def promote_user(client, message):
     userid = message.from_user.id if message.from_user else None
     if not userid:
-        return await message.reply("You are anonymous admin. Use /connect in PM")
+        return await message.reply("You are an anonymous admin. Use /connect in PM")
 
     chat_type = message.chat.type
     if chat_type not in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
         return await message.reply("This command can only be used in groups or supergroups.")
 
     group_id = message.chat.id
-    target_user = None
 
     if len(message.command) != 2:
         return await message.reply("Usage: /promote <user_id>")
 
     try:
         _, user_id = message.command
-        target_user = await client.get_chat_member(group_id, user_id)
+        target_user = await client.get_users(int(user_id))  # Fetch the user directly
     except Exception as e:
         logger.exception(e)
         return await message.reply("Invalid user ID.")
 
-    if target_user.status in [
-        ChatMember.MEMBER_,
-        ChatMember.RESTRICTED,
-        ChatMember.LEFT,
-        ChatMember.KICKED,
-    ]:
-        return await message.reply("The specified user is not a member of the group.")
+    if not target_user:
+        return await message.reply("User not found.")
 
     try:
         await client.promote_chat_member(
             chat_id=group_id,
-            user_id=target_user.user.id,
+            user_id=target_user.id,
             can_change_info=True,
             can_post_messages=True,
             can_edit_messages=True,
@@ -354,14 +348,14 @@ async def promote_user(client, message):
             can_pin_messages=True,
             can_promote_members=True,
         )
-        await message.reply(f"Successfully promoted {target_user.user.username or target_user.user.first_name}.")
+        await message.reply(f"Successfully promoted {target_user.first_name}.")
     except Exception as e:
         logger.exception(e)
         await message.reply("An error occurred while promoting the user.")
 
 
 # Promote command
-@Client.on_message(filters.command('promote') & filters.private & filters.user(ADMINS))
+@Client.on_message(filters.command('pmote') & filters.private & filters.user(ADMINS))
 def promote_command(client, message):
     # Check if the user is an admin
     if message.from_user.id in ADMINS:
