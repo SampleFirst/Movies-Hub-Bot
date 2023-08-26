@@ -18,7 +18,11 @@ from database.connections_mdb import active_connection
 import re
 import json
 import base64
+
+# Enable logging
+logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
+
 
 BATCH_FILES = {}
 RESULTS_PER_PAGE = 10
