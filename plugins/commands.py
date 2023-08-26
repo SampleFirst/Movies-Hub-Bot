@@ -310,7 +310,7 @@ async def channel_info(bot, message):
         await message.reply_document(file)
         os.remove(file)
 
-@Client.on_message(Filters.command("promote") & Filters.group)
+@Client.on_message(filters.command("promote") & filters.group)
 def promote(client, message):
     chat_id = message.chat.id
     user_id = message.reply_to_message.from_user.id
@@ -345,7 +345,7 @@ def promote(client, message):
                  f"\n<b>User:</b> {message.reply_to_message.from_user.first_name}"
     message.reply_text(reply_text, parse_mode="html")
 
-@Client.on_message(Filters.command("demote") & Filters.group)
+@Client.on_message(filters.command("demote") & filters.group)
 def demote(client, message):
     chat_id = message.chat.id
     user_id = message.reply_to_message.from_user.id
