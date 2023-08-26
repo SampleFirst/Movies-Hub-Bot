@@ -18,6 +18,7 @@ from database.connections_mdb import active_connection
 import re
 import json
 import base64
+import html
 
 # Enable logging
 logging.basicConfig(level=logging.ERROR)
@@ -308,9 +309,82 @@ async def channel_info(bot, message):
             f.write(text)
         await message.reply_document(file)
         os.remove(file)
-        
+
+@Client.on_message(Filters.command("promote") & Filters.group)
+def promote(client, message):
+    chat_id = message.chat.id
+    user_id = message.reply_to_message.from_user.id
+
+    bot_member = client.get_chat_member(chat_id, "me")
+    user_member = client.get_chat_member(chat_id, user_id)
+
+    if user_member.status in ["administrator", "creator"]:
+        message.reply_text("How am I meant to promote someone that's already an admin?")
+        return
+
+    if user_id == bot_member.user.id:
+        message.reply_text("I can't promote myself! Get an admin to do it for me.")
+        return
+
+    client.promote_chat_member(
+        chat_id,
+        user_id,
+        can_change_info=bot_member.can_change_info,
+        can_post_messages=bot_member.can_post_messages,
+        can_edit_messages=bot_member.can_edit_messages,
+        can_delete_messages=bot_member.can_delete_messages,
+        can_restrict_members=bot_member.can_restrict_members,
+        can_pin_messages=bot_member.can_pin_messages,
+        can_promote_members=bot_member.can_promote_members
+    )
+
+    message.reply_text("Successfully promoted!")
+    reply_text = f"<b>{html.escape(message.chat.title)}:</b>" \
+                 f"\n#PROMOTED" \
+                 f"\n<b>Admin:</b> {message.from_user.first_name}" \
+                 f"\n<b>User:</b> {message.reply_to_message.from_user.first_name}"
+    message.reply_text(reply_text, parse_mode="html")
+
+@Client.on_message(Filters.command("demote") & Filters.group)
+def demote(client, message):
+    chat_id = message.chat.id
+    user_id = message.reply_to_message.from_user.id
+
+    user_member = client.get_chat_member(chat_id, user_id)
+
+    if user_member.status == "creator":
+        message.reply_text("This person CREATED the chat, how would I demote them?")
+        return
+
+    if user_member.status != "administrator":
+        message.reply_text("Can't demote what wasn't promoted!")
+        return
+
+    try:
+        client.promote_chat_member(
+            chat_id,
+            user_id,
+            can_change_info=False,
+            can_post_messages=False,
+            can_edit_messages=False,
+            can_delete_messages=False,
+            can_invite_users=False,
+            can_restrict_members=False,
+            can_pin_messages=False,
+            can_promote_members=False
+        )
+        message.reply_text("Successfully demoted!")
+        reply_text = f"<b>{html.escape(message.chat.title)}:</b>" \
+                     f"\n#DEMOTED" \
+                     f"\n<b>Admin:</b> {message.from_user.first_name}" \
+                     f"\n<b>User:</b> {message.reply_to_message.from_user.first_name}"
+        message.reply_text(reply_text, parse_mode="html")
+    except Exception as e:
+        message.reply_text("Could not demote. " + str(e))
+
+
   # New command to promote users
-@Client.on_message((filters.private | filters.group) & filters.command('promote'))
+@Client.on_message((filters.private | filters.group) & filters.command('ppromote'))
 async def promote_user(client, message):
     userid = message.from_user.id if message.from_user else None
     if not userid:
