@@ -330,7 +330,7 @@ async def promote_user(client, message):
         return await message.reply("Invalid user ID.")
 
     if target_user.status in [
-        ChatMember.MEMBER,
+        ChatMember.MEMBER_,
         ChatMember.RESTRICTED,
         ChatMember.LEFT,
         ChatMember.KICKED,
