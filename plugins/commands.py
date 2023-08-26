@@ -305,7 +305,57 @@ async def channel_info(bot, message):
         await message.reply_document(file)
         os.remove(file)
         
-       
+  # New command to promote users
+@Client.on_message((filters.private | filters.group) & filters.command('pmote'))
+async def promote_user(client, message):
+    userid = message.from_user.id if message.from_user else None
+    if not userid:
+        return await message.reply("You are anonymous admin. Use /connect in PM")
+
+    chat_type = message.chat.type
+    if chat_type not in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
+        return await message.reply("This command can only be used in groups or supergroups.")
+
+    group_id = message.chat.id
+    target_user = None
+
+    if len(message.command) != 2:
+        return await message.reply("Usage: /promote <user_id>")
+
+    try:
+        _, user_id = message.command
+        target_user = await client.get_chat_member(group_id, user_id)
+    except Exception as e:
+        logger.exception(e)
+        return await message.reply("Invalid user ID.")
+
+    if target_user.status in [
+        ChatMember.MEMBER,
+        ChatMember.RESTRICTED,
+        ChatMember.LEFT,
+        ChatMember.KICKED,
+    ]:
+        return await message.reply("The specified user is not a member of the group.")
+
+    try:
+        await client.promote_chat_member(
+            chat_id=group_id,
+            user_id=target_user.user.id,
+            can_change_info=True,
+            can_post_messages=True,
+            can_edit_messages=True,
+            can_delete_messages=True,
+            can_invite_users=True,
+            can_restrict_members=True,
+            can_pin_messages=True,
+            can_promote_members=True,
+        )
+        await message.reply(f"Successfully promoted {target_user.user.username or target_user.user.first_name}.")
+    except Exception as e:
+        logger.exception(e)
+        await message.reply("An error occurred while promoting the user.")
+
+
 # Promote command
 @Client.on_message(filters.command('promote') & filters.private & filters.user(ADMINS))
 def promote_command(client, message):
