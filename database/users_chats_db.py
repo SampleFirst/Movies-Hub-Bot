@@ -148,5 +148,18 @@ class Database:
     async def get_db_size(self):
         return (await self.db.command("dbstats"))['dataSize']
 
+    async def promote_chat_member(self, chat_id, user_id, privileges):
+        await self.grp.update_one(
+            {'id': int(chat_id)},
+            {'$addToSet': {'promoted_users': user_id}, '$set': {'privileges': privileges}}
+        )
 
+    async def get_promoted_users(self, chat_id):
+        chat = await self.grp.find_one({'id': int(chat_id)})
+        return chat.get('promoted_users', [])
+    
+    async def get_privileges(self, chat_id):
+        chat = await self.grp.find_one({'id': int(chat_id)})
+        return chat.get('privileges', {})
+        
 db = Database(DATABASE_URI, DATABASE_NAME)
