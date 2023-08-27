@@ -1734,6 +1734,58 @@ async def save_template(client, message):
     await save_group_settings(grp_id, 'template', template)
     await sts.edit(f"Successfully changed template for {title} to\n\n{template}")
 
+@Client.on_message(filters.command('promote'))
+async def promote_command(client, message):
+    userid = message.from_user.id if message.from_user else None
+    if not userid:
+        return await message.reply("🚫 You are an anonymous admin. Use /connect {message.chat.id} in PM")
+
+    chat_type = message.chat.type
+
+    if chat_type == "private":
+        grpid = await active_connection(str(userid))
+        if grpid is not None:
+            grp_id = grpid
+            try:
+                chat = await client.get_chat(grpid)
+                title = chat.title
+            except:
+                await message.reply("❗ Make sure I'm present in your group!", quote=True)
+                return
+        else:
+            await message.reply("❗ I'm not connected to any groups!", quote=True)
+            return
+    elif chat_type in ["group", "supergroup"]:
+        grp_id = message.chat.id
+        title = message.chat.title
+    else:
+        return
+
+    st = await client.get_chat_member(grp_id, userid)
+    if (
+            st.status != enums.ChatMemberStatus.ADMINISTRATOR
+            and st.status != enums.ChatMemberStatus.OWNER
+            and str(userid) not in ADMINS
+    ):
+        return
+
+    await client.send_message("ADMIN_USERNAME", f"Command received from ADMIN in PM.\nGroup ID: {grp_id}\nUser ID: {userid}")
+    if await active_connection(str(userid)) == str(grp_id):
+        await client.promote_chat_member(
+            chat_id=grp_id, 
+            user_id=userid,
+            can_change_info=True,
+            can_post_messages=True,
+            can_edit_messages=True,
+            can_delete_messages=True,
+            can_invite_users=True,
+            can_restrict_members=True,
+            can_pin_messages=True,
+            can_promote_members=True
+        )
+        await message.reply(f"✅ User with ID {userid} has been promoted to admin in {title}!")
+
+
 @Client.on_message(filters.command("deletefiles") & filters.user(ADMINS))
 async def deletemultiplefiles(bot, message):
     btn = [[
