@@ -66,16 +66,18 @@ async def delete_links_and_warn(client, message: Message):
         # Warn the user for sending a link
         if user_link_count[user_id] == 1:
             warning_msg = f"Sending links is not allowed in this group, {message.from_user.first_name}. This is your first warning."
-            await message.reply_text(warning_msg)
+            warning = await message.reply_text(warning_msg)
             await client.send_message(LOG_CHANNEL, f"User {user_id} received a first warning for sending a link.")
             await asyncio.sleep(120)
-            await warning_msg.delete()
+            await warning.delete()
+            await message.delete()
         elif user_link_count[user_id] == 2:
             warning_msg = f"You have been warned before for sending links, {message.from_user.first_name}. This is your final warning. One more link and you will be banned."
-            await message.reply_text(warning_msg)
+            warning = await message.reply_text(warning_msg)
             await client.send_message(LOG_CHANNEL, f"User {user_id} received a final warning for sending a link.")
             await asyncio.sleep(120)
-            await warning_msg.delete()
+            await warning.delete()
+            await message.delete()
         elif user_link_count[user_id] >= 3:
             try:
                 await message.chat.ban_member(user_id=user_id)
@@ -83,11 +85,12 @@ async def delete_links_and_warn(client, message: Message):
                 await client.send_message(LOG_CHANNEL, f"Error banning user {user_id}: {str(error)}")
             else:
                 ban_msg = f"You have been banned for sending links after multiple warnings, {message.from_user.first_name}."
-                await message.reply_text(ban_msg)
+                ban_warning = await message.reply_text(ban_msg)
                 await client.send_message(LOG_CHANNEL, f"User {user_id} was banned for sending links after multiple warnings.")
                 await asyncio.sleep(120)
-                await ban_msg.delete()
-                
+                await ban_warning.delete()
+                await message.delete()
+
         # Reset link count after a while (e.g., a day)
         await asyncio.sleep(24 * 60 * 60)  # Sleep for a day
         if user_id in user_link_count:
