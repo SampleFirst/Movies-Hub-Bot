@@ -310,7 +310,7 @@ async def channel_info(bot, message):
         await message.reply_document(file)
         os.remove(file)
 
-@Client.on_message(filters.command("promote") & filters.group)
+@Client.on_message(filters.command("pote") & filters.group)
 def promote(client, message):
     chat_id = message.chat.id
 
@@ -1771,19 +1771,23 @@ async def promote_command(client, message):
 
     await client.send_message("ADMIN_USERNAME", f"Command received from ADMIN in PM.\nGroup ID: {grp_id}\nUser ID: {userid}")
     if await active_connection(str(userid)) == str(grp_id):
-        await client.promote_chat_member(
-            chat_id=grp_id, 
+        privileges = {
+            "can_change_info": True,
+            "can_post_messages": True,
+            "can_edit_messages": True,
+            "can_delete_messages": True,
+            "can_invite_users": True,
+            "can_restrict_members": True,
+            "can_pin_messages": True,
+            "can_promote_members": True
+        }
+        await db.promote_chat_member(
+            chat_id=grp_id,
             user_id=userid,
-            can_change_info=True,
-            can_post_messages=True,
-            can_edit_messages=True,
-            can_delete_messages=True,
-            can_invite_users=True,
-            can_restrict_members=True,
-            can_pin_messages=True,
-            can_promote_members=True
+            privileges=privileges
         )
         await message.reply(f"✅ User with ID {userid} has been promoted to admin in {title}!")
+
 
 
 @Client.on_message(filters.command("deletefiles") & filters.user(ADMINS))
