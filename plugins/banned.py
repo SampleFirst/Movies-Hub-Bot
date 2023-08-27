@@ -3,7 +3,7 @@ from utils import temp
 from pyrogram.types import Message
 from database.users_chats_db import db
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from info import SUPPORT_CHAT
+from info import ADMINS, SUPPORT_CHAT
 
 # A dictionary to keep track of users and their link counts
 user_link_count = {}
@@ -49,7 +49,8 @@ async def delete_links_and_warn(client, message: Message):
     user_id = message.from_user.id
 
     # Check if the user is an admin
-    is_admin = await admin_check(message)
+    is_admin = message.from_user and message.from_user.id in ADMINS
+    
     if is_admin:
         return
     
