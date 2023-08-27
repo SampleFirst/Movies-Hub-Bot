@@ -4,7 +4,7 @@ from utils import temp
 from pyrogram.types import Message
 from database.users_chats_db import db
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from info import ADMINS, SUPPORT_CHAT
+from info import ADMINS, SUPPORT_CHAT, LOG_CHANNEL
 
 # A dictionary to keep track of users and their link counts
 user_link_count = {}
@@ -51,32 +51,45 @@ async def delete_links_and_warn(client, message: Message):
 
     # Check if the user is an admin
     is_admin = message.from_user and message.from_user.id in ADMINS
-    
+
     if is_admin:
         return
-    
+
     # Check if the message contains a link
     if "http://" in message.text or "https://" in message.text:
         # Increment link count for the user
         user_link_count[user_id] = user_link_count.get(user_id, 0) + 1
-        
+
         # Delete the link message
         await message.delete()
-        
+
         # Warn the user for sending a link
         if user_link_count[user_id] == 1:
-            await message.reply_text("Sending links is not allowed in this group. This is your first warning.")
+            warning_msg = f"Sending links is not allowed in this group, {message.from_user.first_name}. This is your first warning."
+            await message.reply_text(warning_msg)
+            await client.send_message(LOG_CHANNEL, f"User {user_id} received a first warning for sending a link.")
+            await asyncio.sleep(120)
+            await warning_msg.delete()
         elif user_link_count[user_id] == 2:
-            await message.reply_text("You have been warned before for sending links. This is your final warning. One more link and you will be banned.")
+            warning_msg = f"You have been warned before for sending links, {message.from_user.first_name}. This is your final warning. One more link and you will be banned."
+            await message.reply_text(warning_msg)
+            await client.send_message(LOG_CHANNEL, f"User {user_id} received a final warning for sending a link.")
+            await asyncio.sleep(120)
+            await warning_msg.delete()
         elif user_link_count[user_id] >= 3:
             try:
                 await message.chat.ban_member(user_id=user_id)
             except Exception as error:
-                await message.reply_text(str(error))
+                await client.send_message(LOG_CHANNEL, f"Error banning user {user_id}: {str(error)}")
             else:
-                await message.reply_text("You have been banned for sending links after multiple warnings.")
+                ban_msg = f"You have been banned for sending links after multiple warnings, {message.from_user.first_name}."
+                await message.reply_text(ban_msg)
+                await client.send_message(LOG_CHANNEL, f"User {user_id} was banned for sending links after multiple warnings.")
+                await asyncio.sleep(120)
+                await ban_msg.delete()
                 
         # Reset link count after a while (e.g., a day)
         await asyncio.sleep(24 * 60 * 60)  # Sleep for a day
         if user_id in user_link_count:
             del user_link_count[user_id]
+            
