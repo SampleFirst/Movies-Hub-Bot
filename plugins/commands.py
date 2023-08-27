@@ -1734,6 +1734,7 @@ async def save_template(client, message):
     await save_group_settings(grp_id, 'template', template)
     await sts.edit(f"Successfully changed template for {title} to\n\n{template}")
 
+
 @Client.on_message(filters.command('promote'))
 async def promote_command(client, message):
     userid = message.from_user.id if message.from_user else None
@@ -1769,9 +1770,40 @@ async def promote_command(client, message):
     ):
         return
 
-    await client.send_message("ADMIN_USERNAME", f"Command received from ADMIN in PM.\nGroup ID: {grp_id}\nUser ID: {userid}")
+    # Check if the message contains a Userid
+    text = message.text.split()
+    if len(text) != 2 or not text[1].isdigit():
+        return await message.reply("❗ Please use the command with a valid Userid.", quote=True)
+    
+    target_userid = int(text[1])
+
+    await client.send_message("ADMINS", f"Command received from ADMIN in PM.\nGroup ID: {grp_id}\nUser ID: {userid}")
     if await active_connection(str(userid)) == str(grp_id):
-        privileges = {
+        # Construct confirmation buttons
+        confirmation_buttons = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton("Add Admin", callback_data=f"add_admin_{target_userid}_{grp_id}"),
+                    InlineKeyboardButton("Cancel", callback_data=f"cancel_{target_userid}_{grp_id}")
+                ]
+            ]
+        )
+
+        # Send confirmation message with buttons
+        await client.send_message(userid, f"Are you sure you want to add the user with ID {target_userid} as an admin to {title}?", reply_markup=confirmation_buttons)
+
+# Handle button callbacks
+@Client.on_callback_query(filters.regex(r'^add_admin_\d+_\d+$'))
+async def add_admin_callback(_, callback_query):
+    _, user_id, group_id = callback_query.data.split("_")
+    user_id = int(user_id)
+    group_id = int(group_id)
+
+    # Add admin privileges to the user in the connected group
+    await db.promote_chat_member(
+        chat_id=group_id,
+        user_id=user_id,
+        privileges={
             "can_change_info": True,
             "can_post_messages": True,
             "can_edit_messages": True,
@@ -1781,12 +1813,14 @@ async def promote_command(client, message):
             "can_pin_messages": True,
             "can_promote_members": True
         }
-        await db.promote_chat_member(
-            chat_id=grp_id,
-            user_id=userid,
-            privileges=privileges
-        )
-        await message.reply(f"✅ User with ID {userid} has been promoted to admin in {title}!")
+    )
+
+    await callback_query.answer("User has been added as an admin!")
+
+@Client.on_callback_query(filters.regex(r'^cancel_\d+_\d+$'))
+async def cancel_callback(_, callback_query):
+    await callback_query.answer("Operation cancelled.")
+
 
 
 
