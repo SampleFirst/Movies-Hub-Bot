@@ -313,6 +313,11 @@ async def channel_info(bot, message):
 @Client.on_message(filters.command("promote") & filters.group)
 def promote(client, message):
     chat_id = message.chat.id
+
+    if message.reply_to_message is None:
+        message.reply_text("Please reply to a user's message to promote them.")
+        return
+
     user_id = message.reply_to_message.from_user.id
 
     bot_member = client.get_chat_member(chat_id, "me")
@@ -338,11 +343,11 @@ def promote(client, message):
         can_promote_members=bot_member.can_promote_members
     )
 
-    message.reply_text("Successfully promoted!")
     reply_text = f"<b>{html.escape(message.chat.title)}:</b>" \
                  f"\n#PROMOTED" \
                  f"\n<b>Admin:</b> {message.from_user.first_name}" \
                  f"\n<b>User:</b> {message.reply_to_message.from_user.first_name}"
+    message.reply_text("Successfully promoted!", parse_mode="html")
     message.reply_text(reply_text, parse_mode="html")
 
 @Client.on_message(filters.command("demote") & filters.group)
