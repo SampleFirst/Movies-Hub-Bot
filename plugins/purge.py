@@ -2,9 +2,10 @@ import asyncio
 from pyrogram import Client, filters
 from info import ADMINS 
 
-@Client.on_message(filters.command("purge") & filters.private(ADMINS))
+@Client.on_message(filters.command("purge") & filters.private)
 async def purge_command(client, message):
-    if not message.from_user.is_self:
+    if message.from_user.id not in ADMINS:
+        await message.reply_text("You are not authorized to use this command.")
         return
 
     try:
