@@ -6,8 +6,8 @@ from database.users_chats_db import db
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from info import ADMINS, SUPPORT_CHAT, LOG_CHANNEL
 
-# A dictionary to keep track of users and their link counts
-user_link_count = {}
+# Initialize user violation counters
+user_violations = {}
 
 
 async def banned_users(_, client, message: Message):
@@ -45,54 +45,74 @@ async def grp_bd(bot, message):
     await bot.leave_chat(message.chat.id)
 
 
+
+
 @Client.on_message(filters.text & filters.group)
-async def delete_links_and_warn(client, message: Message):
+async def delete_and_warn(client, message: Message):
     user_id = message.from_user.id
+    message_text = message.text.lower()
 
     # Check if the user is an admin
-    is_admin = message.from_user and message.from_user.id in ADMINS
+    is_admin = user_id in ADMINS
 
     if is_admin:
         return
 
-    # Check if the message contains a link
-    if "http://" in message.text or "https://" in message.text:
-        # Increment link count for the user
-        user_link_count[user_id] = user_link_count.get(user_id, 0) + 1
+    # Check for links
+    if "http://" in message_text or "https://" in message_text:
+        await handle_violation(user_id, message, "link")
+    else:
+        # Check for keywords related to joining
+        keywords = ["@" "join", "join channel", "channel"]
+        for keyword in keywords:
+            if keyword in message_text:
+                await handle_violation(user_id, message, "keyword")
+                break  # Exit loop after first keyword match
 
-        # Delete the link message
-        await message.delete()
+        # Check for usernames starting with "@"
+        if message.entities:
+            for entity in message.entities:
+                if entity.type == "mention" and message_text[entity.offset] == "@":
+                    await handle_violation(user_id, message, "username")
+                    break
 
-        # Warn the user for sending a link
-        if user_link_count[user_id] == 1:
-            warning_msg = f"Sending links is not allowed in this group, {message.from_user.first_name}. This is your first warning."
-            warning = await message.reply_text(warning_msg)
-            await client.send_message(LOG_CHANNEL, f"User {user_id} received a first warning for sending a link.")
-            await asyncio.sleep(120)
-            await warning.delete()
-            await message.delete()
-        elif user_link_count[user_id] == 2:
-            warning_msg = f"You have been warned before for sending links, {message.from_user.first_name}. This is your final warning. One more link and you will be banned."
-            warning = await message.reply_text(warning_msg)
-            await client.send_message(LOG_CHANNEL, f"User {user_id} received a final warning for sending a link.")
-            await asyncio.sleep(120)
-            await warning.delete()
-            await message.delete()
-        elif user_link_count[user_id] >= 3:
-            try:
-                await message.chat.ban_member(user_id=user_id)
-            except Exception as error:
-                await client.send_message(LOG_CHANNEL, f"Error banning user {user_id}: {str(error)}")
-            else:
-                ban_msg = f"You have been banned for sending links after multiple warnings, {message.from_user.first_name}."
-                ban_warning = await message.reply_text(ban_msg)
-                await client.send_message(LOG_CHANNEL, f"User {user_id} was banned for sending links after multiple warnings.")
-                await asyncio.sleep(120)
-                await ban_warning.delete()
-                await message.delete()
+async def handle_violation(user_id, message, violation_type):
+    user_violations[user_id] = user_violations.get(user_id, 0) + 1
+    violation_count = user_violations[user_id]
+    first_name = message.from_user.first_name
 
-        # Reset link count after a while (e.g., a day)
-        await asyncio.sleep(24 * 60 * 60)  # Sleep for a day
-        if user_id in user_link_count:
-            del user_link_count[user_id]
-            
+    if violation_type == "link":
+        await warn_user(user_id, violation_count, first_name, "sending links")
+    elif violation_type == "keyword":
+        await warn_user(user_id, violation_count, first_name, "using keywords related to joining")
+    elif violation_type == "username":
+        await warn_user(user_id, violation_count, first_name, "sending usernames starting with '@'")
+
+async def warn_user(user_id, count, first_name, violation_type):
+    if count == 1:
+        warning_msg = f"Hello {first_name}, sending {violation_type} is not allowed in this group. This is your first warning."
+    elif count == 2:
+        warning_msg = f"Hey {first_name}, you have been warned before for {violation_type}. This is your final warning. One more violation and you will be banned."
+    elif count >= 3:
+        await ban_user(user_id, first_name)
+
+    await send_warning(user_id, warning_msg)
+
+async def send_warning(user_id, warning_msg):
+    await app.send_message(LOG_CHANNEL, f"User {user_id} received a warning: {warning_msg}")
+    warning = await app.send_message(user_id, warning_msg)
+    await asyncio.sleep(120)
+    await warning.delete()
+
+async def ban_user(user_id, first_name):
+    try:
+        await app.kick_chat_member(chat_id=message.chat.id, user_id=user_id)
+    except Exception as error:
+        await app.send_message(LOG_CHANNEL, f"Error banning user {user_id}: {str(error)}")
+    else:
+        ban_msg = f"Sorry {first_name}, you have been banned for repeated violations."
+        await app.send_message(LOG_CHANNEL, f"User {user_id} was banned for repeated violations.")
+        ban_warning = await app.send_message(user_id, ban_msg)
+        await asyncio.sleep(120)
+        await ban_warning.delete()
+
