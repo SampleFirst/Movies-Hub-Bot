@@ -88,7 +88,7 @@ async def temp_mute_user(_, message):
                 f" muted for {message.command[1]}!"
             )
             
-@Client.on_message(filters.command("promote"))
+@Client.on_message(filters.command("promote_user"))
 async def promote_user(_, message):
     is_admin = await admin_check(message)
     if not is_admin:
@@ -111,7 +111,7 @@ async def promote_user(_, message):
         )
 
 
-@Client.on_message(filters.command("demote"))
+@Client.on_message(filters.command("demote_user"))
 async def demote_user(_, message):
     is_admin = await admin_check(message)
     if not is_admin:
