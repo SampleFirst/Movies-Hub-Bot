@@ -2,18 +2,6 @@ from pyrogram import Client, filters
 from pyrogram.types import ChatPermissions
 from info import *
 
-# Helper function to extract user details and permissions
-permissions = ChatPermissions(
-    can_send_messages=True,
-    can_change_info=True,
-    can_post_messages=True,
-    can_edit_messages=True,
-    can_delete_messages=True,
-    can_invite_users=True,
-    can_restrict_members=True,
-    can_pin_messages=True,
-    can_promote_members=True
-)
 
 # Updated extract_user function to extract user details
 def get_user_details(message):
@@ -37,17 +25,20 @@ async def promote_user(client, message):
         return
 
     user_id, user_first_name = get_user_details(message)
+    permissions = ChatPermissions(
+        can_change_info=True,
+        can_post_messages=True,
+        can_edit_messages=True,
+        can_delete_messages=True,
+        can_invite_users=True,
+        can_restrict_members=True,
+        can_pin_messages=True,
+        can_promote_members=True 
+    )
     try:
         await message.chat.promote_member(
             user_id=user_id,
-            can_change_info=True,
-            can_post_messages=True,
-            can_edit_messages=True,
-            can_delete_messages=True,
-            can_invite_users=True,
-            can_restrict_members=True,
-            can_pin_messages=True,
-            can_promote_members=True
+            permissions=permissions
         )
         await message.reply_text(
             f"✨ {user_first_name} has been promoted to an admin! 🎉"
@@ -67,9 +58,14 @@ async def demote_user(client, message):
 
     user_id, user_first_name = get_user_details(message)
     permissions = ChatPermissions(
-        can_send_messages=True,
-        can_change_info=True,
-        can_invite_users=True,
+        can_change_info=False,
+        can_post_messages=False,
+        can_edit_messages=False,
+        can_delete_messages=False,
+        can_invite_users=False,
+        can_restrict_members=False,
+        can_pin_messages=False,
+        can_promote_members=False
     )
     try:
         await message.chat.restrict_member(
@@ -81,4 +77,3 @@ async def demote_user(client, message):
         )
     except Exception as error:
         await message.reply_text(str(error))
-        
