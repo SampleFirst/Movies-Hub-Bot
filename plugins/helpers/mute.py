@@ -103,7 +103,35 @@ async def temp_mute_user(_, message):
                 " Mouth "
                 f" muted for {message.command[1]}!"
             )
-            
+
+@Client.on_message(filters.private & filters.command("admin_unban"))
+async def admin_unban_user(_, message):
+    is_admin = await admin_check(message.sender_chat)
+    if not is_admin:
+        return
+    
+    command_args = message.text.split()
+    if len(command_args) != 3:
+        await message.reply_text("Invalid command format. Use: /admin_unban chat_id user_id")
+        return
+    
+    chat_id = command_args[1]
+    user_id = command_args[2]
+    
+    try:
+        chat_id = int(chat_id)
+        user_id = int(user_id)
+    except ValueError:
+        await message.reply_text("Invalid chat_id or user_id")
+        return
+    
+    try:
+        chat = await _.get_chat(chat_id)
+        await chat.unban_member(user_id=user_id)
+        await message.reply_text("User has been unbanned.")
+    except Exception as error:
+        await message.reply_text(f"Error: {error}")
+        
 @Client.on_message(filters.command("promote_user"))
 async def promote_user(_, message):
     is_admin = await admin_check(message)
