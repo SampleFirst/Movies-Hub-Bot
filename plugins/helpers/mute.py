@@ -3,16 +3,17 @@ from pyrogram.types import ChatPermissions
 from info import *
 
 # Helper function to extract user details and permissions
-def get_chat_permissions(promote=True):
+def get_chat_permissions():
     permissions = ChatPermissions(
         can_send_messages=True,
         can_change_info=True,
+        can_post_messages=True,
         can_edit_messages=True,
         can_delete_messages=True,
         can_invite_users=True,
         can_restrict_members=True,
         can_pin_messages=True,
-        can_promote_members=promote
+        can_promote_members=True
     )
     return permissions
 
@@ -27,7 +28,6 @@ def get_user_details(message):
         user_first_name = message.from_user.first_name
     return user_id, user_first_name
 
-
 @Client.on_message(filters.command("promote_user") & filters.user(ADMINS))
 async def promote_user(client, message):
     is_admin = message.from_user and message.from_user.id in ADMINS
@@ -39,7 +39,7 @@ async def promote_user(client, message):
         return
 
     user_id, user_first_name = get_user_details(message)
-    permissions = get_chat_permissions(promote=True)
+    permissions = get_chat_permissions()
     try:
         await message.chat.promote_member(
             user_id=user_id,
@@ -62,9 +62,9 @@ async def demote_user(client, message):
         return
 
     user_id, user_first_name = get_user_details(message)
-    permissions = get_chat_permissions(promote=False)
+    permissions = ChatPermissions()
     try:
-        await message.chat.promote_member(
+        await message.chat.restrict_member(
             user_id=user_id,
             permissions=permissions
         )
@@ -73,4 +73,3 @@ async def demote_user(client, message):
         )
     except Exception as error:
         await message.reply_text(str(error))
-        
