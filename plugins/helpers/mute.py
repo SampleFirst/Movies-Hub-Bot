@@ -95,21 +95,35 @@ async def promote_user(_, message):
         await message.reply_text(
             "Attention: Admin Privileges Required\n\n"
             "Dear member,\n\n"
-            "However, to access this, we kindly request that you ensure you have admin privileges within our group."
+            "However, to access this, we kindly request that you ensure you have admin privileges within our group.",
+            quote=True  # Add quote=True here
         )
         return
 
     user_id, user_first_name = extract_user(message)
-
+    ChatPermissions = dict(
+        can_send_messages=True,
+        can_change_info=True,
+        can_post_messages=True,
+        can_edit_messages=True,
+        can_delete_messages=True,
+        can_invite_users=True,
+        can_restrict_members=True,
+        can_pin_messages=True,
+        can_promote_members=True
+    )
     try:
-        await message.chat.promote_member(user_id)
+        await message.chat.promote_member(
+            user_id=user_id,
+            permissions=ChatPermissions
+        )
     except Exception as error:
-        await message.reply_text(str(error))
+        await message.reply_text(str(error), quote=True)  # Add quote=True here
     else:
         await message.reply_text(
-            f"✨ {user_first_name} has been promoted to an admin! 🎉"
+            f"✨ {user_first_name} has been promoted to an admin! 🎉",
+            quote=True  # Add quote=True here
         )
-
 
 @Client.on_message(filters.command("demote_user"))
 async def demote_user(_, message):
@@ -118,17 +132,32 @@ async def demote_user(_, message):
         await message.reply_text(
             "Attention: Admin Privileges Required\n\n"
             "Dear member,\n\n"
-            "To access this, we kindly request that you ensure you have admin privileges within our group."
+            "To access this, we kindly request that you ensure you have admin privileges within our group.",
+            quote=True  # Add quote=True here
         )
         return
 
     user_id, user_first_name = extract_user(message)
-
+    ChatPermissions = dict(
+        can_send_messages=True,
+        can_change_info=False,
+        can_post_messages=False,
+        can_edit_messages=False,
+        can_delete_messages=False,
+        can_invite_users=False,
+        can_restrict_members=False,
+        can_pin_messages=False,
+        can_promote_members=False
+    )
     try:
-        await message.chat.restrict_member(user_id, ChatPermissions())
+        await message.chat.restrict_member(
+            user_id=user_id,
+            permissions=ChatPermissions
+        )
     except Exception as error:
-        await message.reply_text(str(error))
+        await message.reply_text(str(error), quote=True)  # Add quote=True here
     else:
         await message.reply_text(
-            f"🔥 {user_first_name} has been demoted to a regular member!"
+            f"🔥 {user_first_name} has been demoted to a regular member!",
+            quote=True  # Add quote=True here
         )
