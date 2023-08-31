@@ -7,7 +7,6 @@ def get_chat_permissions(promote=True):
     permissions = ChatPermissions(
         can_send_messages=True,
         can_change_info=True,
-        can_post_messages=True,
         can_edit_messages=True,
         can_delete_messages=True,
         can_invite_users=True,
