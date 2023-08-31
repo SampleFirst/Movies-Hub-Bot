@@ -37,11 +37,17 @@ async def promote_user(client, message):
         return
 
     user_id, user_first_name = get_user_details(message)
-    permissions = ChatPermissions()
     try:
         await message.chat.promote_member(
             user_id=user_id,
-            permissions=permissions
+            can_change_info=True,
+            can_post_messages=True,
+            can_edit_messages=True,
+            can_delete_messages=True,
+            can_invite_users=True,
+            can_restrict_members=True,
+            can_pin_messages=True,
+            can_promote_members=True
         )
         await message.reply_text(
             f"✨ {user_first_name} has been promoted to an admin! 🎉"
@@ -60,7 +66,11 @@ async def demote_user(client, message):
         return
 
     user_id, user_first_name = get_user_details(message)
-    permissions = ChatPermissions()
+    permissions = ChatPermissions(
+        can_send_messages=True,
+        can_change_info=True,
+        can_invite_users=True,
+    )
     try:
         await message.chat.restrict_member(
             user_id=user_id,
@@ -71,3 +81,4 @@ async def demote_user(client, message):
         )
     except Exception as error:
         await message.reply_text(str(error))
+        
