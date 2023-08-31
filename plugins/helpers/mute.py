@@ -1,8 +1,6 @@
 from pyrogram import Client, filters
 from pyrogram.types import ChatPermissions
-from plugins.helper_functions.admin_check import admin_check
-from plugins.helper_functions.extract_user import extract_user                               
-from plugins.helper_functions.string_handling import extract_time
+from info import *
 
 # Helper function to extract user details and permissions
 def get_chat_permissions(promote=True):
@@ -19,129 +17,29 @@ def get_chat_permissions(promote=True):
     )
     return permissions
 
-
-@Client.on_message(filters.command("mute"))
-async def mute_user(_, message):
-    is_admin = await admin_check(message)
-    if not is_admin:
-        return
-    user_id, user_first_name = extract_user(message)
-    try:
-        await message.chat.restrict_member(
-            user_id=user_id,
-            permissions=ChatPermissions(
-            )
-        )
-    except Exception as error:
-        await message.reply_text(
-            str(error)
-        )
+# Updated extract_user function to extract user details
+def get_user_details(message):
+    if message.reply_to_message:
+        user = message.reply_to_message.from_user
+        user_id = user.id
+        user_first_name = user.first_name
     else:
-        if str(user_id).lower().startswith("@"):
-            await message.reply_text(
-                "👍🏻 "
-                f"{user_first_name}"
-                " Lavender's mouth is shut! 🤐"
-            )
-        else:
-            await message.reply_text(
-                "👍🏻 "
-                f"<a href='tg://user?id={user_id}'>"
-                "Of lavender"
-                "</a>"
-                " The mouth is closed! 🤐"
-            )
+        user_id = message.from_user.id
+        user_first_name = message.from_user.first_name
+    return user_id, user_first_name
 
 
-@Client.on_message(filters.command("tmute"))
-async def temp_mute_user(_, message):
-    is_admin = await admin_check(message)
-    if not is_admin:
-        return
+@Client.on_message(filters.command("promote_user") & filters.user(ADMINS))
+async def promote_user(client, message):
+    is_admin = message.from_user and message.from_user.id in ADMINS
 
-    if not len(message.command) > 1:
-        return
-
-    user_id, user_first_name = extract_user(message)
-
-    until_date_val = extract_time(message.command[1])
-    if until_date_val is None:
-        await message.reply_text(
-            (
-                "Invalid time type specified. "
-                "Expected m, h, or d, Got it: {}"
-            ).format(
-                message.command[1][-1]
-            )
-        )
-        return
-
-    try:
-        await message.chat.restrict_member(
-            user_id=user_id,
-            permissions=ChatPermissions(
-            ),
-            until_date=until_date_val
-        )
-    except Exception as error:
-        await message.reply_text(
-            str(error)
-        )
-    else:
-        if str(user_id).lower().startswith("@"):
-            await message.reply_text(
-                "Be quiet for a while! 😠"
-                f"{user_first_name}"
-                f" muted for {message.command[1]}!"
-            )
-        else:
-            await message.reply_text(
-                "Be quiet for a while! 😠"
-                f"<a href='tg://user?id={user_id}'>"
-                "Of lavender"
-                "</a>"
-                " Mouth "
-                f" muted for {message.command[1]}!"
-            )
-
-@Client.on_message(filters.private & filters.command("admin_unban"))
-async def admin_unban_user(_, message):
-    is_admin = await admin_check(message.sender_chat)
-    if not is_admin:
-        return
-    
-    command_args = message.text.split()
-    if len(command_args) != 3:
-        await message.reply_text("Invalid command format. Use: /admin_unban chat_id user_id")
-        return
-    
-    chat_id = command_args[1]
-    user_id = command_args[2]
-    
-    try:
-        chat_id = int(chat_id)
-        user_id = int(user_id)
-    except ValueError:
-        await message.reply_text("Invalid chat_id or user_id")
-        return
-    
-    try:
-        chat = await _.get_chat(chat_id)
-        await chat.unban_member(user_id=user_id)
-        await message.reply_text("User has been unbanned.")
-    except Exception as error:
-        await message.reply_text(f"Error: {error}")
-        
-@Client.on_message(filters.command("promote_user"))
-async def promote_user(_, message):
-    is_admin = await admin_check(message)
     if not is_admin:
         await message.reply_text(
             "Admin privileges are required to promote users."
         )
         return
 
-    user_id, user_first_name = extract_user(message)
+    user_id, user_first_name = get_user_details(message)
     permissions = get_chat_permissions(promote=True)
     try:
         await message.chat.promote_member(
@@ -154,16 +52,17 @@ async def promote_user(_, message):
     except Exception as error:
         await message.reply_text(str(error))
 
-@Client.on_message(filters.command("demote_user"))
-async def demote_user(_, message):
-    is_admin = await admin_check(message)
+@Client.on_message(filters.command("demote_user") & filters.user(ADMINS))
+async def demote_user(client, message):
+    is_admin = message.from_user and message.from_user.id in ADMINS
+
     if not is_admin:
         await message.reply_text(
             "Admin privileges are required to demote users."
         )
         return
 
-    user_id, user_first_name = extract_user(message)
+    user_id, user_first_name = get_user_details(message)
     permissions = get_chat_permissions(promote=False)
     try:
         await message.chat.promote_member(
