@@ -126,7 +126,7 @@ async def promote_user(_, message):
     except Exception as error:
         await message.reply_text(str(error))
 
-@app.on_message(filters.command("demote_user"))
+@Client.on_message(filters.command("demote_user"))
 async def demote_user(_, message):
     is_admin = await admin_check(message)
     if not is_admin:
