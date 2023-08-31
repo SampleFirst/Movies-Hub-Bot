@@ -3,19 +3,18 @@ from pyrogram.types import ChatPermissions
 from info import *
 
 # Helper function to extract user details and permissions
-def get_chat_permissions():
-    permissions = ChatPermissions(
-        can_send_messages=True,
-        can_change_info=True,
-        can_post_messages=True,
-        can_edit_messages=True,
-        can_delete_messages=True,
-        can_invite_users=True,
-        can_restrict_members=True,
-        can_pin_messages=True,
-        can_promote_members=True
-    )
-    return permissions
+permissions = ChatPermissions(
+    can_send_messages=True,
+    can_change_info=True,
+    can_post_messages=True,
+    can_edit_messages=True,
+    can_delete_messages=True,
+    can_invite_users=True,
+    can_restrict_members=True,
+    can_pin_messages=True,
+    can_promote_members=True
+)
+return permissions
 
 # Updated extract_user function to extract user details
 def get_user_details(message):
@@ -39,7 +38,7 @@ async def promote_user(client, message):
         return
 
     user_id, user_first_name = get_user_details(message)
-    permissions = get_chat_permissions()
+    permissions = ChatPermissions()
     try:
         await message.chat.promote_member(
             user_id=user_id,
