@@ -14,7 +14,6 @@ permissions = ChatPermissions(
     can_pin_messages=True,
     can_promote_members=True
 )
-return permissions
 
 # Updated extract_user function to extract user details
 def get_user_details(message):
