@@ -1,16 +1,15 @@
 from pyrogram import Client, filters
-from pyrogram.types import Message
 import re
 
 
 # Define the delete_msg command handler
 @Client.on_message(filters.private & filters.command("delete_message"))
-async def delete_messages_command(client, message: Message):
+async def delete_messages_command(client, message):
     try:
-        # Extract the chat ID and message link from the command
+        # Extract the chat ID and number of messages from the command
         command_parts = message.text.split()
         if len(command_parts) != 3:
-            await message.reply("Invalid command format. Use /delete_msg <channel_message_link> <num_messages>")
+            await message.reply("Invalid command format. Use /delete_message <channel_message_link> <num_messages>")
             return
 
         channel_message_link = command_parts[1]
