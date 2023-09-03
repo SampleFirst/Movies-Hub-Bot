@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 
-@Client.on_message(filters.private & filters.command("unban"))
+@Client.on_message(filters.private & filters.command("unban_user"))
 async def unban_user_pm(_, message):
     try:
         # Parse the command in the format "/unban chat_id user_id"
@@ -8,7 +8,7 @@ async def unban_user_pm(_, message):
         chat_id = int(chat_id)
         user_id = int(user_id)
     except ValueError:
-        await message.reply_text("Invalid command format. Please use /unban chat_id user_id")
+        await message.reply_text("Invalid command format. Please use /unban_user chat_id user_id")
         return
     
     is_admin = message.from_user and message.from_user.id in ADMINS
