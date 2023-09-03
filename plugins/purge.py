@@ -1,12 +1,12 @@
 import asyncio
 from pyrogram import Client, filters
-from info import ADMINS  # Assuming you have a file named 'info.py' with the ADMINS list.
+from info import *  # Assuming you have a file named 'info.py' with the ADMINS list.
 
 # Define your chat IDs
 chat_ids = [-1001912697656]
 
-@Client.on_message(filters.command('purge_all') & filters.user(ADMINS))
-async def purge(client, message):
+@Client.on_message(filters.command('delete_msg') & filters.user(ADMINS))
+async def delete_all_message(client, message):
     if message.chat.id not in chat_ids:
         return
 
