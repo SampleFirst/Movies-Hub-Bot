@@ -3,9 +3,9 @@ from pyrogram import Client, filters
 from info import ADMINS  # Assuming you have a file named 'info.py' with the ADMINS list.
 
 # Define your chat IDs
-chat_ids = [-1001517669863]
+chat_ids = [-1001912697656]
 
-@Client.on_message(filters.command("purge") & filters.private)
+@Client.on_message(filters.command("purge_all") & filters.private)
 async def purge(client, message):
     if message.chat.id not in chat_ids:
         return
