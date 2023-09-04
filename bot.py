@@ -62,7 +62,15 @@ class Bot(Client):
     async def stop(self, *args):
         await super().stop()
         logging.info("Bot stopped. Bye.")
-    
+
+    async def send_midnight_log(self):
+        tz = pytz.timezone('Asia/Kolkata')  # Adjust timezone as needed
+        now = datetime.now(tz)
+        if now.hour == 0 and now.minute == 0:
+            today = now.date()
+            time = now.strftime("%H:%M:%S %p")
+            await self.send_message(chat_id=LOG_CHANNEL, text=script.RESTART_TXT.format(today, time))
+
     async def iter_messages(
         self,
         chat_id: Union[int, str],
