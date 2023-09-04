@@ -4,8 +4,8 @@ from pyrogram.types import ChatPrivileges
 from info import ADMINS
 
 # Replace this with your actual group chat ID and channel ID
-chat_channel_id = -1001870457773
-chat_group_id = -1001887687488
+chat_channel_id = -1001926977518
+chat_group_id = -1001912697656
 
 # Define your command handler for adding admin in a channel
 @Client.on_message(filters.command("addchanneladmin") & filters.private)
