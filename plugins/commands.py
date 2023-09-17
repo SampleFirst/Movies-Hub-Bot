@@ -278,33 +278,42 @@ async def start(client, message):
 
 @Client.on_message(filters.command('channel') & filters.user(ADMINS))
 async def channel_info(bot, message):
-           
-    """Send basic information of channel"""
-    if isinstance(CHANNELS, (int, str)):
-        channels = [CHANNELS]
-    elif isinstance(CHANNELS, list):
-        channels = CHANNELS
-    else:
-        raise ValueError("Unexpected type of CHANNELS")
-
-    text = '📑 **Indexed channels/groups**\n'
-    for channel in channels:
-        chat = await bot.get_chat(channel)
-        if chat.username:
-            text += '\n@' + chat.username
+    try:
+        if isinstance(CHANNELS, (int, str)):
+            channels = [CHANNELS]
+        elif isinstance(CHANNELS, list):
+            channels = CHANNELS
         else:
-            text += '\n' + chat.title or chat.first_name
+            raise ValueError("Unexpected type of CHANNELS")
 
-    text += f'\n\n**Total:** {len(CHANNELS)}'
+        if not channels:
+            await message.reply("No channels or groups found in CHANNELS variable.")
+            return
 
-    if len(text) < 4096:
-        await message.reply(text)
-    else:
-        file = 'Indexed channels.txt'
-        with open(file, 'w') as f:
-            f.write(text)
-        await message.reply_document(file)
-        os.remove(file)
+        text = '📑 **Indexed channels/groups**\n'
+        for channel in channels:
+            chat = await bot.get_chat(channel)
+            text += f'\n👥 **Title:** {chat.title or chat.first_name}'
+            text += f'\n🆔 **ID:** {chat.id}'
+            
+            if chat.username:
+                text += f'\n🌐 **Username:** @{chat.username}\n'
+            else:
+                invite_link = await bot.export_chat_invite_link(chat.id)
+                text += f'\n🔗 **Invite Link:** {invite_link}\n'
+                
+        text += f'**Total:** {len(channels)}'
+
+        if len(text) < 4096:
+            await message.reply(text)
+        else:
+            file = 'Indexed_channels.txt'
+            with open(file, 'w') as f:
+                f.write(text)
+            await message.reply_document(file)
+            os.remove(file)
+    except Exception as e:
+        await message.reply(f"An error occurred: {str(e)}")
 
 
 @Client.on_message(filters.command('logs') & filters.user(ADMINS))
