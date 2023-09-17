@@ -21,7 +21,7 @@ from datetime import date, datetime
 import pytz
 from aiohttp import web
 from plugins import web_server
-from send_log import send_log
+
 
 class Bot(Client):
 
