@@ -1,7 +1,7 @@
 # Asynchronous and Networking Libraries
 aiofiles
 aiohttp==3.8.1
-httpcore==0.13.3
+httpcore
 requests
 
 # Audio/Video Processing
