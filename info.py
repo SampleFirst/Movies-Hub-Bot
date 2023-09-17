@@ -49,7 +49,7 @@ BOT_TOKEN = environ['BOT_TOKEN']
 # Bot settings
 CACHE_TIME = int(environ.get('CACHE_TIME', 300))
 USE_CAPTION_FILTER = bool(environ.get('USE_CAPTION_FILTER', False))
-PICS = (environ.get('PICS', 'https://telegra.ph/file/a44112335c3e0b6df7d2b.jpg')).split()
+PICS = (environ.get('PICS', 'https://telegra.ph/file/c5ad6209bd63012457461.jpg')).split()
 NOR_IMG = environ.get('NOR_IMG', "https://telegra.ph/file/7d7cbf0d6c39dc5a05f5a.jpg")
 SPELL_IMG = environ.get('SPELL_IMG',"https://telegra.ph/file/b58f576fed14cd645d2cf.jpg")
 UPTIME = time.time()
@@ -85,8 +85,8 @@ MONGO_URL = os.environ.get('MONGO_URL', "")
 DOWNLOAD_LOCATION = environ.get("DOWNLOAD_LOCATION", "./DOWNLOADS/AudioBoT/")
 
 #url links
-SHORTLINK_URL = environ.get('SHORTLINK_URL', 'shorturllink.in')
-SHORTLINK_API = environ.get('SHORTLINK_API', '3a3935e37c74a2384f7a689c414f078ab6320785')
+SHORTLINK_URL = environ.get('SHORTLINK_URL', 'omegalinks.in')
+SHORTLINK_API = environ.get('SHORTLINK_API', 'd820675f896d6263d2efc35040edf912bd2f8e2f')
 IS_SHORTLINK = bool(environ.get('IS_SHORTLINK', False))
 
 #Auto approve 
@@ -101,8 +101,8 @@ MAIN_CHANNEL = environ.get('MAIN_CHANNEL', "https://t.me/+BKZsRSZO-wQ3ZDJl")
 FILE_FORWARD = environ.get('FILE_FORWARD', "https://t.me/+IASDysIDZG5kMDhl")
 FILE_CHANNEL = int(environ.get('FILE_CHANNEL', 0))
 LOG_CHANNEL = int(environ.get('LOG_CHANNEL', 0))
-SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'Elsasupportgp')
-S_GROUP = environ.get('S_GROUP', "https://t.me/Elsasupportgp")
+SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'PremiumMHUpdate')
+S_GROUP = environ.get('S_GROUP', "https://t.me/PremiumMHUpdate")
 INDEX_REQ_CHANNEL = int(environ.get('INDEX_REQ_CHANNEL', LOG_CHANNEL))
 FILE_STORE_CHANNEL = [int(ch) for ch in (environ.get('FILE_STORE_CHANNEL', '')).split()]
 
@@ -114,7 +114,6 @@ IMDB = is_enabled((environ.get('IMDB', "True")), True)
 IMDB_TEMPLATE = environ.get("IMDB_TEMPLATE", f"{script.IMDB_TEMPLATE_TXT}")
 SPELL_CHECK_REPLY = is_enabled(environ.get("SPELL_CHECK_REPLY", "True"), True)
 AUTO_DELETE = is_enabled((environ.get('AUTO_DELETE', "True")), True)
-RULS_ON = is_enabled((environ.get('RULS_ON', "True")), True)
 
 # Other 
 PORT = os.environ.get("PORT", "8080")
