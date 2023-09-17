@@ -27,7 +27,7 @@ pytz
 bs4
 git+https://github.com/Joelkb/cinemagoer
 countryinfo
-dnspython
+dnspython==2.3.0
 gTTS
 googletrans==3.1.0a0
 pyshorteners
