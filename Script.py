@@ -179,8 +179,8 @@ Time: <code>{h}</code>
 Added By: {i}
 By {j}
 
-#{h}
-#Chats_{h}
+#{k}
+#Chats_{k}
 """
     
     LOG_TEXT_P = """NewUsers 😀
