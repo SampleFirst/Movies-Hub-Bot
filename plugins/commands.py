@@ -25,34 +25,36 @@ async def start(client, message):
     if message.chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
         buttons = [
             [
-                InlineKeyboardButton('🤖 Updates', url=(MAIN_CHANNEL))
+                InlineKeyboardButton('Updates', url=MAIN_CHANNEL)
             ],
             [
-                InlineKeyboardButton('ʜᴇʟᴘ', url=f"https://t.me/{temp.U_NAME}?start=help"),
+                InlineKeyboardButton('Help', url=f"https://t.me/{temp.U_NAME}?start=help"),
             ]
-            ]
+        ]
         reply_markup = InlineKeyboardMarkup(buttons)
-        await message.reply(script.START_TXT.format(message.from_user.mention if message.from_user else message.chat.title, temp.U_NAME, temp.B_NAME), reply_markup=reply_markup)
+        mention = message.from_user.mention if message.from_user else message.chat.title
+        await message.reply(script.START_TXT.format(mention, temp.U_NAME, temp.B_NAME), reply_markup=reply_markup)
         await asyncio.sleep(2)
         if not await db.get_chat(message.chat.id):
             total = await client.get_chat_members_count(message.chat.id)
-            total_chat = await db.total_chat_count() + 1
+            total_chats = await db.total_chat_count() + 1
+            daily_chats = await db.daily_chats_count(today) + 1
             tz = pytz.timezone('Asia/Kolkata')
             now = datetime.now(tz)
             time = now.strftime('%I:%M:%S %p')
             today = now.date()
-            daily_chats = await db.daily_chats_count(today) + 1
             await client.send_message(LOG_CHANNEL, script.LOG_TEXT_G.format(
                 a=message.chat.title,
                 b=message.chat.id,
                 c=message.chat.username,
                 d=total,
-                e="Unknown",
-                k=str(today),
-                g=time,
-                h=daily_chats,
-                i=temp.B_NAME,
-                j=total_chat
+                e=total_chats,
+                f=daily_chats,
+                g=str(today),
+                h=time,
+                i="Unknown",
+                j=temp.B_NAME,
+                k=temp.U_NAME
             ))
             await db.add_chat(message.chat.id, message.chat.title, message.chat.username)
         return
