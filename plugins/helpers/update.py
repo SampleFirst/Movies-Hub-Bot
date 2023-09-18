@@ -24,7 +24,10 @@ def show_updates_command(client, message):
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("Movies Hub Bot V2.0", url="https://t.me/Movies_Hole_Robot")
+                InlineKeyboardButton("Movies Hub Bot V2.0", url="https://t.me/Movies_Hole_Robot?start"),
+            ],
+            [
+                InlineKeyboardButton("Add Me To Your Group", url="http://t.me/Movies_Hole_Robot?startgroup=true")
             ]
         ]
     )
