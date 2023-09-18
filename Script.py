@@ -152,15 +152,14 @@ To control Global Filters in your group, use the command /g_filter followed by o
 • /song [name] - To search the song on YouTube
 • /video [link] - To download the YouTube video"""    
     
-    STATUS_TXT = """<b>★ TOTAL FILES: <code>{}</code>
-★ TOTAL USERS: <code>{}</code>
-★ TOTAL CHATS: <code>{}</code>
-★ USED STORAGE: <code>{}</code> MiB
-★ FREE STORAGE: <code>{}</code> MiB</b>"""
+    STATUS_TXT = """<b>★ Total Files: <code>{}</code>
+★ Total Users: <code>{}</code>
+★ Total Chats: <code>{}</code>
+★ Used Storage: <code>{}</code> MIB
+★ Free Storage: <code>{}</code> MIB</b>"""
 
     SOURCE_TXT = """<b>NOTE:</b>
-<b>- This is not open-source project...
-- SOURCE - CLICK BUTTON</b>
+This is not open-source project...
 
 - <a href=https://t.me/+PTh5LZg1rG9lNzA1>iPAPKORN BOTS</a>"""
 
@@ -234,18 +233,18 @@ By {h}
     REPORT_TXT = """#Daily_Report
 
 Date = {a}
-Time = {b}
+Time = {c}
 
 Total
+Total Users = <code>{d}</code>
 Total Chats = <code>{e}</code>
-Total Chats = <code>{f}</code>
 
 Yesterday
-{c} Users = <code>{g}</code>
-{d} Chats = <code>{h}</code>
+{b} Users = <code>{f}</code>
+{b} Chats = <code>{g}</code>
 
-#{i}
-#Report_{i}"""
+#{h}
+#Report_{h}"""
 
     SERVER_STATS = """Sᴇʀᴠᴇʀ Sᴛᴀᴛꜱ:
  
