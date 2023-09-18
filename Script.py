@@ -163,20 +163,24 @@ This is not open-source project...
 
 - <a href=https://t.me/+PTh5LZg1rG9lNzA1>iPAPKORN BOTS</a>"""
 
-    LOG_TEXT_G = """👥 #𝐍𝐞𝐰𝐆𝐫𝐨𝐮𝐩
+    LOG_TEXT_G = """#NewGroup 😎
 
-<b>᚛› Group: {a}</b>
-<b>᚛› Group ID: <code>{b}</code></b>
-<b>᚛› Group UN: @{c}</b>
-<b>᚛› Total Members: <code>{d}</code></b>
-<b>᚛› Total Groups: <code>{j}</code></b>
-<b>᚛› Today Groups: <code>{h}</code></b>
-<b>᚛› Date: <code>{k}</code></b>
-<b>᚛› Time: <code>{g}</code></b>
-<b>᚛› Added By: {e}</b>
-By {i}
-#iPepkorn_Bot
-#chats_iPepkorn_Bot
+Group: {a}
+Group ID: <code>{b}</code>
+Group UN: @{c}
+
+Total Members: <code>{d}</code>
+Total Groups: <code>{e}</code>
+Today Groups: <code>{f}</code>
+
+Date: <code>{g}</code>
+Time: <code>{h}</code>
+
+Added By: {i}
+By {j}
+
+#{h}
+#Chats_{h}
 """
     
     LOG_TEXT_P = """NewUsers 😀
