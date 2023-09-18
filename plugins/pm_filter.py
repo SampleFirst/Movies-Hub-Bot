@@ -79,27 +79,40 @@ FILTER_MODE = {}
 # Define a variable to store the rules status
 rules_on = False 
 
+
 @Client.on_message(filters.command('autofilter') & filters.user(ADMINS))
-async def fil_mod(client, message): 
-      mode_on = ["yes", "on", "true"]
-      mode_of = ["no", "off", "false"]
+async def toggle_autofilter(client, message):
+    chat_id = message.chat.id
+    current_mode = FILTER_MODE.get(chat_id, False)
+    
+    # Create inline keyboard with toggle buttons
+    keyboard = [
+        [
+            InlineKeyboardButton("On" if current_mode else "Off", callback_data="toggle_filter"),
+        ],
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await message.reply("Toggle Auto Filter:", reply_markup=reply_markup)
 
-      try: 
-         args = message.text.split(None, 1)[1].lower() 
-      except: 
-         return await message.reply("**𝙸𝙽𝙲𝙾𝙼𝙿𝙴𝚃𝙴𝙽𝚃 𝙲𝙾𝙼𝙼𝙰𝙳...**")
-      
-      m = await message.reply("**𝚂𝙴𝚃𝚃𝙸𝙽𝙶.../**")
+@Client.on_callback_query(filters.regex(r'^toggle_filter$'))
+async def toggle_filter_callback(client, query):
+    chat_id = query.message.chat.id
+    current_mode = FILTER_MODE.get(chat_id, False)
+    
+    # Toggle the filter mode
+    FILTER_MODE[chat_id] = not current_mode
+    
+    # Update the message text and inline keyboard
+    keyboard = [
+        [
+            InlineKeyboardButton("On" if not current_mode else "Off", callback_data="toggle_filter"),
+        ],
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await query.message.edit_text(f"Auto Filter is {'On' if not current_mode else 'Off'}", reply_markup=reply_markup)
 
-      if args in mode_on:
-          FILTER_MODE[str(message.chat.id)] = "True" 
-          await m.edit("**𝙰𝚄𝚃𝙾𝙵𝙸𝙻𝚃𝙴𝚁 𝙴𝙽𝙰𝙱𝙻𝙴𝙳**")
-      
-      elif args in mode_of:
-          FILTER_MODE[str(message.chat.id)] = "False"
-          await m.edit("**𝙰𝚄𝚃𝙾𝙵𝙸𝙻𝚃𝙴𝚁 𝙳𝙸𝚂𝙰𝙱𝙻𝙴𝙳**")
-      else:
-          await m.edit("𝚄𝚂𝙴 :- /autofilter on 𝙾𝚁 /autofilter off")
 
 @Client.on_message(filters.command("rules") & filters.group)
 async def toggle_rules(client, message):
