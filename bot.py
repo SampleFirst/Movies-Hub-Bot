@@ -54,12 +54,44 @@ class Bot(Client):
         today = date.today()
         now = datetime.now(tz)
         time = now.strftime("%H:%M:%S %p")
-        await self.send_message(chat_id=LOG_CHANNEL, text=script.RESTART_TXT.format(today, time))
+        await self.send_message(chat_id=LOG_CHANNEL, text=script.RESTART_TXT.format(a=today, b=time, c=temp.U_NAME))
         app = web.AppRunner(await web_server())
         await app.setup()
         bind_address = "0.0.0.0"
         await web.TCPSite(app, bind_address, PORT).start()
-        
+
+        # Add a job to send a message at 11:59 PM daily
+        await self.send_report_message()
+    
+    async def send_report_message(self):
+        while True:
+            total_users = await db.total_users_count()
+            total_chats = await db.total_chat_count()
+            today_users = await db.daily_users_count(today) + 1
+            today_chats = await db.daily_chats_count(today) + 1
+            tz = pytz.timezone('Asia/Kolkata')
+            today = date.today()
+            now = datetime.now(tz)
+            time = now.strftime("%H:%M:%S %p")
+            if now.hour == 23 and now.minute == 59:
+                await self.send_message(
+                    chat_id=LOG_CHANNEL, 
+                    text=script.REPORT_TXT.format(
+                        a=today,
+                        b=time,
+                        c=total_users, 
+                        d=total_chats,
+                        e=today_users, 
+                        f=today_chats,
+                        g=temp.U_NAME
+                    )
+                )
+                # Sleep for 1 minute to avoid sending multiple messages
+                await asyncio.sleep(60)
+            else:
+                # Sleep for 1 minute and check again
+                await asyncio.sleep(60)
+                
     async def stop(self, *args):
         await super().stop()
         logging.info("Bot stopped. Bye.")
