@@ -135,7 +135,7 @@ async def toggle_rules(client, message):
 
     await message.reply_text("You've toggled the group rules.", reply_markup=keyboard)
 
-@Client.on_callback_query(filters.callback_data("toggle_rules"))
+@Client.on_callback_query(filters.regex(r'^toggle_rules'))
 async def toggle_rules_callback(client, callback_query):
     global rules_on
     # Toggle the rules state
