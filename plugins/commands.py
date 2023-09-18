@@ -36,7 +36,7 @@ async def start(client, message):
         await message.reply(script.START_TXT.format(mention, temp.U_NAME, temp.B_NAME), reply_markup=reply_markup)
         await asyncio.sleep(2)
         if not await db.get_chat(message.chat.id):
-            total = await client.get_chat_members_count(message.chat.id)
+            total_members = await client.get_chat_members_count(message.chat.id)
             total_chats = await db.total_chat_count() + 1
             daily_chats = await db.daily_chats_count(today) + 1
             tz = pytz.timezone('Asia/Kolkata')
@@ -47,7 +47,7 @@ async def start(client, message):
                 a=message.chat.title,
                 b=message.chat.id,
                 c=message.chat.username,
-                d=total,
+                d=total_members,
                 e=total_chats,
                 f=daily_chats,
                 g=str(today),
