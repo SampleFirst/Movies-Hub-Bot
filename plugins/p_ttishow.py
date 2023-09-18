@@ -22,23 +22,24 @@ async def save_group(bot, message):
         if not await db.get_chat(message.chat.id):
             total_members = await bot.get_chat_members_count(message.chat.id)
             total_chat = await db.total_chat_count() + 1
+            daily_chats = await db.daily_chats_count(today) + 1
             tz = timezone('Asia/Kolkata')
             now = datetime.now(tz)
             time = now.strftime('%I:%M:%S %p')
             today = now.date()
-            daily_chats = await db.daily_chats_count(today) + 1
             referrer = message.from_user.mention if message.from_user else "Anonymous"
             await bot.send_message(LOG_CHANNEL, script.LOG_TEXT_G.format(
                 a=message.chat.title,
                 b=message.chat.id,
                 c=message.chat.username,
                 d=total_members,
-                e=referrer,
-                k=str(today),
-                g=time,
-                h=daily_chats,
-                i=temp.B_NAME,
-                j=total_chat
+                e=total_chats,
+                f=daily_chats,
+                g=str(today),
+                h=time,
+                i=referrer,
+                j=temp.B_NAME,
+                k=temp.U_NAME
             ))
             await db.add_chat(message.chat.id, message.chat.title, message.chat.username)
 
