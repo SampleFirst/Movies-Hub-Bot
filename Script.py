@@ -231,15 +231,21 @@ By {h}
 
 """
 
-    REPORT_TXT = """#YESTERDAY_REPORT
-Date = {c}
-Time = {d} (Past Day)
-TotalGroup
-Total Chats = <code>{a}</code>
+    REPORT_TXT = """#Daily_Report
 
-TodayUsers
-Total Users = <code>{b}</code>
-"""
+Date = {a}
+Time = {b}
+
+Total
+Total Chats = <code>{e}</code>
+Total Chats = <code>{f}</code>
+
+Yesterday
+{c} Users = <code>{g}</code>
+{d} Chats = <code>{h}</code>
+
+#{i}
+#Report_{i}"""
 
     SERVER_STATS = """Sᴇʀᴠᴇʀ Sᴛᴀᴛꜱ:
  
