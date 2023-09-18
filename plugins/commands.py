@@ -62,20 +62,21 @@ async def start(client, message):
     if not await db.is_user_exist(message.from_user.id):
         await db.add_user(message.from_user.id, message.from_user.first_name)
         total_users = await db.total_users_count()
+        daily_users = await db.daily_users_count(today)
         tz = pytz.timezone('Asia/Kolkata')
         now = datetime.now(tz)
         time = now.strftime('%I:%M:%S %p')
         today = now.date()
-        daily_users = await db.daily_users_count(today)
         await client.send_message(LOG_CHANNEL, script.LOG_TEXT_P.format(
             a=message.from_user.id,
             b=message.from_user.mention,
             c=message.from_user.username,
             d=total_users,
-            e=str(today),
-            k=time,
-            g=daily_users,
-            h=temp.B_NAME
+            e=daily_users,
+            f=str(today),
+            g=time,
+            h=temp.B_NAME,
+            i=temp.U_NAME
         ))
     if len(message.command) != 2:
         buttons = [[
