@@ -1,26 +1,37 @@
+# Standard Library Imports
+import datetime
+from typing import Union, Optional, AsyncGenerator
+
+# Third-Party Library Imports
 import logging
 import logging.config
+import pytz
+from aiohttp import web
+from pyrogram import Client, __version__, filters, types
+from pyrogram.raw.all import layer
+
+# Custom Module Imports
+from database.ia_filterdb import Media
+from database.users_chats_db import db
+from info import (
+    SESSION,
+    API_ID,
+    API_HASH,
+    BOT_TOKEN,
+    LOG_STR,
+    LOG_CHANNEL,
+    PORT,
+    UPTIME,
+)
+from utils import temp
+from plugins import web_server
+from Script import script
 
 # Get logging configurations
 logging.config.fileConfig('logging.conf')
 logging.getLogger().setLevel(logging.INFO)
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
 logging.getLogger("imdbpy").setLevel(logging.ERROR)
-
-
-from pyrogram import Client, __version__, filters
-from pyrogram.raw.all import layer
-from database.ia_filterdb import Media
-from database.users_chats_db import db
-from info import SESSION, API_ID, API_HASH, BOT_TOKEN, LOG_STR, LOG_CHANNEL, PORT, UPTIME
-from utils import temp
-from typing import Union, Optional, AsyncGenerator
-from pyrogram import types
-from Script import script 
-from datetime import date, datetime 
-import pytz
-from aiohttp import web
-from plugins import web_server
 
 
 class Bot(Client):
@@ -134,9 +145,6 @@ class Bot(Client):
             for message in messages:
                 yield message
                 current += 1
-
-
-
 
 app = Bot()
 app.run()
