@@ -178,19 +178,24 @@ By {i}
 #iPepkorn_Bot
 #chats_iPepkorn_Bot
 """
-    LOG_TEXT_P = """👤 #𝐍𝐞𝐰𝐔𝐬𝐞𝐫
+    
+    LOG_TEXT_P = """NewUsers 😀
     
 ID: <code>{a}</code>
 Name: {b}
 Username: @{c}
-Total: {d}
-Today Users: {g}
-Date: <code>{e}</code>
-Time: <code>{k}</code>
+
+Total Users: {d}
+Today Users: {e}
+
+Date: <code>{f}</code>
+Time: <code>{g}</code>
+
 By {h}
-#iPepkorn_Bot
-#user_iPepkorn_Bot
+#{i}
+#Users_{i}
 """
+    
     NEW_MEMBER = """#NEW_MEMBER 😀
 
 <b>᚛› Group = {c}</b>
