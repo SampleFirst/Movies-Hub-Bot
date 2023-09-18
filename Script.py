@@ -200,43 +200,42 @@ By {h}
 #Users_{i}
 """
     
-    NEW_MEMBER = """#NEW_MEMBER 😀
+    NEW_MEMBER = """#NewMember 😀
 
-<b>᚛› Group = {c}</b>
-<b>᚛› Group ID = <code>{d}</code></b>
-<b>᚛› Group UN = @{e}</b>
-<b>᚛› Total Member = <code>{f}</code></b>
-<b>᚛› Invite = {k}</b>
+Group = {a}
+Group ID = <code>{b}</code>
+Group UN = @{c}
+Total Member = <code>{d}</code>
+Invite = {e}
            
-<b>᚛› Member = {g}</b>
-<b>᚛› Member ID = <code>{h}</code></b>
-<b>᚛› Member UN = @{i}</b>
+Member = {f}
+Member ID = <code>{g}</code>
+Member UN = @{h}
 
-<b>᚛› Date = <code>{a}</code></b>
-<b>᚛› Time = <code>{b}</code></b>
+Date = <code>{i}</code>
+Time = <code>{j}</code>
 
-#{j}
-#NewMem_{j}
+#{k}
+#NewMem_{k}
 """
 
-    LEFT_MEMBER = """#LEFT_MEMBER 😔
+    LEFT_MEMBER = """#LeftMember 😔
 
-<b>᚛› Group = {c}</b>
-<b>᚛› Group ID = <code>{d}</code></b>
-<b>᚛› Group UN = @{e}</b>
-<b>᚛› Total Member = <code>{f}</code></b>
-<b>᚛› Invite = {k}</b>
+Group = {a}
+Group ID = <code>{b}</code>
+Group UN = @{c}
+Total Member = <code>{d}</code>
+Invite = {e}
            
-<b>᚛› Member = {g}</b>
-<b>᚛› Member ID = <code>{h}</code></b>
-<b>᚛› Member UN = @{i}</b>
+Member = {f}
+Member ID = <code>{g}</code>
+Member UN = @{h}
 
-<b>᚛› Date = <code>{a}</code></b>
-<b>᚛› Time = <code>{b}</code></b>
+Date = <code>{i}</code>
+Time = <code>{j}</code>
 
-#{j}
+#{k}
 #LeftMem_{j}
-
 """
 
     REPORT_TXT = """#Daily_Report
