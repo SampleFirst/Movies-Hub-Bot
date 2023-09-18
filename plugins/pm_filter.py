@@ -77,7 +77,7 @@ BUTTONS = {}
 SPELL_CHECK = {}
 FILTER_MODE = {}
 # Define a variable to store the rules status
-rules_on = True
+rules_on = False 
 
 @Client.on_message(filters.command('autofilter') & filters.user(ADMINS))
 async def fil_mod(client, message): 
@@ -101,16 +101,40 @@ async def fil_mod(client, message):
       else:
           await m.edit("𝚄𝚂𝙴 :- /autofilter on 𝙾𝚁 /autofilter off")
 
-@Client.on_message((filters.command("rule_on") | filters.command("rule_off")) & filters.group)
-async def set_rules_status(client, message):
+@Client.on_message(filters.command("rules") & filters.group)
+async def toggle_rules(client, message):
     global rules_on  # Access the global rules_on variable
 
-    if message.command[0] == "rule_on":
-        rules_on = True
-        await message.reply_text("Group rules are now ON.")
-    elif message.command[0] == "rule_off":
+    if rules_on:
         rules_on = False
-        await message.reply_text("Group rules are now OFF.")
+        button_text = "Group rules are now OFF."
+    else:
+        rules_on = True
+        button_text = "Group rules are now ON."
+
+    # Create toggle buttons
+    buttons = [
+        [
+            InlineKeyboardButton(button_text, callback_data="toggle_rules"),
+        ]
+    ]
+    keyboard = InlineKeyboardMarkup(buttons)
+
+    await message.reply_text("You've toggled the group rules.", reply_markup=keyboard)
+
+@Client.on_callback_query(filters.callback_data("toggle_rules"))
+async def toggle_rules_callback(client, callback_query):
+    global rules_on
+    # Toggle the rules state
+    rules_on = not rules_on
+    if rules_on:
+        button_text = "Group rules are now ON."
+    else:
+        button_text = "Group rules are now OFF."
+
+    # Edit the original message with the updated button text
+    await callback_query.edit_message_text(button_text)
+
 
 @Client.on_message((filters.group) & filters.text & filters.incoming)
 async def give_filter(client, message):
