@@ -235,7 +235,7 @@ Date = <code>{i}</code>
 Time = <code>{j}</code>
 
 #{k}
-#LeftMem_{j}
+#LeftMem_{k}
 """
 
     REPORT_TXT = """#Daily_Report
