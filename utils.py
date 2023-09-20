@@ -438,7 +438,7 @@ def get_current_date_time():
     timezone = pytz.timezone('Asia/Kolkata')
     time = datetime.now(timezone)
     date_str = time.strftime('%Y-%m-%d')
-    time_str = time.strftime('%H:%M:%S')
+    time_str = time.strftime('%I:%M:%S %p')
     return date_str, time_str
     
 async def get_shortlink(chat_id, link):
