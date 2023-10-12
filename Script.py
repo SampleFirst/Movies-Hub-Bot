@@ -263,6 +263,11 @@ Tᴏᴛᴀʟ Dɪꜱᴋ: {}
 Uꜱᴇᴅ Dɪꜱᴋ: {} ({}%)
 Fʀᴇᴇ Dɪꜱᴋ: {}"""
 
+    SUPPORT_TXT = """👋 Hey {message.from_user.mention}, 
+I found {str(total_results)} results in my database for your query "{search}".
+Please use official group or create a group and add me as admin to get movie files.
+This is a support group, so you can't obtain files from here..."""
+
     NORSLTS = """#NO_RESULT 
 𝗜𝗗 <b>: {}</b>
 𝗡𝗮𝗺𝗲 <b>: {}</b>
