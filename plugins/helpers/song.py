@@ -118,14 +118,14 @@ async def vsong(client, message: Message):
     url = mo
     sedlyf = wget.download(kekme)
     opts = {
-        "format": "higher",
+        "format": "1080p",
         "addmetadata": True,
         "key": "FFmpegMetadata",
         "prefer_ffmpeg": True,
         "geo_bypass": True,
         "nocheckcertificate": True,
         "postprocessors": [{"key": "FFmpegVideoConvertor", "preferedformat": "mp4"}],
-        "outtmpl": "%(id)s.mp4",
+        "outtmpl": "%(id)s.mkv",
         "logtostderr": False,
         "quiet": True,
     }
