@@ -461,7 +461,7 @@ async def next_page(bot, query):
              InlineKeyboardButton(f'Series', 'sinfo'),
              InlineKeyboardButton(f'Tips', 'tinfo')
          ]
-
+    )
     if 0 < offset <= 10:
         off_set = 0
     elif offset == 0:
