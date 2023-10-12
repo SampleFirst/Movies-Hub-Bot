@@ -180,5 +180,20 @@ class Database:
             return chat.get('invite_link', None)
         return None
 
+    async def get_group_rules_status(self, group_id):
+        group = await self.grp.find_one({'id': int(group_id)})
+        if group:
+            return group.get('rules_status', False)
+        return False
+
+    async def toggle_group_rules(self, group_id):
+        group = await self.grp.find_one({'id': int(group_id)})
+        if group:
+            current_status = group.get('rules_status', False)
+            new_status = not current_status
+            await self.grp.update_one({'id': int(group_id)}, {'$set': {'rules_status': new_status}})
+            return new_status
+        return False
+
 db = Database(DATABASE_URI, DATABASE_NAME)
 
