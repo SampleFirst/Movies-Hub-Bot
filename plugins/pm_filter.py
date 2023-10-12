@@ -76,8 +76,6 @@ logger.setLevel(logging.ERROR)
 BUTTONS = {}
 SPELL_CHECK = {}
 FILTER_MODE = {}
-# Define a variable to store the rules status
-rules_on = False 
 
 
 @Client.on_message(filters.command('autofilter') & filters.user(ADMINS))
@@ -114,39 +112,65 @@ async def toggle_filter_callback(client, query):
     await query.message.edit_text(f"Auto Filter is {'On' if not current_mode else 'Off'}", reply_markup=reply_markup)
 
 
-@Client.on_message(filters.command("rules") & filters.group)
-async def toggle_rules(client, message):
-    global rules_on  # Access the global rules_on variable
+@Client.on_message(filters.command("setrules") & filters.group)
+async def set_rules_command(client, message):
+    group_id = message.chat.id
+    user_id = message.from_user.id
 
-    if rules_on:
-        rules_on = False
-        button_text = "Group rules are now OFF."
+    # Check if the user has admin rights
+    member = await client.get_chat_member(group_id, user_id)
+    if member.status not in ["administrator", "creator"]:
+        await message.reply_text("You need to be an admin to set group rules.")
+        return
+
+    # Get the current group rules status from the database
+    current_rules_status = await db.get_group_rules_status(group_id)
+
+    # Create and send a message with the toggle button
+    text = "Group Rules are currently "
+    if current_rules_status:
+        text += "ON ✅"
     else:
-        rules_on = True
-        button_text = "Group rules are now ON."
+        text += "OFF ❌"
 
-    # Create toggle buttons
-    buttons = [
-        [
-            InlineKeyboardButton(button_text, callback_data="toggle_rules"),
-        ]
+    keyboard = [
+        [{"text": "Toggle Rules", "callback_data": "toggle_rules"}]
     ]
-    keyboard = InlineKeyboardMarkup(buttons)
 
-    await message.reply_text("You've toggled the group rules.", reply_markup=keyboard)
+    await message.reply_text(
+        text,
+        reply_markup={"inline_keyboard": keyboard}
+    )
 
-@Client.on_callback_query(filters.regex(r'^toggle_rules'))
+@Client.on_callback_query(filters.regex("^toggle_rules$"))
 async def toggle_rules_callback(client, callback_query):
-    global rules_on
-    # Toggle the rules state
-    rules_on = not rules_on
-    if rules_on:
-        button_text = "Group rules are now ON."
-    else:
-        button_text = "Group rules are now OFF."
+    group_id = callback_query.message.chat.id
+    user_id = callback_query.from_user.id
 
-    # Edit the original message with the updated button text
-    await callback_query.edit_message_text(button_text)
+    # Check if the user has admin rights
+    member = await client.get_chat_member(group_id, user_id)
+    if member.status not in ["administrator", "creator"]:
+        await callback_query.answer("You need to be an admin to toggle group rules.", show_alert=True)
+        return
+
+    # Toggle the group rules status in the database
+    new_status = await db.toggle_group_rules(group_id)
+
+    # Update the message text and button
+    text = "Group Rules are currently "
+    if new_status:
+        text += "ON ✅"
+    else:
+        text += "OFF ❌"
+
+    keyboard = [
+        [{"text": "Toggle Rules", "callback_data": "toggle_rules"}]
+    ]
+
+    await callback_query.edit_message_text(
+        text,
+        reply_markup={"inline_keyboard": keyboard}
+    )
 
 
 @Client.on_message((filters.group) & filters.text & filters.incoming)
@@ -154,7 +178,7 @@ async def give_filter(client, message):
     group_id = message.chat.id
     name = message.text
 
-    settings = await get_settings(group_id)
+    rules_on = await db.get_group_rules_status(group_id)
 
     if rules_on:  # Check if rules are enabled
         violations = []
