@@ -117,30 +117,38 @@ async def set_rules_command(client, message):
     group_id = message.chat.id
     user_id = message.from_user.id
 
-    # Check if the user has admin rights
-    member = await client.get_chat_member(group_id, user_id)
-    if member.status not in ["administrator", "creator"]:
-        await message.reply_text("You need to be an admin to set group rules.")
-        return
+    if message.chat.type == enums.ChatType.PRIVATE:
+        await message.reply_text("This command is only for groups or Supergroups", quote=True)
+        
+    elif message.chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
+        # Check if the user has admin rights
+        member = await client.get_chat_member(group_id, user_id)
+        if (
+                member.status != enums.ChatMemberStatus.ADMINISTRATOR
+                and member.status != enums.ChatMemberStatus.OWNER
+                and str(user_id) not in ADMINS
+        ):
+            await message.reply_text("You need to be an admin to toggle group rules.", quote=True)
+            return
 
-    # Get the current group rules status from the database
-    current_rules_status = await db.get_group_rules_status(group_id)
+        # Get the current group rules status from the database
+        current_rules_status = await db.get_group_rules_status(group_id)
 
-    # Create and send a message with the toggle button
-    text = "Group Rules are currently "
-    if current_rules_status:
-        text += "ON ✅"
-    else:
-        text += "OFF ❌"
+        # Create and send a message with the toggle button
+        text = "Group Rules are currently "
+        if current_rules_status:
+            text += "ON ✅"
+        else:
+            text += "OFF ❌"
 
-    keyboard = [
-        [{"text": "Toggle Rules", "callback_data": "toggle_rules"}]
-    ]
+        keyboard = [
+            [{"text": "Toggle Rules", "callback_data": "toggle_rules"}]
+        ]
 
-    await message.reply_text(
-        text,
-        reply_markup={"inline_keyboard": keyboard}
-    )
+        await message.reply_text(
+            text,
+            reply_markup={"inline_keyboard": keyboard}
+        )
 
 @Client.on_callback_query(filters.regex("^toggle_rules$"))
 async def toggle_rules_callback(client, callback_query):
@@ -149,7 +157,11 @@ async def toggle_rules_callback(client, callback_query):
 
     # Check if the user has admin rights
     member = await client.get_chat_member(group_id, user_id)
-    if member.status not in ["administrator", "creator"]:
+    if (
+            member.status != enums.ChatMemberStatus.ADMINISTRATOR
+            and member.status != enums.ChatMemberStatus.OWNER
+            and str(user_id) not in ADMINS
+    ):
         await callback_query.answer("You need to be an admin to toggle group rules.", show_alert=True)
         return
 
@@ -171,7 +183,6 @@ async def toggle_rules_callback(client, callback_query):
         text,
         reply_markup={"inline_keyboard": keyboard}
     )
-
 
 @Client.on_message((filters.group) & filters.text & filters.incoming)
 async def give_filter(client, message):
