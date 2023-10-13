@@ -2,6 +2,8 @@ from pyrogram import Client, filters
 import requests
 import os
 
+
+
 @Client.on_message(filters.command("insta"))
 async def download_instagram_post(client, message):
     # Get the Instagram post link from the command arguments
@@ -23,7 +25,12 @@ async def download_instagram_post(client, message):
                 with open(file_name, "wb") as image_file:
                     image_file.write(response.content)
                 
+                # Get chat ID from the incoming message
+                chat_id = message.chat.id
+
+                # Send the downloaded image as a photo
                 await client.send_photo(
+                    chat_id=chat_id,
                     photo=open(file_name, "rb"),
                     caption=copy,
                 )
@@ -41,8 +48,12 @@ async def download_instagram_post(client, message):
                 with open(file_name, "wb") as video_file:
                     video_file.write(response.content)
 
+                # Get chat ID from the incoming message
+                chat_id = message.chat.id
+
                 # Send the downloaded video as a document
                 await client.send_video(
+                    chat_id=chat_id,
                     video=open(file_name, "rb"),
                     caption=copy,
                     supports_streaming=True,
@@ -57,4 +68,3 @@ async def download_instagram_post(client, message):
             await message.reply_text(f"Error: {str(e)}")
     else:
         await message.reply_text("Please provide an Instagram post link with the command.")
-
