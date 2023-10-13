@@ -31,6 +31,7 @@ async def download_instagram_post(client, message):
                     chat_id=chat_id,
                     photo=file_name,
                     caption=copy,
+                    file_ref="hd",
                 )
 
                 # Remove the temporary file after sending
@@ -55,6 +56,7 @@ async def download_instagram_post(client, message):
                     video=file_name,
                     caption=copy,
                     supports_streaming=True,
+                    file_ref="hd",
                 )
 
                 # Delete the downloaded file
@@ -66,3 +68,4 @@ async def download_instagram_post(client, message):
             await message.reply_text(f"Error: {str(e)}")
     else:
         await message.reply_text("Please provide an Instagram post link with the command.")
+
