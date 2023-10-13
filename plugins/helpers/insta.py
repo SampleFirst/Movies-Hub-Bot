@@ -24,8 +24,7 @@ def download_instagram_post(client, message):
                     file.write(response.content)
 
                 # Send the downloaded image as a photo
-                with open(file_name, "rb") as photo_file:
-                    message.reply_photo(photo=photo_file, caption="Post downloaded successfully!")
+                message.reply_photo(photo=file_name, caption="Post downloaded successfully!")
 
                 # Remove the temporary file after sending
                 os.remove(file_name)
@@ -40,8 +39,7 @@ def download_instagram_post(client, message):
                     file.write(response.content)
 
                 # Send the downloaded video as a document
-                with open(file_name, "rb") as video_file:
-                    message.reply_video(video=video_file, caption="Reel downloaded successfully!")
+                message.reply_video(video=file_name, caption="Reel downloaded successfully!")
 
                 # Remove the temporary file after sending
                 os.remove(file_name)
