@@ -1,7 +1,8 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
 import requests
-from bs4 import BeautifulSoup  # Make sure to install BeautifulSoup using pip
+from bs4 import BeautifulSoup
+import os
 
 @Client.on_message(filters.command("insta"))
 def download_instagram_post(client, message):
@@ -9,8 +10,8 @@ def download_instagram_post(client, message):
     if len(message.command) > 1:
         instagram_link = message.command[1]
 
-        # Add "dd" before "instagram"
-        modified_link = instagram_link.replace("://www.instagram.com", "s://www.ddinstagram.com")
+        # Fix the link modification
+        modified_link = instagram_link.replace("://www.instagram.com", "://www.ddinstagram.com")
 
         # Download the Instagram post
         try:
