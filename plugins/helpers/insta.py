@@ -14,14 +14,31 @@ def download_instagram_post(client, message):
         # Download the Instagram post
         try:
             response = requests.get(modified_link)
-            # Process the response or save the content as needed
-            # For example, you can save it to a file
-            file_name = "downloaded_post.mp4"
-            with open(file_name, "wb") as file:
-                file.write(response.content)
-            # Send the downloaded file as a document
-            message.reply_document(document=file_name, caption="Post downloaded successfully!")
+
+            # Check if it's an image or a reel
+            if "/p/" in modified_link:
+                # It's a post
+                # Process the response or save the content as needed
+                # For example, you can save it to a file
+                file_name = "downloaded_post.html"
+                with open(file_name, "wb") as file:
+                    file.write(response.content)
+                # Send the downloaded file as a document
+                message.reply_document(document=file_name, caption="Post downloaded successfully!")
+            elif "/reel/" in modified_link:
+                # It's a reel
+                # Process the response or save the content as needed
+                # For example, you can save it to a file
+                file_name = "downloaded_reel.html"
+                with open(file_name, "wb") as file:
+                    file.write(response.content)
+                # Send the downloaded file as a document
+                message.reply_document(document=file_name, caption="Reel downloaded successfully!")
+            else:
+                # Unknown post type
+                message.reply_text("Unknown Instagram post type.")
         except Exception as e:
             message.reply_text(f"Error: {str(e)}")
     else:
         message.reply_text("Please provide an Instagram post link with the command.")
+
