@@ -1,8 +1,8 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from instaloader import Instaloader, Post
+import instaloder 
 
-# Create an Instaloader instance
+# Creating an Instaloader instance
 instaloader = Instaloader()
 
 # Define a command handler for /sendpost
@@ -12,8 +12,11 @@ def send_post(client: Client, message: Message):
     post_link = message.text.split(" ", 1)[1]
 
     try:
-        # Get post details using Instaloader
-        post = instaloader.get_post(post_link)
+        # Extract shortcode from the Instagram post link
+        shortcode = instaloader.parse_shortcode_from_url(post_link)
+        
+        # Get post details using Post.from_shortcode
+        post = Post.from_shortcode(instaloader.context, shortcode)
         
         # Process the post and send images or videos
         send_post_media(client, message.chat.id, post)
