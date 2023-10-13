@@ -6,7 +6,7 @@ async def instagram_download(client, message):
     try:
         # Get the Instagram reel link from the command
         command_parts = message.text.split(" ", 1)
-        
+
         if len(command_parts) == 2:
             reel_link = command_parts[1]
 
@@ -18,7 +18,7 @@ async def instagram_download(client, message):
 
                 # Send the downloaded video to the user
                 video_path = f"{reel_link.split('/')[-2]}_{reel_link.split('/')[-1]}.mp4"
-                caption = reel_link
+                caption = f"Instagram Reels Download\nLink: {reel_link}"
                 await client.send_video(
                     chat_id=message.chat.id,
                     video=video_path,
@@ -30,5 +30,6 @@ async def instagram_download(client, message):
             await message.reply_text("Please provide a valid Instagram Reels link.")
 
     except Exception as e:
-        print(f"An error occurred: {e}")
-        await message.reply_text("An error occurred while processing the request.")
+        error_message = f"An error occurred: {str(e)}"
+        print(error_message)
+        await message.reply_text(error_message)
