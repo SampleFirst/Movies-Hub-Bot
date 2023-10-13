@@ -1,20 +1,27 @@
 from pyrogram import Client, filters
 import instaloader
 
-
 @Client.on_message(filters.command("insta"))
 async def instagram_download(client, message):
     try:
         # Get the Instagram reel link from the command
-        reel_link = message.text.split(" ", 1)[1]
+        command_parts = message.text.split(" ", 1)
+        if len(command_parts) == 2:
+            reel_link = command_parts[1]
 
-        # Download the reel using instaloader
-        insta_loader = instaloader.Instaloader()
-        insta_loader.download_reels([reel_link], download_pictures=False)
+            # Ensure it's a valid Instagram Reels link
+            if "instagram.com/reel/" in reel_link:
+                # Download the reel using instaloader
+                insta_loader = instaloader.Instaloader()
+                insta_loader.download_reels([reel_link], download_pictures=False)
 
-        # Send the downloaded video to the user
-        video_path = f"{reel_link.split('/')[-2]}_{reel_link.split('/')[-1]}.mp4"
-        await message.reply_video(video_path)
+                # Send the downloaded video to the user
+                video_path = f"{reel_link.split('/')[-2]}_{reel_link.split('/')[-1]}.mp4"
+                await message.reply_video(video_path)
+            else:
+                await message.reply_text("Please provide a valid Instagram Reels link.")
+        else:
+            await message.reply_text("Please provide a valid Instagram Reels link.")
 
-    except IndexError:
-        await message.reply_text("Please provide a valid Instagram Reels link.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
