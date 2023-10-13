@@ -52,6 +52,7 @@ youtube-search-python==1.4.6
 yt-dlp
 youtube-dl
 youtube_search
+instaloader
 
 # Web Frameworks and Hosting
 Flask==2.2.2
