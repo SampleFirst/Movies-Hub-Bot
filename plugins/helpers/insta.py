@@ -10,7 +10,7 @@ def download_instagram_post(client, message):
         instagram_link = message.command[1]
 
         # Add "dd" before "instagram"
-        modified_link = instagram_link.replace("://www.instagram.com", "://www.ddinstagram.com")
+        modified_link = instagram_link.replace("://www.instagram.com", "s://www.ddinstagram.com")
 
         # Download the Instagram post
         try:
