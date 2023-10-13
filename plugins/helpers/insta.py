@@ -14,7 +14,7 @@ async def instagram_download(client, message):
             if "instagram.com/reel/" in reel_link:
                 # Download the reel using instaloader
                 insta_loader = instaloader.Instaloader()
-                insta_loader.download_post(reel_link, target='Reels', download_video_thumbnails=False)
+                insta_loader.download_post(insta_loader, target='Reels')
 
                 # Send the downloaded video to the user
                 video_path = f"Reels/{reel_link.split('/')[-2]}_{reel_link.split('/')[-1]}.mp4"
