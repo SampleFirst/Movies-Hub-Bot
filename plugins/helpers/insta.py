@@ -8,7 +8,7 @@ instaloader = Instaloader()
 
 # Define a command handler for /sendpost
 @Client.on_message(filters.command("sendpost"))
-def send_post(client, message):
+def send_post(client: Client, message: Message):
     # Get the Instagram post link from the command
     post_link = message.text.split(" ", 1)[1]
 
@@ -19,8 +19,9 @@ def send_post(client, message):
         # Process the post and send images or videos
         send_post_media(client, message.chat.id, post)
     except Exception as e:
-        print(f"Error: {e}")
-        client.send_message(message.chat.id, "Error processing the Instagram post.")
+        print(f"Error processing the Instagram post: {e}")
+        client.send_message(message.chat.id, f"Error processing the Instagram post: {e}")
+
 
 def send_post_media(client: Client, chat_id: int, post: Post):
     # Send images
