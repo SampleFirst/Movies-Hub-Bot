@@ -14,10 +14,10 @@ async def instagram_download(client, message):
             if "instagram.com/reel/" in reel_link:
                 # Download the reel using instaloader
                 insta_loader = instaloader.Instaloader()
-                insta_loader.download_reels([reel_link], download_pictures=False)
+                insta_loader.download_post(reel_link, target='Reels', download_pictures=False, download_video_thumbnails=False)
 
                 # Send the downloaded video to the user
-                video_path = f"{reel_link.split('/')[-2]}_{reel_link.split('/')[-1]}.mp4"
+                video_path = f"Reels/{reel_link.split('/')[-2]}_{reel_link.split('/')[-1]}.mp4"
                 caption = f"Instagram Reels Download\nLink: {reel_link}"
                 await client.send_video(
                     chat_id=message.chat.id,
