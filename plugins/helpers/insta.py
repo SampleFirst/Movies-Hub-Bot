@@ -16,11 +16,12 @@ def download_instagram_post(client, message):
             response = requests.get(modified_link)
             # Process the response or save the content as needed
             # For example, you can save it to a file
-            with open("downloaded_post.html", "wb") as file:
+            file_name = "downloaded_post.html"
+            with open(file_name, "wb") as file:
                 file.write(response.content)
-            message.reply_text("Post downloaded successfully!")
+            # Send the downloaded file as a document
+            message.reply_document(document=file_name, caption="Post downloaded successfully!")
         except Exception as e:
             message.reply_text(f"Error: {str(e)}")
     else:
         message.reply_text("Please provide an Instagram post link with the command.")
-
