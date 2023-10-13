@@ -20,20 +20,20 @@ def download_instagram_post(client, message):
                 # It's a post
                 # Process the response or save the content as needed
                 # For example, you can save it to a file
-                file_name = "downloaded_post.html"
+                file_name = "downloaded_post.jpg"
                 with open(file_name, "wb") as file:
                     file.write(response.content)
-                # Send the downloaded file as a document
-                message.reply_document(document=file_name, caption="Post downloaded successfully!")
+                # Send the downloaded image as a photo
+                message.reply_photo(photo=file_name, caption="Post downloaded successfully!")
             elif "/reel/" in modified_link:
                 # It's a reel
                 # Process the response or save the content as needed
                 # For example, you can save it to a file
-                file_name = "downloaded_reel.html"
+                file_name = "downloaded_reel.mp4"
                 with open(file_name, "wb") as file:
                     file.write(response.content)
-                # Send the downloaded file as a document
-                message.reply_document(document=file_name, caption="Reel downloaded successfully!")
+                # Send the downloaded video as a document
+                message.reply_video(video=file_name, caption="Reel downloaded successfully!")
             else:
                 # Unknown post type
                 message.reply_text("Unknown Instagram post type.")
