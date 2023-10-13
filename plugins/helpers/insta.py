@@ -31,7 +31,6 @@ async def download_instagram_post(client, message):
                     chat_id=chat_id,
                     photo=file_name,
                     caption=copy,
-                    parse_mode="MarkdownV2",
                 )
 
                 # Remove the temporary file after sending
@@ -55,7 +54,6 @@ async def download_instagram_post(client, message):
                     chat_id=chat_id,
                     video=file_name,
                     caption=copy,
-                    parse_mode="MarkdownV2",
                     supports_streaming=True,
                 )
 
