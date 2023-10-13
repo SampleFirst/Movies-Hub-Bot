@@ -24,10 +24,8 @@ async def download_instagram_post(client, message):
                     image_file.write(response.content)
                 
                 await client.send_photo(
-                    message.chat.id,
                     photo=open(file_name, "rb"),
                     caption=copy,
-                    reply_to_message_id=message.message_id
                 )
 
                 # Remove the temporary file after sending
@@ -45,11 +43,9 @@ async def download_instagram_post(client, message):
 
                 # Send the downloaded video as a document
                 await client.send_video(
-                    message.chat.id,
                     video=open(file_name, "rb"),
                     caption=copy,
                     supports_streaming=True,
-                    reply_to_message_id=message.message_id
                 )
 
                 # Delete the downloaded file
