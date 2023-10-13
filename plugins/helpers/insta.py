@@ -22,7 +22,7 @@ def get_instagram_content(url):
 
 
 @Client.on_message(filters.command("insta"))
-def instagram_download(client, message):
+async def instagram_download(client, message):
     if len(message.command) == 2:
         url = message.command[1]
         video_url, image_url = get_instagram_content(url)
