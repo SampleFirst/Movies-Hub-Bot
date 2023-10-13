@@ -1,5 +1,5 @@
 from pyrogram import Client, filters
-import instaloader
+from instaloader import Instaloader, Post
 
 @Client.on_message(filters.command("insta"))
 async def instagram_download(client, message):
@@ -12,12 +12,18 @@ async def instagram_download(client, message):
 
             # Ensure it's a valid Instagram Reels link
             if "instagram.com/reel/" in reel_link:
-                # Download the reel using instaloader
-                insta_loader = instaloader.Instaloader()
-                insta_loader.download_post(insta_loader, target='Reels')
+                # Download the reel using Instaloader
+                insta_loader = Instaloader()
+
+                # Extracting Post ID from the Reels link
+                post_id = reel_link.split("/")[-1]
+
+                # Download the post
+                post = Post.from_shortcode(insta_loader.context, post_id)
+                insta_loader.download_post(post, target='Reels')
 
                 # Send the downloaded video to the user
-                video_path = f"Reels/{reel_link.split('/')[-2]}_{reel_link.split('/')[-1]}.mp4"
+                video_path = f"Reels/{post.date_utc.strftime('%Y%m%d_%H%M%S')}_{post_id}.mp4"
                 caption = f"Instagram Reels Download\nLink: {reel_link}"
                 await client.send_video(
                     chat_id=message.chat.id,
