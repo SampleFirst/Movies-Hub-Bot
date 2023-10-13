@@ -5,7 +5,6 @@ from instaloader import Instaloader, Post
 # Create an Instaloader instance
 instaloader = Instaloader()
 
-
 # Define a command handler for /sendpost
 @Client.on_message(filters.command("sendpost"))
 def send_post(client: Client, message: Message):
@@ -14,14 +13,13 @@ def send_post(client: Client, message: Message):
 
     try:
         # Get post details using Instaloader
-        post = instaloader.load_post_from_url(post_link)
+        post = instaloader.get_post(post_link)
         
         # Process the post and send images or videos
         send_post_media(client, message.chat.id, post)
     except Exception as e:
         print(f"Error processing the Instagram post: {e}")
         client.send_message(message.chat.id, f"Error processing the Instagram post: {e}")
-
 
 def send_post_media(client: Client, chat_id: int, post: Post):
     # Send images
