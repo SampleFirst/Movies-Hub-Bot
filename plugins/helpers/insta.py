@@ -1,34 +1,31 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
-import instaloder 
+import instaloader
 
-# Creating an Instaloader instance
-instaloader = Instaloader()
 
-# Define a command handler for /sendpost
-@Client.on_message(filters.command("sendpost"))
-def send_post(client: Client, message: Message):
-    # Get the Instagram post link from the command
-    post_link = message.text.split(" ", 1)[1]
+def download_and_send_media(url, chat_id):
+    L = instaloader.Instaloader()
 
     try:
-        # Extract shortcode from the Instagram post link
-        shortcode = instaloader.parse_shortcode_from_url(post_link)
-        
-        # Get post details using Post.from_shortcode
-        post = Post.from_shortcode(instaloader.context, shortcode)
-        
-        # Process the post and send images or videos
-        send_post_media(client, message.chat.id, post)
+        post = instaloader.Post.from_shortcode(L.context, url)
+        if post.is_video:
+            video_path = f"{post.owner_username}_{post.shortcode}.mp4"
+            L.download_post(post, target=video_path, post_filter=lambda _: _.is_video)
+            Client.send_video(chat_id, video_path)
+        else:
+            image_path = f"{post.owner_username}_{post.shortcode}.jpg"
+            L.download_post(post, target=image_path, post_filter=lambda _: not _.is_video)
+            Client.send_photo(chat_id, image_path)
     except Exception as e:
-        print(f"Error processing the Instagram post: {e}")
-        client.send_message(message.chat.id, f"Error processing the Instagram post: {e}")
+        Client.send_message(chat_id, f"Error: {str(e)}")
 
-def send_post_media(client: Client, chat_id: int, post: Post):
-    # Send images
-    for index, image_url in enumerate(post.get_sidecar_nodes()):
-        client.send_photo(chat_id, image_url.display_url, caption=f"Image {index + 1}")
 
-    # Send videos
-    if post.is_video:
-        client.send_video(chat_id, post.video_url, caption="Video")
+@Client.on_message(filters.command("sendpost"))
+def send_post(client: Client, message: Message):
+    if message.reply_to_message and message.reply_to_message.text:
+        url = message.reply_to_message.text
+    else:
+        url = message.text.split(" ", 1)[1]
+
+    download_and_send_media(url, message.chat.id)
+
