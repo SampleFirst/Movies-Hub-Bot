@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pyrogram import types, errors
-from info *
+from info import ADMINS 
 
 
 @Client.on_message(filters.command("purge") & (filters.group | filters.channel))
