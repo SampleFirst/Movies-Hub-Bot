@@ -1,5 +1,6 @@
 from pyrogram import Client, filters
 import requests
+import json
 
 @Client.on_message(filters.command("download"))
 def download_instagram_post(client, message):
@@ -14,20 +15,24 @@ def download_instagram_post(client, message):
         response = requests.get(modified_link)
         response.raise_for_status()  # Check for request errors
 
-        # Extract image URL from HTML content using JSON parsing
-        json_data = response.json()
-        image_url = json_data["graphql"]["shortcode_media"]["display_url"]
+        # Check if the response content is JSON
+        if response.headers.get('content-type') == 'application/json':
+            json_data = response.json()
+            image_url = json_data["graphql"]["shortcode_media"]["display_url"]
 
-        # Download the image
-        image_response = requests.get(image_url)
-        image_response.raise_for_status()  # Check for request errors
+            # Download the image
+            image_response = requests.get(image_url)
+            image_response.raise_for_status()  # Check for request errors
 
-        # Save the image
-        with open("downloaded_image.jpg", "wb") as image_file:
-            image_file.write(image_response.content)
+            # Save the image
+            with open("downloaded_image.jpg", "wb") as image_file:
+                image_file.write(image_response.content)
 
-        # Send the image back to the user
-        message.reply_photo("downloaded_image.jpg")
+            # Send the image back to the user
+            message.reply_photo("downloaded_image.jpg")
+        else:
+            # Handle the case where the response is not JSON
+            message.reply_text("Invalid response format. Unable to extract image URL.")
 
     except Exception as e:
         # Handle any exceptions and inform the user
