@@ -1,4 +1,5 @@
 from pyrogram import Client, filters
+from pyrogram.types import Message
 import aiohttp
 from io import BytesIO
 
@@ -33,3 +34,18 @@ async def download_instagram_post(client, message):
             await message.reply_text(f"Error: {str(e)}")
     else:
         await message.reply_text("Please provide an Instagram post link with the command.")
+
+
+@Client.on_message(filters.command("modifylink"))
+def modify_instagram_link(client: Client, message: Message):
+    # Extract the Instagram post link from the command
+    original_link = message.text.split(" ", 1)[1].strip()
+
+    # Modify the link by adding "dd" before "instagram"
+    modified_link = original_link.replace("instagram", "ddinstagram")
+
+    # Send back the modified link
+    client.send_message(
+        chat_id=message.chat.id,
+        text=f"Modified Instagram Post Link: {modified_link}",
+    )
