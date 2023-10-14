@@ -76,7 +76,34 @@ logger.setLevel(logging.ERROR)
 BUTTONS = {}
 SPELL_CHECK = {}
 FILTER_MODE = {}
+MESSAGE_COUNT_THRESHOLD = 50  # Set your desired threshold
 
+async def count_and_auto_delete_messages(client, message):
+    # Increment the message count for the group
+    chat_id = message.chat.id
+    message_count_key = f"message_count_{chat_id}"
+    
+    current_count = await db.get(message_count_key, 0)
+    current_count += 1
+    await db.set(message_count_key, current_count)
+    
+    # Check if the count exceeds the threshold
+    if current_count > MESSAGE_COUNT_THRESHOLD:
+        # Delete messages
+        await delete_messages_in_batch(client, chat_id)
+        
+        # Reset the count
+        await db.set(message_count_key, 0)
+
+async def delete_messages_in_batch(client, chat_id):
+    try:
+        # Fetch recent messages
+        messages = await client.get_chat_history(chat_id, limit=MESSAGE_COUNT_THRESHOLD)
+        
+        # Delete messages
+        await client.delete_messages(chat_id, messages)
+    except Exception as e:
+        logger.exception(e)
 
 @Client.on_message(filters.command('autofilter') & filters.user(ADMINS))
 async def toggle_autofilter(client, message):
@@ -1314,13 +1341,15 @@ async def auto_filter(client, msg, spoll=False):
     if not spoll:
         message = msg
         settings = await get_settings(message.chat.id)
+        # Call the function to count and auto-delete messages
+        await count_and_auto_delete_messages(client, message)
+        
         if message.text.startswith("/"):
             return
         if re.findall("((^\/|^,|^!|^\.|^[\U0001F600-\U000E007F]).*)", message.text):
             return
         if len(message.text) < 100:
             search = message.text
-            searching_message = await message.reply_text("Searching Your Query.")
             files, offset, total_results = await get_search_results(search.lower(), offset=0, filter=True)
             if not files:
                 if settings["spell_check"]:
