@@ -17,16 +17,19 @@ def download_instagram_post(client, message):
         try:
             response = requests.get(modified_link)
 
-            # Process the response and save as an image
-            image = Image.open(BytesIO(response.content))
-            image_file_name = "downloaded_post.jpg"
-            image.save(image_file_name, "JPEG")
+            # Check if the response contains image data
+            if response.headers.get('content-type', '').startswith('image'):
+                # Process the response and save as an image
+                image = Image.open(BytesIO(response.content))
+                image_file_name = "downloaded_post.jpg"
+                image.save(image_file_name, "JPEG")
 
-            # Send the downloaded image as a document
-            message.reply_document(document=image_file_name, caption="Post downloaded successfully!")
+                # Send the downloaded image as a document
+                message.reply_document(document=image_file_name, caption="Post downloaded successfully!")
+            else:
+                message.reply_text("Error: The provided link does not seem to point to an image.")
         except Exception as e:
             message.reply_text(f"Error: {str(e)}")
     else:
         message.reply_text("Please provide an Instagram post link with the command.")
-
 
