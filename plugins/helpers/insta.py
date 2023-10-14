@@ -1,40 +1,37 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
-import aiohttp
-from io import BytesIO
+import instaloader
 
-# Command handler for downloading Instagram posts
+
+
+def download_media(media_url):
+    loader = instaloader.Instaloader()
+
+    try:
+        post = instaloader.Post.from_shortcode(loader.context, media_url)
+        for node in post.get_sidecar_nodes():
+            if node.is_video:
+                loader.download_post(post, target=node.url, filename='video')
+            elif node.is_image:
+                loader.download_post(post, target=node.url, filename='image')
+    except Exception as e:
+        print(f"Error: {e}")
+
+
 @Client.on_message(filters.command("download"))
-async def download_instagram_post(client, message):
-    # Check if the command includes an Instagram post link
-    if len(message.command) > 1:
-        instagram_link = message.command[1]
-
-        # Modify the link for downloading
-        modified_link = instagram_link.replace("://www.instagram.com", "://www.ddinstagram.com")
-
-        try:
-            # Use aiohttp for asynchronous HTTP requests
-            async with aiohttp.ClientSession() as session:
-                async with session.get(modified_link) as response:
-                    # Check if the response is successful
-                    if response.status == 200:
-                        # Read the content and send it as a photo
-                        content = await response.read()
-                        file_bytes = BytesIO(content)
-                        file_bytes.name = "downloaded_post.jpg"  # You can adjust the file name and extension
-                        await client.send_photo(
-                            chat_id=message.chat.id,
-                            photo=file_bytes,
-                            caption="Post downloaded successfully!"
-                        )
-                    else:
-                        await message.reply_text(f"Failed to download the Instagram post. Status Code: {response.status}")
-        except Exception as e:
-            await message.reply_text(f"Error: {str(e)}")
+def download_command(client, message):
+    if len(message.command) == 2:
+        media_url = message.command[1]
+        download_media(media_url)
+        client.send_message(
+            chat_id=message.chat.id,
+            text="Media downloaded successfully!",
+        )
     else:
-        await message.reply_text("Please provide an Instagram post link with the command.")
-
+        client.send_message(
+            chat_id=message.chat.id,
+            text="Please provide a valid Instagram post or reel link.",
+        )
 
 @Client.on_message(filters.command("modifylink"))
 def modify_instagram_link(client: Client, message: Message):
