@@ -1341,9 +1341,6 @@ async def auto_filter(client, msg, spoll=False):
     if not spoll:
         message = msg
         settings = await get_settings(message.chat.id)
-        # Call the function to count and auto-delete messages
-        await count_and_auto_delete_messages(client, message)
-        
         if message.text.startswith("/"):
             return
         if re.findall("((^\/|^,|^!|^\.|^[\U0001F600-\U000E007F]).*)", message.text):
@@ -1445,7 +1442,9 @@ async def auto_filter(client, msg, spoll=False):
     TEMPLATE = settings['template']
     
     await waiting_message.delete()
-
+    # Call the function to count and auto-delete messages
+    await count_and_auto_delete_messages(client, message)
+        
     if imdb:
         cap = TEMPLATE.format(
             query=search,
