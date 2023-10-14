@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
-from pyrogram import errors
-from pyrogram.types import Message, enums
+from pyrogram import errors, enums
+from pyrogram.types import Message
 from info import ADMINS
 
 @Client.on_message(filters.command("purge") & (filters.group | filters.channel))
