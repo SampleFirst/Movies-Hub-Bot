@@ -1402,7 +1402,7 @@ async def auto_filter(client, msg, spoll=False):
             ]
         )
     
-    waiting_message = await message.reply_text(f" Searching.. {msg}...")
+    waiting_message = await message.reply_text(f" Searching...")
     
     imdb = await get_poster(search, file=(files[0]).file_name) if settings["imdb"] else None
     TEMPLATE = settings['template']
