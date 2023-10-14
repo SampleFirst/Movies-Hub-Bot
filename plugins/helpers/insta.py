@@ -27,9 +27,12 @@ def download_instagram_post(client, message):
                 # Send the downloaded image as a document
                 message.reply_document(document=image_file_name, caption="Post downloaded successfully!")
             else:
-                message.reply_text("Error: The provided link does not seem to point to an image.")
+                # Handle the case where the response does not contain image data
+                message.reply_text("Error: The provided link does not seem to point to an image. Check if the link is correct or if the content is accessible.")
         except Exception as e:
+            # Handle other exceptions
             message.reply_text(f"Error: {str(e)}")
     else:
+        # Handle the case where no Instagram post link is provided
         message.reply_text("Please provide an Instagram post link with the command.")
 
