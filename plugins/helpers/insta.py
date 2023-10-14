@@ -49,3 +49,15 @@ def modify_instagram_link(client: Client, message: Message):
         chat_id=message.chat.id,
         text=f"Modified Instagram Post Link: {modified_link}",
     )
+
+    # Check if the modified link contains "instagram" to identify it as an image post
+    if "instagram" in modified_link:
+        # Assuming you have the image file path or URL, replace 'image_path_or_url' with the actual path or URL
+        image_path_or_url = 'image_path_or_url'
+
+        # Send the image
+        client.send_photo(
+            chat_id=message.chat.id,
+            photo=image_path_or_url,
+            caption="Modified Instagram Post Image",
+        )
