@@ -1,11 +1,12 @@
 from pyrogram import Client, filters
-from pyrogram import types, errors
+from pyrogram import errors
+from pyrogram.types import enums
 from info import ADMINS 
 
 
 @Client.on_message(filters.command("purge") & (filters.group | filters.channel))
 async def purge_command(client, message):
-    if message.chat.type not in (types.ChatType.SUPERGROUP, types.ChatType.CHANNEL):
+    if message.chat.type not in (enums.ChatType.SUPERGROUP, enums.ChatType.CHANNEL):
         await message.reply("This command is only for Supergroups or channels.")
         return
     
