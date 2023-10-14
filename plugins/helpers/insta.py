@@ -2,6 +2,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 import requests
 import aiohttp
+from io import BytesIO
 
 @Client.on_message(filters.command("download"))
 async def download_instagram_post(client, message):
@@ -16,16 +17,18 @@ async def download_instagram_post(client, message):
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(modified_link) as response:
-                    # Process the response or save the content as needed
-                    # For example, you can save it to a file
-                    file_name = "downloaded_post.html"
-                    with open(file_name, "wb") as file:
-                        file.write(await response.read())
-                    # Send the downloaded file as a document
-                    await message.reply_photo(
-                        photo=file_name,
-                        caption="Post downloaded successfully!"
-                    )
+                    # Check if the response is successful
+                    if response.status == 200:
+                        # Read the content and send it as a photo
+                        content = await response.read()
+                        file_bytes = BytesIO(content)
+                        file_bytes.name = "downloaded_post.jpg"  # You can adjust the file name and extension
+                        await message.reply_photo(
+                            photo=file_bytes,
+                            caption="Post downloaded successfully!"
+                        )
+                    else:
+                        await message.reply_text(f"Failed to download the Instagram post. Status Code: {response.status}")
         except Exception as e:
             await message.reply_text(f"Error: {str(e)}")
     else:
