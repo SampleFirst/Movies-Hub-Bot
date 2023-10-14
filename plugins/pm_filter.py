@@ -76,34 +76,7 @@ logger.setLevel(logging.ERROR)
 BUTTONS = {}
 SPELL_CHECK = {}
 FILTER_MODE = {}
-MESSAGE_COUNT_THRESHOLD = 50  # Set your desired threshold
 
-async def count_and_auto_delete_messages(client, message):
-    # Increment the message count for the group
-    chat_id = message.chat.id
-    message_count_key = f"message_count_{chat_id}"
-    
-    current_count = await db.get(message_count_key, 0)
-    current_count += 1
-    await db.set(message_count_key, current_count)
-    
-    # Check if the count exceeds the threshold
-    if current_count > MESSAGE_COUNT_THRESHOLD:
-        # Delete messages
-        await delete_messages_in_batch(client, chat_id)
-        
-        # Reset the count
-        await db.set(message_count_key, 0)
-
-async def delete_messages_in_batch(client, chat_id):
-    try:
-        # Fetch recent messages
-        messages = await client.get_chat_history(chat_id, limit=MESSAGE_COUNT_THRESHOLD)
-        
-        # Delete messages
-        await client.delete_messages(chat_id, messages)
-    except Exception as e:
-        logger.exception(e)
 
 @Client.on_message(filters.command('autofilter') & filters.user(ADMINS))
 async def toggle_autofilter(client, message):
@@ -286,9 +259,7 @@ async def give_filter(client, message):
                 else:
                     await auto_filter(client, message)
                     
-            if settings['auto_delete']:
-                await asyncio.sleep(600)
-                await message.delete()
+            
     else:
         await global_filters(client, message)
         keywords = await get_filters(group_id)
@@ -330,9 +301,7 @@ async def give_filter(client, message):
             else:
                 await auto_filter(client, message)
                 
-        if settings['auto_delete']:
-            await asyncio.sleep(600)
-            await message.delete()
+        
             
                 
 @Client.on_message(filters.private & filters.text & filters.incoming)
@@ -1433,18 +1402,13 @@ async def auto_filter(client, msg, spoll=False):
             ]
         )
     
-    #waiting user to complete imdb process @LazyDeveloperr
-    user = message.from_user
-    full_name = user.first_name + " " + user.last_name if user.last_name else user.first_name
-    waiting_message = await message.reply_text(f" Searching.. {full_name}...")
+    waiting_message = await message.reply_text(f" Searching.. {msg}...")
     
     imdb = await get_poster(search, file=(files[0]).file_name) if settings["imdb"] else None
     TEMPLATE = settings['template']
     
     await waiting_message.delete()
-    # Call the function to count and auto-delete messages
-    await count_and_auto_delete_messages(client, message)
-        
+
     if imdb:
         cap = TEMPLATE.format(
             query=search,
