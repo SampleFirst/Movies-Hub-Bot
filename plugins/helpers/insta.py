@@ -1,20 +1,20 @@
 from pyrogram import Client, filters
-from pyrogram.types import Message
-import requests
 import aiohttp
 from io import BytesIO
 
+
+# Command handler for downloading Instagram posts
 @Client.on_message(filters.command("download"))
 async def download_instagram_post(client, message):
-    # Get the Instagram post link from the command arguments
+    # Check if the command includes an Instagram post link
     if len(message.command) > 1:
         instagram_link = message.command[1]
 
-        # Add "dd" before "instagram"
+        # Modify the link for downloading
         modified_link = instagram_link.replace("://www.instagram.com", "://www.ddinstagram.com")
 
-        # Download the Instagram post
         try:
+            # Use aiohttp for asynchronous HTTP requests
             async with aiohttp.ClientSession() as session:
                 async with session.get(modified_link) as response:
                     # Check if the response is successful
