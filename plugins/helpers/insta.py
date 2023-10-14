@@ -1,39 +1,32 @@
 from pyrogram import Client, filters
+from pyrogram.types import Message
 import requests
-import json
+from io import BytesIO
+from PIL import Image
 
 @Client.on_message(filters.command("download"))
 def download_instagram_post(client, message):
-    try:
-        # Extracting the original link from the message
-        original_link = message.text.split()[1]
+    # Get the Instagram post link from the command arguments
+    if len(message.command) > 1:
+        instagram_link = message.command[1]
 
-        # Modifying the link for extraction
-        modified_link = original_link.replace("www.instagram.com", "www.ddinstagram.com")
+        # Add "dd" before "instagram"
+        modified_link = instagram_link.replace("://www.instagram.com", "://www.ddinstagram.com")
 
-        # Fetch HTML content to extract image URL
-        response = requests.get(modified_link)
-        response.raise_for_status()  # Check for request errors
+        # Download the Instagram post
+        try:
+            response = requests.get(modified_link)
 
-        # Check if the response content is JSON
-        if response.headers.get('content-type') == 'application/json':
-            json_data = response.json()
-            image_url = json_data["graphql"]["shortcode_media"]["display_url"]
+            # Process the response and save as an image
+            image = Image.open(BytesIO(response.content))
+            image_file_name = "downloaded_post.jpg"
+            image.save(image_file_name, "JPEG")
 
-            # Download the image
-            image_response = requests.get(image_url)
-            image_response.raise_for_status()  # Check for request errors
+            # Send the downloaded image as a document
+            message.reply_document(document=image_file_name, caption="Post downloaded successfully!")
+        except Exception as e:
+            message.reply_text(f"Error: {str(e)}")
+    else:
+        message.reply_text("Please provide an Instagram post link with the command.")
 
-            # Save the image
-            with open("downloaded_image.jpg", "wb") as image_file:
-                image_file.write(image_response.content)
 
-            # Send the image back to the user
-            message.reply_photo("downloaded_image.jpg")
-        else:
-            # Handle the case where the response is not JSON
-            message.reply_text("Invalid response format. Unable to extract image URL.")
-
-    except Exception as e:
-        # Handle any exceptions and inform the user
-        message.reply_text(f"An error occurred: {str(e)}")
