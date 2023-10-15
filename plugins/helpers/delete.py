@@ -20,7 +20,10 @@ async def delete_last_messages(client, message):
     count_deletions = 0
 
     if message.reply_to_message:
-        for a_s_message_id in range(message.reply_to_message.message_id, message.message_id):
+        replied_message_id = message.reply_to_message.message_id
+        start_message_id = max(replied_message_id - 100, 2)
+
+        for a_s_message_id in range(start_message_id, replied_message_id):
             message_ids.append(a_s_message_id)
             if len(message_ids) == 100:
                 await client.delete_messages(
@@ -31,7 +34,7 @@ async def delete_last_messages(client, message):
                 count_deletions += len(message_ids)
                 message_ids = []
 
-        if len(message_ids) > 1:
+        if len(message_ids) > 0:
             await client.delete_messages(
                 chat_id=message.chat.id,
                 message_ids=message_ids,
@@ -42,4 +45,3 @@ async def delete_last_messages(client, message):
     await status_message.edit_text(f"Deleted {count_deletions} messages")
     await asyncio.sleep(5)
     await status_message.delete()
-
