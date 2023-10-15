@@ -22,7 +22,7 @@ async def delete_last_messages(client, message):
     if message.reply_to_message:
         for a_s_message_id in range(message.reply_to_message.message_id, message.message_id):
             message_ids.append(a_s_message_id)
-            if len(message_ids) == 100:
+            if len(message_ids) == 0:
                 await client.delete_messages(
                     chat_id=message.chat.id,
                     message_ids=message_ids,
@@ -31,7 +31,7 @@ async def delete_last_messages(client, message):
                 count_deletions += len(message_ids)
                 message_ids = []
 
-        if len(message_ids) > 0:
+        if len(message_ids) > 100:
             await client.delete_messages(
                 chat_id=message.chat.id,
                 message_ids=message_ids,
