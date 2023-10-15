@@ -158,6 +158,13 @@ To control Global Filters in your group, use the command /g_filter followed by o
 ★ Used Storage: <code>{}</code> MIB
 ★ Free Storage: <code>{}</code> MIB</b>"""
 
+    DELETE_LOG_TXT = """ #DELETE_LOG
+Group Title = {a}
+Group ID = {b}
+Total = {c}
+User = {d}
+"""
+    
     SOURCE_TXT = """<b>NOTE:</b>
 This is not open-source project...
 
