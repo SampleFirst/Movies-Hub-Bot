@@ -1,5 +1,4 @@
 from pyrogram import Client, filters
-from pyrogram.types import Message
 
 # Define the command handler
 @Client.on_message(filters.command("deletelast"))
@@ -9,13 +8,13 @@ async def delete_last_messages(client, message):
         chat_id = message.chat.id
         messages = []
 
-        async for msg in client.iter_messages(chat_id, limit=100):
-            messages.append(msg)
+        async for message in client.iter_messages(chat_id, limit=100):
+            messages.append(message)
 
         # Check if there are messages to delete
         if messages:
             # Extract message IDs
-            message_ids = [msg.message_id for msg in messages]
+            message_ids = [message.message_id for message in messages]
 
             # Delete the last 100 messages
             await client.delete_messages(chat_id, message_ids)
