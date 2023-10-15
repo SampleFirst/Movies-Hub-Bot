@@ -1,4 +1,5 @@
 from pyrogram import Client, filters
+from pyrogram.types import Message
 
 # Define the command handler
 @Client.on_message(filters.command("deletelast"))
