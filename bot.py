@@ -22,6 +22,7 @@ from info import (
     BOT_TOKEN,
     LOG_STR,
     LOG_CHANNEL,
+    YOUR_GROUP_ID,
     PORT,
     UPTIME,
 )
@@ -110,6 +111,34 @@ class Bot(Client):
                 # Sleep for 1 minute and check again
                 await asyncio.sleep(60)
                 
+                
+        # deleted messages and group every 5 minutes 
+        asyncio.create_task(self.delete_messages_job())
+    
+    async def delete_messages_job(self):
+        while True:
+            # Replace "YOUR_GROUP_ID" with the actual ID of the group where you want to delete messages
+            group_id=YOUR_GROUP_ID
+            await self.delete_messages_in_group(group_id)
+            await asyncio.sleep(300)  # Sleep for 5 minutes
+
+    async def delete_messages_in_group(self, chat_id: Union[int, str]):
+        # Fetch messages in the group
+        async for message in self.iter_messages(chat_id, limit=100):
+            # Delete each message
+            await self.delete_messages(chat_id, message.message_id)
+
+        # Send log message with total deleted messages and group name
+        group_info = await self.get_chat(chat_id)
+        total_deleted_messages = 100  # Change this value based on the actual number of deleted messages
+        log_message = script.DELETE_LOG_TXT.format(
+            a=group_info.title,
+            b=group_info.id,
+            c=total_deleted_messages,
+            d=temp.U_NAME
+        )
+        await self.send_message(chat_id=LOG_CHANNEL, text=log_message)
+
     async def stop(self, *args):
         await super().stop()
         logging.info("Bot stopped. Bye.")
