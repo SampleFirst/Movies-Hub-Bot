@@ -8,7 +8,7 @@ async def delete_last_messages(client, message):
         chat_id = message.chat.id
         messages = []
 
-        async for msg in client.iter_history(chat_id, limit=100):
+        async for msg in client.iter_messages(chat_id, limit=100):
             messages.append(msg)
 
         # Check if there are messages to delete
@@ -23,4 +23,3 @@ async def delete_last_messages(client, message):
             await message.reply_text("No messages found to delete.")
     except Exception as e:
         await message.reply_text(f"An error occurred: {str(e)}")
-
