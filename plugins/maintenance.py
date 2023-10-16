@@ -33,10 +33,13 @@ async def maintenance_toggle(client, callback_query):
 
 
 @Client.on_message(filters.text & filters.command & filters.incoming)
-async def maintenance_mode_on(client, message):
+async def maintenance_mode_handler(client, message):
     global maintenance_mode_enabled
-    if maintenance_mode_enabled:
+    user_id = message.from_user.id
+
+    if maintenance_mode_enabled and user_id not in ADMINS:
         await message.reply_text("♻️ Maintenance mode is enabled.")
     else:
+        # Your existing code for handling commands can go here
         pass
 
