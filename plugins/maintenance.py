@@ -13,7 +13,7 @@ async def maintenance_mode(client, message):
         ]]
     )
 
-    await message.reply_text("Maintenance mode options:", reply_markup=keyboard)
+    await message.reply_text("Maintenance mode options:", reply_markup=keyboard, quote=True)
 
 
 @Client.on_callback_query(filters.regex(r'^maintenance_toggle') & filters.user(ADMINS))
@@ -38,8 +38,7 @@ async def maintenance_mode_handler(client, message):
     user_id = message.from_user.id
 
     if maintenance_mode_enabled and user_id not in ADMINS:
-        await message.reply_text("♻️ Maintenance mode is enabled.")
+        await message.reply_text("♻️ Maintenance mode is enabled.", quote=True)
     else:
         # Your existing code for handling commands can go here
         pass
-
