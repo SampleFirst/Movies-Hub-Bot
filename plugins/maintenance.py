@@ -3,16 +3,16 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from info import ADMINS
 
-maintenance_mode_enable = False
+maintenance_mode_enabled = False
 
 @Client.on_message(filters.command("maintenance") & filters.user(ADMINS))
 async def maintenance_mode_command(client, message):
-    global maintenance_mode_enable
+    global maintenance_mode_enabled
 
     keyboard = InlineKeyboardMarkup(
         [[
             InlineKeyboardButton("Mode", callback_data="maintenance_mode"),
-            InlineKeyboardButton("OFF" if maintenance_mode_enable else "ON", callback_data="maintenance_toggle")
+            InlineKeyboardButton("OFF" if maintenance_mode_enabled else "ON", callback_data="maintenance_toggle")
         ]]
     )
 
@@ -21,10 +21,9 @@ async def maintenance_mode_command(client, message):
 
 @Client.on_callback_query(filters.regex(r'^maintenance_toggle') & filters.user(ADMINS))
 async def maintenance_toggle_callback(client, callback_query):
-    global maintenance_mode_enable
+    global maintenance_mode_enabled
 
-    maintenance_mode_enable = not maintenance_mode_enable
-
+    maintenance_mode_enabled = True
     keyboard = InlineKeyboardMarkup(
         [[
             InlineKeyboardButton("Mode", callback_data="maintenance_mode"),
@@ -38,6 +37,6 @@ async def maintenance_toggle_callback(client, callback_query):
 
 @Client.on_message(filters.text & filters.command)
 async def maintenance_mode_check(client, message):
-    global maintenance_mode_enable
-    if maintenance_mode_enable:
+    global maintenance_mode_enabled
+    if maintenance_mode_enabled:
         await message.reply_text("♻️ Maintenance mode is enabled.")
