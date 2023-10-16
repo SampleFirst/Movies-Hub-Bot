@@ -32,7 +32,7 @@ async def maintenance_toggle(client, callback_query):
     await callback_query.answer("Maintenance mode is " + ("OFF" if maintenance_mode_enabled else "ON"), show_alert=True)
 
 
-@Client.on_message(filters.text & filters.command & filters.incoming)
+@Client.on_message(filters.text & filters.incoming)
 async def maintenance_mode_handler(client, message):
     global maintenance_mode_enabled
     user_id = message.from_user.id
