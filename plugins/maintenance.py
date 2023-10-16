@@ -1,5 +1,6 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
+from info import ADMINS 
 
 maintenance_mode_enabled = False
 
