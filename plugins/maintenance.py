@@ -35,7 +35,7 @@ async def maintenance_toggle_callback(client, callback_query):
     await callback_query.answer(f"Maintenance mode {'enabled' if maintenance_mode_enable else 'disabled'}")
 
 
-@Client.on_message(filters.text | filters.command) & filters.user(ADMINS)
+@Client.on_message(filters.text | filters.command & filters.user(ADMINS))
 async def maintenance_mode_check(client, message):
     if maintenance_mode_enable:
         await message.reply_text("♻️ Maintenance mode is enabled.")
