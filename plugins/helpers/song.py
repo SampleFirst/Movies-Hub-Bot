@@ -156,3 +156,33 @@ async def vsong(client, message: Message):
     for files in (sedlyf, file_stark):
         if files and os.path.exists(files):
             os.remove(files)
+
+
+from pyrogram import Client, filters
+from pyrogram.errors import MessageNotModified
+from youtube_dl import YoutubeDL
+
+
+@Client.on_message(filters.command("insta"))
+async def insta(client, message):
+    # Get the Instagram reel link from the message
+    link = message.text.split()[1]
+    # Check if the link is a valid Instagram reel link
+    if not link.startswith("https://www.instagram.com/reel/"):
+        await message.reply("Invalid Instagram reel link.")
+        return
+    # Extract the reel ID from the link
+    reel_id = link.split("/")[-1]
+    # Download the reel using youtube_dl
+    ydl_opts = {
+        "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]",
+        "outtmpl": f"{reel_id}.mp4",
+    }
+    with YoutubeDL(ydl_opts) as ydl:
+        ydl.download([link])
+    # Send the downloaded reel to the user
+    try:
+        await message.reply_document(f"{reel_id}.mp4", caption="Here is the reel you requested.")
+    except MessageNotModified:
+        await message.reply("Failed to send the reel. Please try again.")
+
