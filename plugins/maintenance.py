@@ -11,7 +11,7 @@ async def maintenance_mode_command(client, message):
     keyboard = InlineKeyboardMarkup(
         [[
             InlineKeyboardButton("Mode", callback_data="maintenance_mode"),
-            InlineKeyboardButton("OFF" if maintenance_mode_enable else "ON", callback_data="maintenance_toggle")
+            InlineKeyboardButton("False" if maintenance_mode_enable else "True", callback_data="maintenance_toggle")
         ]]
     )
 
@@ -27,15 +27,15 @@ async def maintenance_toggle_callback(client, callback_query):
     keyboard = InlineKeyboardMarkup(
         [[
             InlineKeyboardButton("Mode", callback_data="maintenance_mode"),
-            InlineKeyboardButton("OFF" if maintenance_mode_enable else "ON", callback_data="maintenance_toggle")
+            InlineKeyboardButton("False" if maintenance_mode_enable else "True", callback_data="maintenance_toggle")
         ]]
     )
 
     await callback_query.edit_message_reply_markup(reply_markup=keyboard)
     await callback_query.answer(f"Maintenance mode {'enabled' if maintenance_mode_enable else 'disabled'}")
 
-
 @Client.on_message(filters.text & filters.command & filters.user(ADMINS))
 async def maintenance_mode_check(client, message):
     if maintenance_mode_enable:
         await message.reply_text("♻️ Maintenance mode is enabled.")
+        
