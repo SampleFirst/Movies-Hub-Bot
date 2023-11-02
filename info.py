@@ -100,6 +100,7 @@ DELETE_CHANNELS = [int(dch) if id_pattern.search(dch) else dch for dch in enviro
 MAIN_CHANNEL = environ.get('MAIN_CHANNEL', "https://t.me/+BKZsRSZO-wQ3ZDJl")
 FILE_FORWARD = environ.get('FILE_FORWARD', "https://t.me/+IASDysIDZG5kMDhl")
 FILE_CHANNEL = int(environ.get('FILE_CHANNEL', 0))
+FILE_DB_CHANNEL = int(environ.get('FILE_DB_CHANNEL', 0))
 LOG_CHANNEL = int(environ.get('LOG_CHANNEL', 0))
 YOUR_GROUP_ID = int(environ.get('YOUR_GROUP_ID', '-1001912697656'))
 SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'PremiumMHUpdate')
