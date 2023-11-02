@@ -5,6 +5,7 @@ import logging
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from database.ia_filterdb import get_search_results
+from info import ADMINS, PROTECT_CONTENT
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
@@ -52,7 +53,7 @@ async def show_all_files_command(client, message):
         await abc.delete()
 
 # Add a command handler for /showallfiles command
-@Client.on_message(filters.command(["showallfiles"]) & filters.private & filters.user(AUTH_USERS))
+@Client.on_message(filters.command("showallfiles") & filters.user(ADMINS))
 async def show_all_files(client, message):
     await show_all_files_command(client, message)
 
