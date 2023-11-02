@@ -1,61 +1,58 @@
-from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from database.ia_filterdb import get_search_results, Media, get_file_details
-from info import ADMINS 
+import asyncio
+import re
+import math
+import logging
+import pyrogram
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from database.ia_filterdb import get_search_results
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
 
-# Define a command handler function
-@Client.on_message(filters.command("show_files") & filters.user(ADMINS))
-async def show_files_command(client, message):
-    # Extract chat ID
+# Function to handle the command and show results in buttons for all files
+async def show_all_files_command(client, message):
     chat_id = message.chat.id
+    max_results = 10  # Adjust this value as needed
+    files, offset, total_results = await get_search_results(chat_id, '', max_results=max_results, offset=0, filter=True)
 
-    # Get the user's query from the message
-    query = message.text.split(maxsplit=1)
-    if len(query) > 1:
-        query = query[1].strip()
+    if not files:
+        await message.reply("No files found.")
+        return
+
+    pre = 'pmfilep' if PROTECT_CONTENT else 'pmfile'
+
+    btn = [
+        [
+            InlineKeyboardButton(text=f"[{file.file_name}]", callback_data=f'{pre}#{file.file_id}')
+        ] 
+        for file in files
+    ]
+
+    if offset != "":
+        key = f"{message.message_id}"
+        temp.PM_BUTTONS[key] = ''
+        req = message.from_user.id if message.from_user else 0
+        btn.append(
+            [
+                InlineKeyboardButton(text=f"📄 Page 1/{math.ceil(total_results / max_results)}", callback_data="pages"),
+                InlineKeyboardButton(text="Next ➡️", callback_data=f"pmnext_{req}_{key}_{offset}")
+            ]
+        )
     else:
-        query = ""
+        btn.append(
+            [
+                InlineKeyboardButton(text=f"📄 Page 1/1", callback_data="pages")
+            ]
+        )
 
-    # Define a function to generate inline keyboard buttons for pagination
-    def generate_pagination_buttons(offset, total_results):
-        buttons = []
+        caption = f"Here are all available files:"
+        abc = await message.reply(caption, reply_markup=InlineKeyboardMarkup(btn))
 
-        if offset > 0:
-            buttons.append(
-                InlineKeyboardButton(
-                    "PREVIOUS",
-                    callback_data=f"prev_{offset - 10}_{total_results}",
-                )
-            )
+        await asyncio.sleep(IMDB_DELET_TIME)
+        await abc.delete()
 
-        if offset + 10 < total_results:
-            buttons.append(
-                InlineKeyboardButton(
-                    "NEXT",
-                    callback_data=f"next_{offset + 10}_{total_results}",
-                )
-            )
-
-        return buttons
-
-    # Get search results
-    files, next_offset, total_results = await get_search_results(chat_id, query, max_results=10)
-
-    # Create a list of file names for displaying in the message
-    file_names = [file.file_name for file in files]
-
-    # Create an inline keyboard for pagination
-    pagination_buttons = generate_pagination_buttons(0, total_results)
-
-    # Create a message with the list of files and pagination buttons
-    if file_names:
-        message_text = "\n".join(file_names)
-        reply_markup = InlineKeyboardMarkup([pagination_buttons])
-    else:
-        message_text = "No files found."
-        reply_markup = None
-
-    # Send the message with the inline keyboard
-    await message.reply_text(message_text, reply_markup=reply_markup)
+# Add a command handler for /showallfiles command
+@Client.on_message(filters.command(["showallfiles"]) & filters.private & filters.user(AUTH_USERS))
+async def show_all_files(client, message):
+    await show_all_files_command(client, message)
 
