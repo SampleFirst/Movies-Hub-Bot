@@ -1,6 +1,8 @@
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database.ia_filterdb import get_search_results, Media, get_file_details
+from info import ADMINS 
+
 
 # Define a command handler function
 @Client.on_message(filters.command("show_files") & filters.user(ADMINS))
