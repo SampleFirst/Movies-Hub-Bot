@@ -1,16 +1,14 @@
 from pyrogram import Client, filters
-from pyrogram.types import InputMediaDocument
-from database.ia_filterdb import get_search_results
+from database.ia_filterdb import get_search_results, Media, get_file_details
 from info import ADMINS, FILE_DB_CHANNEL
 import asyncio
 
 # Define a command handler
 @Client.on_message(filters.command("sendallmedia") & filters.user(ADMINS))
 async def send_all_media(client, message):
-
     # Query the database to get all media files (Assuming the get_search_results function is defined elsewhere)
     files, _, _ = await get_search_results("", max_results=None)
-
+    
     if not files:
         await message.reply("No media files found in the database.")
         return
@@ -27,7 +25,7 @@ async def send_all_media(client, message):
             caption = media.caption if media.caption else ""
             await client.send_media(
                 chat_id=FILE_DB_CHANNEL,
-                media=InputMediaDocument(file_id),
+                media=file_id,
                 caption=caption
             )
 
