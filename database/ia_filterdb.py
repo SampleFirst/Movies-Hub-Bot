@@ -110,6 +110,25 @@ async def get_search_results(query, file_type=None, max_results=(MAX_BTN), offse
 
     return files, next_offset, total_results
 
+async def get_all_files(max_results=MAX_BTN, offset=0):
+    """Retrieve all files with pagination."""
+    
+    total_results = await Media.count_documents({})
+    next_offset = offset + max_results
+
+    if next_offset > total_results:
+        next_offset = ''
+
+    cursor = Media.find({})
+    # Sort by recent
+    cursor.sort('$natural', -1)
+    # Slice files according to offset and max results
+    cursor.skip(offset).limit(max_results)
+    # Get a list of files
+    files = await cursor.to_list(length=max_results)
+
+    return files, next_offset, total_results
+
 
 async def get_bad_files(query, file_type=None, max_results=100, offset=0, filter=False):
     """For given query return (results, next_offset)"""
