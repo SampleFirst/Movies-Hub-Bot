@@ -1,49 +1,59 @@
 from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database.ia_filterdb import get_search_results, Media, get_file_details
-from info import ADMINS, FILE_DB_CHANNEL
-import asyncio
 
-# Define a command handler
-@Client.on_message(filters.command("sendallmedia") & filters.user(ADMINS))
-async def send_all_media(client, message):
-    # Query the database to get all media files (Assuming the get_search_results function is defined elsewhere)
-    files, _, _ = await get_search_results("", max_results=None)
-    
-    if not files:
-        await message.reply("No media files found in the database.")
-        return
+# Define a command handler function
+@Client.on_message(filters.command("show_files") & filters.user(ADMINS))
+async def show_files_command(client, message):
+    # Extract chat ID
+    chat_id = message.chat.id
 
-    batch_size = 100  # Number of media files to send in each batch
-    total_files = len(files)
+    # Get the user's query from the message
+    query = message.text.split(maxsplit=1)
+    if len(query) > 1:
+        query = query[1].strip()
+    else:
+        query = ""
 
-    for i in range(0, total_files, batch_size):
-        batch = files[i:i + batch_size]
-        batch_info = []
+    # Define a function to generate inline keyboard buttons for pagination
+    def generate_pagination_buttons(offset, total_results):
+        buttons = []
 
-        for media in batch:
-            file_id = media.file_id
-            caption = media.caption if media.caption else ""
-            await client.send_media(
-                chat_id=FILE_DB_CHANNEL,
-                media=file_id,
-                caption=caption
+        if offset > 0:
+            buttons.append(
+                InlineKeyboardButton(
+                    "PREVIOUS",
+                    callback_data=f"prev_{offset - 10}_{total_results}",
+                )
             )
 
-            # Collect information for the batch
-            file_name = media.file_name
-            file_size = media.file_size
-            batch_info.append(f"Name: {file_name}, Size: {file_size} bytes")
+        if offset + 10 < total_results:
+            buttons.append(
+                InlineKeyboardButton(
+                    "NEXT",
+                    callback_data=f"next_{offset + 10}_{total_results}",
+                )
+            )
 
-        # Create a .txt file for the batch
-        batch_info_txt = "\n".join(batch_info)
-        file_name = f"batch_{i // batch_size + 1}_info.txt"
-        with open(file_name, "w") as file:
-            file.write(batch_info_txt)
+        return buttons
 
-        # Send the .txt file to the admins
-        for admin in ADMINS:
-            await client.send_document(admin, document=file_name)
+    # Get search results
+    files, next_offset, total_results = await get_search_results(chat_id, query, max_results=10)
 
-        await asyncio.sleep(2)  # Wait for 2 seconds before sending the next batch
+    # Create a list of file names for displaying in the message
+    file_names = [file.file_name for file in files]
 
-    await message.reply("All media files have been sent to the 'FILE_DB_CHANNEL.'")
+    # Create an inline keyboard for pagination
+    pagination_buttons = generate_pagination_buttons(0, total_results)
+
+    # Create a message with the list of files and pagination buttons
+    if file_names:
+        message_text = "\n".join(file_names)
+        reply_markup = InlineKeyboardMarkup([pagination_buttons])
+    else:
+        message_text = "No files found."
+        reply_markup = None
+
+    # Send the message with the inline keyboard
+    await message.reply_text(message_text, reply_markup=reply_markup)
+
