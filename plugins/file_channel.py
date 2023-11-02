@@ -1,6 +1,5 @@
 from pyrogram import Client, filters
 from pyrogram.types import InputMediaDocument
-from database.ia_filterdb import save_file
 from info import ADMINS, FILE_DB_CHANNEL
 import asyncio
 
@@ -10,15 +9,15 @@ async def send_all_media(client, message):
     # Define your 'FILE_DB_CHANNEL' ID
     file_db_channel_id = FILE_DB_CHANNEL
 
-    # Query the database to get all media files
-    files, _, _ = await get_search_results("", max_results=None)  # Assuming this function gets all media files
+    # Query the database to get all media files (Assuming the get_search_results function is defined elsewhere)
+    files, _, _ = await get_search_results("", max_results=None)
 
     if not files:
         await message.reply("No media files found in the database.")
         return
 
     batch_size = 100  # Number of media files to send in each batch
-    total_files = len(files
+    total_files = len(files)
 
     for i in range(0, total_files, batch_size):
         batch = files[i:i + batch_size]
@@ -28,7 +27,7 @@ async def send_all_media(client, message):
             file_id = media.file_id
             caption = media.caption if media.caption else ""
             await client.send_media(
-                file_db_channel_id,
+                chat_id=file_db_channel_id,
                 media=InputMediaDocument(file_id),
                 caption=caption
             )
@@ -50,4 +49,4 @@ async def send_all_media(client, message):
 
         await asyncio.sleep(2)  # Wait for 2 seconds before sending the next batch
 
-    await message.reply("All media files have been sent to the 'FILE_CHANNEL.'")
+    await message.reply("All media files have been sent to the 'FILE_DB_CHANNEL.'")
