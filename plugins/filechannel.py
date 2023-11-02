@@ -2,7 +2,7 @@ import asyncio
 import re
 import math
 import logging
-import pyrogram
+from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from database.ia_filterdb import get_search_results
 
