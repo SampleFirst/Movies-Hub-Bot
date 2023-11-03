@@ -17,8 +17,11 @@ async def send_all_media(client, message):
             for file in files
         ]
 
+        btn.insert([
+            InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ Tᴏ PM !", callback_data=f"get_all")
+        ])
         if offset:
-            page_number = int(offset) // max_results + 1
+            page_number = int(offset) // max_results
             btn.append([
                 InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages"),
                 InlineKeyboardButton(text="Next", callback_data=f"pmnext_{offset}")
@@ -44,14 +47,16 @@ async def next_page_button(client, query: CallbackQuery):
             [InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')]
             for file in files
         ]
-
+        btn.insert([
+            InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ Tᴏ PM !", callback_data=f"get_all")
+        ])
         if new_offset:
             page_number = int(new_offset) // max_results + 1
             prev_offset = int(offset) - max_results  # Calculate the previous page offset
             if prev_offset >= 0:
                 btn.append([
-                    InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages"),
                     InlineKeyboardButton(text="Previous", callback_data=f"pmprev_{prev_offset}"),
+                    InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages"),
                     InlineKeyboardButton(text="Next", callback_data=f"pmnext_{new_offset}")
                 ])
             else:
@@ -60,7 +65,7 @@ async def next_page_button(client, query: CallbackQuery):
                     InlineKeyboardButton(text="Next", callback_data=f"pmnext_{new_offset}")
                 ])
         else:
-            btn.append([InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages")])
+            btn.append([InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages")]
 
         await query.edit_message_text(
             text=query.message.text.markdown,
@@ -81,7 +86,9 @@ async def prev_page_button(client, query: CallbackQuery):
             [InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')]
             for file in files
         ]
-
+        btn.insert([
+            InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ Tᴏ PM !", callback_data=f"get_all")
+        ])
         if new_offset:
             page_number = int(new_offset) // max_results + 1
             prev_offset = int(offset) - max_results
@@ -89,17 +96,18 @@ async def prev_page_button(client, query: CallbackQuery):
 
             if prev_offset >= 0:
                 btn.append([
-                    InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages"),
                     InlineKeyboardButton(text="Previous", callback_data=f"pmprev_{prev_offset}"),
+                    InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages"),
                 ])
             if next_offset < total_results:
                 btn.append([
+                    InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages"),
                     InlineKeyboardButton(text="Next", callback_data=f"pmnext_{next_offset}")
                 ])
-            await query.edit_message_text(
-                text=query.message.text.markdown,
-                reply_markup=InlineKeyboardMarkup(btn)
-            )
+                await query.edit_message_text(
+                    text=query.message.text.markdown,
+                    reply_markup=InlineKeyboardMarkup(btn)
+                )
         else:
             btn.append([InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages")])
 
