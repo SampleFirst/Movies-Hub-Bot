@@ -30,7 +30,8 @@ async def send_all_media(client, message):
             for file in files
         ]
 
-        btn.insert([
+        btn.insert(49, 
+         [
             InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data=f"get_all")
         ])
         if offset:
@@ -60,7 +61,8 @@ async def next_page_button(client, query: CallbackQuery):
             [InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')]
             for file in files
         ]
-        btn.insert([
+        btn.insert(49, 
+         [
             InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data=f"get_all")
         ])
         if new_offset:
@@ -99,7 +101,8 @@ async def prev_page_button(client, query: CallbackQuery):
             [InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')]
             for file in files
         ]
-        btn.insert([
+        btn.insert(49, 
+         [
             InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data=f"get_all")
         ])
         if new_offset:
