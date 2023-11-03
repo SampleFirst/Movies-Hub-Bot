@@ -38,38 +38,40 @@ async def show_files_command(client, message):
 
 @Client.on_callback_query(filters.regex(r"^(prev|next)_\d+"))
 async def paginate_files(client, callback_query):
-    data = callback_query.data.split("_")
-    action, offset = data[0], int(data[1])
-
-    max_results = 10
-
-    if action == "prev" and offset > 0:
-        page = offset - 1
-    elif action == "next":
-        page = offset
-
-    files, next_offset, total_results = await get_all_files(max_results, page * max_results)
-
-    if not files:
-        await callback_query.answer("No more files.")
-        return
-
-    btn = [
-        [
-            InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')
+    try:
+        data = callback_query.data.split("_")
+        action, offset = data[0], int(data[1])
+    
+        max_results = 10
+    
+        if action == "prev" and offset > 0:
+            page = offset - 1
+        elif action == "next":
+            page = offset
+    
+        files, next_offset, total_results = await get_all_files(max_results, page * max_results)
+    
+        if not files:
+            await callback_query.answer("No more files.")
+            return
+    
+        btn = [
+            [
+                InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')
+            ]
+            for file in files
         ]
-        for file in files
-    ]
-
-    if next_offset:
-        btn.append(InlineKeyboardButton("Next", callback_data=f"next_{next_offset}"))
-    if page > 0:
-        btn.append(InlineKeyboardButton("Previous", callback_data=f"prev_{page - 1}"))
-
-    await callback_query.edit_message_reply_markup(
-        reply_markup=InlineKeyboardMarkup(btn)
-    )
-    await callback_query.answer()
+    
+        if next_offset:
+            btn.append(InlineKeyboardButton("Next", callback_data=f"next_{next_offset}"))
+        if page > 0:
+            btn.append(InlineKeyboardButton("Previous", callback_data=f"prev_{page - 1}"))
+    
+        await callback_query.edit_message_reply_markup(
+            reply_markup=InlineKeyboardMarkup(btn)
+        )
+        await callback_query.answer()
     except Exception as e:
         # Handle any exceptions here
         print(f"An error occurred: {str(e)}")
+        
