@@ -1,82 +1,74 @@
-import math
-from pyrogram.errors import MessageNotModified
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database.ia_filterdb import Media, get_all_files
 from info import ADMINS
 
-@Client.on_callback_query(filters.regex(r"^pmnext"))
-async def pm_next_page(bot, query):
-    ident, offset = query.data.split("_")
+@Client.on_message(filters.command("show_files") & filter.users(ADMINS))
+async def show_files_command(client, message):
     try:
-        offset = int(offset)
-    except:
-        offset = 0
+        page = 0  # Initialize the page offset
+        max_results = 10  # Number of files to show per page
 
-    files, n_offset, total_results = await get_all_files()
-    try:
-        n_offset = int(n_offset)
-    except:
-        n_offset = 0
+        # Get the list of files for the current page
+        files, next_offset, total_results = await get_all_files(max_results, page * max_results)
+
+        if not files:
+            await message.reply("No files found.")
+            return
+
+        # Create a function to send files with pagination
+        async def send_files():
+            text = "List of Files:"
+            buttons = []
+
+            for file in files:
+                text += f"\n- {file.file_name}"
+
+            if next_offset:
+                buttons.append(InlineKeyboardButton("Next", callback_data=f"next_{next_offset}"))
+            if page > 0:
+                buttons.append(InlineKeyboardButton("Previous", callback_data=f"prev_{page - 1}"))
+
+            markup = InlineKeyboardMarkup([buttons])
+            await message.reply(text, reply_markup=markup)
+
+        await send_files()
+
+    except Exception as e:
+        print(e)
+        await message.reply("An error occurred while fetching files.")
+
+@Client.on_callback_query(filters.regex(r"^(prev|next)_\d+"))
+async def paginate_files(client, callback_query):
+    data = callback_query.data.split("_")
+    action, offset = data[0], int(data[1])
+
+    max_results = 10
+
+    if action == "prev" and offset > 0:
+        page = offset - 1
+    elif action == "next":
+        page = offset
+
+    files, next_offset, total_results = await get_all_files(max_results, page * max_results)
 
     if not files:
+        await callback_query.answer("No more files.")
         return
 
-    btn = [
-        [InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')]
-        for file in files
-    ]
+    async def send_files():
+        text = "List of Files:"
+        buttons = []
 
-    if 0 < offset <= 10:
-        off_set = 0
-    elif offset == 0:
-        off_set = None
-    else:
-        off_set = offset - 10
-    if n_offset == 0:
-        btn.append([
-            InlineKeyboardButton("⬅️ BACK", callback_data=f"pmnext_{off_set}"),
-            InlineKeyboardButton(f"PAGE 📃 {math.ceil(int(offset) / 10) + 1} / {math.ceil(total_results / 10)}", callback_data="pages")
-        ])
-    elif off_set is None:
-        btn.append([
-            InlineKeyboardButton(f"PAGE 📃 {math.ceil(int(offset) / 10) + 1} / {math.ceil(total_results / 10)}", callback_data="pages"),
-            InlineKeyboardButton("NEXT ➡️", callback_data=f"pmnext_{n_offset}")
-        ])
-    else:
-        btn.append([
-            InlineKeyboardButton("⬅️ BACK", callback_data=f"pmnext_{off_set}"),
-            InlineKeyboardButton(f"PAGE 📃 {math.ceil(int(offset) / 10) + 1} / {math.ceil(total_results / 10)}", callback_data="pages"),
-            InlineKeyboardButton("NEXT ➡️", callback_data=f"pmnext_{n_offset}")
-        ])
-    try:
-        await query.edit_message_reply_markup(reply_markup=InlineKeyboardMarkup(btn))
-    except MessageNotModified:
-        pass
-    await query.answer()
+        for file in files:
+            text += f"\n- {file.file_name}"
 
-@Client.on_message(filters.command("getallmedia") & filters.user(ADMINS))
-async def send_all_media(client, message):
-    try:
-        files, offset, total_results = await get_all_files()
+        if next_offset:
+            buttons.append(InlineKeyboardButton("Next", callback_data=f"next_{next_offset}"))
+        if page > 0:
+            buttons.append(InlineKeyboardButton("Previous", callback_data=f"prev_{page - 1}"))
 
-        btn = [
-            [InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')]
-            for file in files
-        ]
+        markup = InlineKeyboardMarkup([buttons])
+        await callback_query.edit_message_text(text, reply_markup=markup)
 
-        if offset:
-            btn.append([
-                InlineKeyboardButton(text=f"📄 Page 1/{math.ceil(total_results / 5)}", callback_data="pages"),
-                InlineKeyboardButton(text="Next", callback_data=f"pmnext_{offset}")
-            ])
-        else:
-            btn.append([InlineKeyboardButton(text="📄 Page 1/1", callback_data="pages")])
-
-        cap = f"Here are the {total_results} media files found in the database."
-
-        abc = await message.reply_text(cap, quote=True, reply_markup=InlineKeyboardMarkup(btn))
-    except Exception as e:
-        # Handle any exceptions here
-        print(f"An error occurred: {str(e)}")
-
+    await send_files()
