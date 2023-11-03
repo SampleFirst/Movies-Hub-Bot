@@ -16,23 +16,21 @@ async def show_files_command(client, message):
             await message.reply("No files found.")
             return
 
-        # Create a function to send files with pagination
-        async def send_files():
-            text = "List of Files:"
-            buttons = []
+        btn = [
+            [
+                InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')
+            ]
+            for file in files
+        ]
 
-            for file in files:
-                text += f"\n- {file.file_name}"
+        if next_offset:
+            btn.append(InlineKeyboardButton("Next", callback_data=f"next_{next_offset}")
+        if page > 0:
+            btn.append(InlineKeyboardButton("Previous", callback_data=f"prev_{page - 1}"))
 
-            if next_offset:
-                buttons.append(InlineKeyboardButton("Next", callback_data=f"next_{next_offset}"))
-            if page > 0:
-                buttons.append(InlineKeyboardButton("Previous", callback_data=f"prev_{page - 1}"))
+        cap = f"Here are the {total_results} media files found in the database."
 
-            markup = InlineKeyboardMarkup([buttons])
-            await message.reply(text, reply_markup=markup)
-
-        await send_files()
+        abc = await message.reply_text(cap, quote=True, reply_markup=InlineKeyboardMarkup(btn))
 
     except Exception as e:
         print(e)
@@ -56,19 +54,22 @@ async def paginate_files(client, callback_query):
         await callback_query.answer("No more files.")
         return
 
-    async def send_files():
-        text = "List of Files:"
-        buttons = []
+    btn = [
+        [
+            InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')
+        ]
+        for file in files
+    ]
 
-        for file in files:
-            text += f"\n- {file.file_name}"
+    if next_offset:
+        btn.append(InlineKeyboardButton("Next", callback_data=f"next_{next_offset}"))
+    if page > 0:
+        btn.append(InlineKeyboardButton("Previous", callback_data=f"prev_{page - 1}"))
 
-        if next_offset:
-            buttons.append(InlineKeyboardButton("Next", callback_data=f"next_{next_offset}"))
-        if page > 0:
-            buttons.append(InlineKeyboardButton("Previous", callback_data=f"prev_{page - 1}"))
-
-        markup = InlineKeyboardMarkup([buttons])
-        await callback_query.edit_message_text(text, reply_markup=markup)
-
-    await send_files()
+    await callback_query.edit_message_reply_markup(
+        reply_markup=InlineKeyboardMarkup(btn)
+    )
+    await callback_query.answer()
+    except Exception as e:
+        # Handle any exceptions here
+        print(f"An error occurred: {str(e)}")
