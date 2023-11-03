@@ -78,7 +78,7 @@ async def next_page_button(client, query: CallbackQuery):
                     InlineKeyboardButton(text="Next", callback_data=f"pmnext_{new_offset}")
                 ])
         else:
-            btn.append([InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages")]
+            btn.append([InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages")])
 
         await query.edit_message_text(
             text=query.message.text.markdown,
