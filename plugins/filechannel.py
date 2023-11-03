@@ -10,7 +10,7 @@ async def show_files_command(client, message):
         max_results = 10  # Number of files to show per page
 
         # Get the list of files for the current page
-        files, next_offset, total_results = await get_all_files(max_results, page * max_results)
+        files, offset, total_results = await get_all_files()
 
         if not files:
             await message.reply("No files found.")
@@ -49,7 +49,7 @@ async def paginate_files(client, callback_query):
         elif action == "next":
             page = offset
     
-        files, next_offset, total_results = await get_all_files(max_results, page * max_results)
+        files, next_offset, total_results = await get_all_files()
     
         if not files:
             await callback_query.answer("No more files.")
