@@ -7,7 +7,7 @@ from pymongo.errors import DuplicateKeyError
 from umongo import Instance, Document, fields
 from motor.motor_asyncio import AsyncIOMotorClient
 from marshmallow.exceptions import ValidationError
-from info import DATABASE_URI, DATABASE_NAME, COLLECTION_NAME, USE_CAPTION_FILTER, MAX_BTN
+from info import DATABASE_URI, DATABASE_NAME, COLLECTION_NAME, USE_CAPTION_FILTER, MAX_BTN, MAX_BTTN
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -110,7 +110,7 @@ async def get_search_results(query, file_type=None, max_results=(MAX_BTN), offse
 
     return files, next_offset, total_results
 
-async def get_all_files(max_results=MAX_BTN, offset=0):
+async def get_all_files(max_results=MAX_BTTN, offset=0):
     """Retrieve all files with pagination."""
     
     total_results = await Media.count_documents({})
