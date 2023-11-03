@@ -3,7 +3,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database.ia_filterdb import Media, get_all_files
 from info import ADMINS
 
-@Client.on_message(filters.command("show_files") & filter.users(ADMINS))
+@Client.on_message(filters.command("show_files") & filters.user(ADMINS))
 async def show_files_command(client, message):
     try:
         page = 0  # Initialize the page offset
