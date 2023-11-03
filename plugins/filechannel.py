@@ -2,11 +2,24 @@ import math
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from pyrogram import Client, filters
-from database.ia_filterdb import Media, get_all_files
-from info import ADMINS, MAX_BTTN
+from database.ia_filterdb import Media, get_all_files, get_file_details
+from info import ADMINS, MAX_BTTN, FILE_CHANNEL
 
 max_results = MAX_BTTN
 
+def get_size(size):
+    size = int(size)
+    power = 2**10
+    n = 0
+    power_labels = {0: 'B', 1: 'KB', 2: 'MB', 3: 'GB', 4: 'TB'}
+
+    while size > power:
+        size /= power
+        n += 1
+
+    return f"{size:.2f} {power_labels[n]}"
+
+    
 @Client.on_message(filters.command("getallmedia") & filters.user(ADMINS))
 async def send_all_media(client, message):
     try:
@@ -18,7 +31,7 @@ async def send_all_media(client, message):
         ]
 
         btn.insert([
-            InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ Tᴏ PM !", callback_data=f"get_all")
+            InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data=f"get_all")
         ])
         if offset:
             page_number = int(offset) // max_results
@@ -48,7 +61,7 @@ async def next_page_button(client, query: CallbackQuery):
             for file in files
         ]
         btn.insert([
-            InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ Tᴏ PM !", callback_data=f"get_all")
+            InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data=f"get_all")
         ])
         if new_offset:
             page_number = int(new_offset) // max_results + 1
@@ -87,7 +100,7 @@ async def prev_page_button(client, query: CallbackQuery):
             for file in files
         ]
         btn.insert([
-            InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ Tᴏ PM !", callback_data=f"get_all")
+            InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data=f"get_all")
         ])
         if new_offset:
             page_number = int(new_offset) // max_results + 1
@@ -115,6 +128,61 @@ async def prev_page_button(client, query: CallbackQuery):
             text=query.message.text.markdown,
             reply_markup=InlineKeyboardMarkup(btn)
         )
+    except Exception as e:
+        # Handle any exceptions here
+        print(f"An error occurred: {str(e)}")
+
+
+@Client.on_callback_query(filters.regex(r'^send#'))
+async def send_media_to_channel(client, query: CallbackQuery):
+    try:
+        file_id = query.data.split("#")[1]
+        files_ = await get_file_details(file_id)
+        
+        if not files_:
+            return await query.answer('No such file exists.')
+        
+        files = files_[0]
+        title = files.file_name
+        size = get_size(files.file_size)
+        
+        # Send the selected media to the FILE_CHANNEL
+        await client.send_cached_media(
+            chat_id=FILE_CHANNEL,
+            file_id=file_id,
+            caption=title,
+        )
+        
+        await query.answer('Media sent to the channel.')
+    except Exception as e:
+        # Handle any exceptions here
+        print(f"An error occurred: {str(e)}")
+
+@Client.on_callback_query(filters.regex(r'^get_all'))
+async def send_all_media_to_channel(client, query: CallbackQuery):
+    try:
+        files, offset, total_results = await get_all_files(max_results=max_results)
+
+        file_list = []
+        total_size = 0
+
+        for file in files:
+            file_list.append(f"{file.file_name} - {get_size(file.file_size)}")
+            total_size += file.file_size
+
+            await client.send_media(FILE_CHANNEL, file.file_id)
+        
+        file_list.append(f"Total: {get_size(total_size)}")
+
+        # Save the list of sent files to a .txt file
+        with open("sent_files.txt", "w") as file_txt:
+            for line in file_list:
+                file_txt.write(f"{line}\n")
+
+        # Send the .txt file as a document
+        await client.send_document(FILE_CHANNEL, document="sent_files.txt")
+
+        await query.answer("All media sent to the channel. File list sent as a .txt document.")
     except Exception as e:
         # Handle any exceptions here
         print(f"An error occurred: {str(e)}")
