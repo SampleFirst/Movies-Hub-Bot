@@ -76,7 +76,7 @@ async def send_all_media(client, message):
         btn.append(
             [
                 InlineKeyboardButton(text=f"📄 Page 1/{math.ceil(total_results / 5)}", callback_data="pages"),
-                InlineKeyboardButton(text="Next", callback_data=f"pmnext_{offset}")
+                InlineKeyboardButton(text="Next", callback_data=f"pmnext_{n_offset}")
             ]
         )
     else:
