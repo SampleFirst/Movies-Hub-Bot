@@ -7,7 +7,6 @@ from info import ADMINS
 async def show_files_command(client, message):
     try:
         page = 0  # Initialize the page offset
-        max_results = 10  # Number of files to show per page
 
         # Get the list of files for the current page
         files, offset, total_results = await get_all_files()
@@ -42,8 +41,7 @@ async def paginate_files(client, callback_query):
         data = callback_query.data.split("_")
         action, offset = data[0], int(data[1])
     
-        max_results = 10
-    
+
         if action == "prev" and offset > 0:
             page = offset - 1
         elif action == "next":
