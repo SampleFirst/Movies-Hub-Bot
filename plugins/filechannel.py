@@ -6,8 +6,7 @@ from info import ADMINS
 @Client.on_message(filters.command("show_files") & filters.user(ADMINS))
 async def show_files_command(client, message):
     try:
-        page = 0  # Initialize the page offset
-
+        
         # Get the list of files for the current page
         files, offset, total_results = await get_all_files()
 
