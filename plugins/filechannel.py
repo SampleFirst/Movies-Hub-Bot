@@ -24,7 +24,7 @@ async def show_files_command(client, message):
         ]
 
         if next_offset:
-            btn.append(InlineKeyboardButton("Next", callback_data=f"next_{next_offset}")
+            btn.append(InlineKeyboardButton("Next", callback_data=f"next_{next_offset}"))
         if page > 0:
             btn.append(InlineKeyboardButton("Previous", callback_data=f"prev_{page - 1}"))
 
