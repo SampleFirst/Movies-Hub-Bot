@@ -5,8 +5,8 @@ from pyrogram import Client, filters
 from database.ia_filterdb import Media, get_all_files
 from info import ADMINS
 
-@Client.on_callback_query(filters.create(lambda _, __, query: query.data.startswith("pmnext")))
-async def pm_next_page(bot, query):
+@Client.on_callback_query(filters.regex(r"^pmnext"))
+async def pm_next_page(client, message):
     files, n_offset, total_results = await get_all_files()
     try:
         n_offset = int(n_offset)
@@ -76,7 +76,7 @@ async def send_all_media(client, message):
         btn.append(
             [
                 InlineKeyboardButton(text=f"📄 Page 1/{math.ceil(total_results / 5)}", callback_data="pages"),
-                InlineKeyboardButton(text="Next", callback_data=f"pmnext_{n_offset}")
+                InlineKeyboardButton(text="Next", callback_data=f"pmnext_{offset}")
             ]
         )
     else:
