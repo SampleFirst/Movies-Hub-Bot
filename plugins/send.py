@@ -10,8 +10,8 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-
 max_results = MAX_BTTN
+
 
 # Define your command handler
 @Client.on_message(filters.command("sendfiles") & filters.user(ADMINS))
@@ -26,7 +26,7 @@ async def send_saved_files(client, message):
     start_time = time.time()
 
     while True:
-        files, next_offset, total_results = await get_all_files(max_results=max_results, offset=offset)
+        files, offset, total_results = await get_all_files(max_results=max_results)
 
         if not files:
             break
@@ -34,11 +34,10 @@ async def send_saved_files(client, message):
         batch_count += 1
         total_sent_files += len(files)
 
-        await client.send_message(
-            chat_id,
-            f"Batch {batch_count}: Sending {len(files)} files, Total Sent Files: {total_sent_files}",
+        await message.reply_text(
+            f"Batch {batch_count}: Sending {len(files)} files, Total Sent Files: {total_sent_files}"
         )
-        
+
         for file in files:
             f_caption = file.caption
             title = file.file_name
@@ -65,10 +64,11 @@ async def send_saved_files(client, message):
                 )
             except PeerIdInvalid:
                 logger.error("Error: Peer ID is invalid!")
-                return "Peer ID is invalid!"
+                await message.reply_text("Peer ID is invalid!")
+                return
             except Exception as e:
                 logger.error(f"Error: {e}")
-                return f"Error: {e}"
+                await message.reply_text(f"Error: {e}")
 
             file_info_list.append(f"File Name: {title}, File Size: {size}, Caption: {f_caption}")
 
@@ -79,9 +79,8 @@ async def send_saved_files(client, message):
     end_time = time.time()
     elapsed_time = end_time - start_time
 
-    await client.send_message(
-        chat_id,
-        f"All batches sent. Total Sent Files: {total_sent_files}, Total Batches: {batch_count}, Elapsed Time: {elapsed_time} seconds",
+    await message.reply_text(
+        f"All batches sent. Total Sent Files: {total_sent_files}, Total Batches: {batch_count}, Elapsed Time: {elapsed_time} seconds"
     )
 
     # Create and send the .txt file with file information
@@ -89,4 +88,4 @@ async def send_saved_files(client, message):
     with open("file_info.txt", "w") as txt_file:
         txt_file.write(txt_file_content)
 
-    await client.send_document(chat_id, "file_info.txt")
+    await message.reply_document("file_info.txt")
