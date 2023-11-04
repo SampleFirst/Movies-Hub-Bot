@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from database.ia_filterdb import Media, get_all_files
-from info import ADMINS, FILE_CHANNEL, MAX_BTTN 
+from info import ADMINS, FILE_CHANNEL, MAX_BTTN
 import time
 import asyncio
 
@@ -16,6 +16,7 @@ async def send_saved_files(client, message):
     batch_count = 0
 
     start_time = time.time()
+    file_info_list = []
 
     while True:
         files, next_offset, total_results = await get_all_files(max_results=max_results, offset=offset)
@@ -32,12 +33,14 @@ async def send_saved_files(client, message):
         )
 
         for file in files:
-            await bot.send_cached_media(
+            await client.send_document(
                 chat_id=FILE_CHANNEL,
-                file_id=file.file_id,
+                document=file.file_id,
                 caption=file.file_name
-                )
-            
+            )
+
+            file_info_list.append(f"File Name: {file.file_name}\nFile ID: {file.file_id}")
+
         await asyncio.sleep(60)  # Sleep for 60 seconds between batches
 
         offset = next_offset
@@ -55,4 +58,5 @@ async def send_saved_files(client, message):
     with open("file_info.txt", "w") as txt_file:
         txt_file.write(txt_file_content)
 
-    await client.send_document(chat_id, "file_info.txt")
+    await client.send_document(chat_id, document="file_info.txt")
+    
