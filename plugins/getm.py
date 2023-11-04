@@ -14,10 +14,14 @@ async def send_all_media_command(client, message):
             await message.reply("No saved media found.")
         else:
             for file in files:
-                # Send each file to the specified channel
-                # You can customize this part based on your requirements
-                await client.send_cached_media(chat_id, file.file_id, caption=file.caption)
+                try:
+                    # Send each file to the specified channel
+                    # You can customize this part based on your requirements
+                    await client.send_cached_media(chat_id, file.file_id, caption=file.caption)
+                except Exception as e:
+                    print(f"Error sending media: {str(e)}")
+                    continue  # Continue with the next file if there's an error
 
         await message.reply("All saved media files have been sent to the channel.")
     except Exception as e:
-        await message.reply(f"An error occurred: {str(e)}")
+        await message.reply(f"An error occurred: {str(e}")
