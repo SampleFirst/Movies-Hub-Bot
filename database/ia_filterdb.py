@@ -129,7 +129,16 @@ async def get_all_files(max_results=MAX_BTTN, offset=0):
 
     return files, next_offset, total_results
 
-
+async def get_all_saved_media():
+    try:
+        cursor = Media.find({})
+        cursor.sort('$natural', -1)
+        files = await cursor.to_list(length=MAX_BTTN)  # Fetch all saved media files
+        return files
+    except Exception as e:
+        logger.exception(f'Error occurred while fetching all saved media: {str(e)}')
+        return []
+        
 async def get_bad_files(query, file_type=None, max_results=100, offset=0, filter=False):
     """For given query return (results, next_offset)"""
     query = query.strip()
