@@ -24,4 +24,4 @@ async def send_all_media_command(client, message):
 
         await message.reply("All saved media files have been sent to the channel.")
     except Exception as e:
-        await message.reply(f"An error occurred: {str(e}")
+        await message.reply(f"An error occurred: {str(e)}")
