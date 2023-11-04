@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from info import FILE_CHANNEL  # Assuming you have defined FILE_CHANNEL in info.py
-from database.ia_filterdb import get_all_saved_media
+from database.ia_filterdb import Media, get_all_saved_media
 
 
 # Define a command handler for your new command
@@ -16,7 +16,7 @@ async def send_all_media_command(client, message):
             for file in files:
                 # Send each file to the specified channel
                 # You can customize this part based on your requirements
-                await client.send_document(chat_id, file.file_id, caption=file.caption)
+                await client.send_cached_media(chat_id, file.file_id, caption=file.caption)
 
         await message.reply("All saved media files have been sent to the channel.")
     except Exception as e:
