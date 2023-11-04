@@ -1,9 +1,10 @@
 from pyrogram import Client, filters
-from pyrogram.types import InputFile
 from database.ia_filterdb import Media, get_all_files
-from info import ADMINS, FILE_CHANNEL
+from info import ADMINS, FILE_CHANNEL, MAX_BTTN 
 import time
 import asyncio
+
+max_results = MAX_BTTN
 
 # Define your command handler
 @Client.on_message(filters.command("sendfiles") & filters.user(ADMINS))
@@ -17,7 +18,7 @@ async def send_saved_files(client, message):
     start_time = time.time()
 
     while True:
-        files, next_offset, total_results = await get_all_files(max_results=100, offset=offset)
+        files, next_offset, total_results = await get_all_files(max_results=max_results, offset=offset)
 
         if not files:
             break
@@ -31,8 +32,12 @@ async def send_saved_files(client, message):
         )
 
         for file in files:
-            await client.send_document(FILE_CHANNEL, InputFile(file.file_id, file.file_name))
-
+            await bot.send_cached_media(
+                chat_id=FILE_CHANNEL,
+                file_id=file.file_id,
+                caption=file.file_name
+                )
+            
         await asyncio.sleep(60)  # Sleep for 60 seconds between batches
 
         offset = next_offset
