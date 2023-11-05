@@ -1,29 +1,15 @@
 from pyrogram import Client, filters
-from info import FILE_DB_CHANNEL
-from database.ia_filterdb import Media, get_all_saved_media
+from info import DATABASE_NAME
+from database.ia_filterdb import Media
 
 
-# Define a command handler for your new command
-@Client.on_message(filters.command("send_all_media"))
-async def send_all_media_command(bot, message):
-    try:
-        files = await get_all_saved_media()
 
-        if not files:
-            await message.reply("No saved media found.")
-        else:
-            for file in files:
-                try:
-                    await bot.send_cached_media(
-                        chat_id=FILE_DB_CHANNEL,
-                        file_id=file.file_id,
-                        caption=file.caption,
-                    )
-                except Exception as e:
-                    print(f"Error sending media: {str(e)}")
-                    continue
-                    
-        await message.reply("All saved media files have been sent to the channel.")
-    except Exception as e:
-        await message.reply(f"An error occurred: {str(e)}")
-        
+@Client.on_message(filters.command("mystats"))
+async def get_stats(_, message):
+    total_documents = await Media.count_documents()
+    total_videos = await Media.count_documents({"file_type": "video"})
+    total_audio = await Media.count_documents({"file_type": "audio"})
+
+    response_text = f"Total Documents: {total_documents}\nTotal Videos: {total_videos}\nTotal Audio Files: {total_audio}"
+
+    await message.reply(response_text)
