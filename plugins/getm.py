@@ -5,7 +5,7 @@ from database.ia_filterdb import Media, get_all_saved_media
 
 # Define a command handler for your new command
 @Client.on_message(filters.command("send_all_media"))
-async def send_all_media_command(client, message):
+async def send_all_media_command(bot, message):
     try:
         files = await get_all_saved_media()
 
