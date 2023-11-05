@@ -110,6 +110,14 @@ async def get_search_results(query, file_type=None, max_results=(MAX_BTN), offse
 
     return files, next_offset, total_results
 
+async def get_files_from_channel(file_type, max_results):
+    filter = {'file_type': file_type}
+    cursor = Media.find(filter)
+    cursor.sort('$natural', -1)
+    cursor.limit(max_results)
+    files = await cursor.to_list(length=max_results)
+    return files
+
 async def get_all_files(max_results=MAX_BTTN, offset=0):
     """Retrieve all files with pagination."""
     
