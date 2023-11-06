@@ -83,11 +83,11 @@ async def send_documents_button(bot, callback_query):
         if files:
             total_files, sent_count, corrupted_count = await send_media_files_in_batches(bot, files, "document", MAX_BUTTON, FILE_DB_CHANNEL)
             message = f"Total Documents: {total_files}\nSent Documents: {sent_count}\nCorrupted Documents: {corrupted_count}"
-            await callback_message.reply(message)
+            await callback_query.edit_message_text(message)
         else:
-            await callback_message.reply("No Documents found.")
+            await callback_query.edit_message_text("No Documents found.")
     except Exception as e:
-        await callback_message.reply(f"Error: {str(e)}")
+        await callback_query.edit_message_text(f"Error: {str(e)}")
 
 @Client.on_callback_query(filters.regex(r"send_videos"))
 async def send_videos_button(bot, callback_query):
@@ -96,11 +96,11 @@ async def send_videos_button(bot, callback_query):
         if files:
             total_files, sent_count, corrupted_count = await send_media_files_in_batches(bot, files, "video", MAX_BUTTON, FILE_DB_CHANNEL)
             message = f"Total Videos: {total_files}\nSent Videos: {sent_count}\nCorrupted Videos: {corrupted_count}"
-            await callback_message.reply(message)
+            await callback_query.edit_message_text(message)
         else:
-            await callback_message.reply("No Videos found.")
+            await callback_query.edit_message_text("No Videos found.")
     except Exception as e:
-        await callback_message.reply(f"Error: {str(e)}")
+        await callback_query.edit_message_text(f"Error: {str(e)}")
 
 @Client.on_callback_query(filters.regex(r"send_audios"))
 async def send_audios_button(bot, callback_query):
@@ -109,11 +109,12 @@ async def send_audios_button(bot, callback_query):
         if files:
             total_files, sent_count, corrupted_count = await send_media_files_in_batches(bot, files, "audio", MAX_BUTTON, FILE_DB_CHANNEL)
             message = f"Total Audios: {total_files}\nSent Audios: {sent_count}\nCorrupted Audios: {corrupted_count}"
-            await callback_message.reply(message)
+            await callback_query.edit_message_text(message)
         else:
-            await callback_message.reply("No Audios found.")
+            await callback_query.edit_message_text("No Audios found.")
     except Exception as e:
-        await callback_message.reply(f"Error: {str(e)}")
+        await callback_query.edit_message_text(f"Error: {str(e)}")
+
 
 @Client.on_callback_query(filters.regex(r"cancel_send"))
 async def cancel_send_button(bot, callback_query):
