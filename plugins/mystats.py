@@ -3,6 +3,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from info import MAX_BTN, FILE_DB_CHANNEL 
 from database.ia_filterdb import Media, get_files_from_channel
 import time
+import asyncio
 
 @Client.on_message(filters.command("mystats"))
 async def get_stats(_, message):
@@ -30,59 +31,63 @@ async def get_stats(_, message):
         reply_markup=keyboard,
     )
 
-async def send_media_files(bot, chat_id, files, file_type, callback_query):
+async def send_media_files_in_batches(bot, files, file_type, batch_size, chat_id):
     try:
-        batches = [files[i:i + MAX_BTN] for i in range(0, len(files), MAX_BTN)]
-        for batch in batches:
+        total_files = len(files)
+        for i in range(0, total_files, batch_size):
+            batch = files[i:i + batch_size]
             if file_type == "document":
                 for file in batch:
-                    await bot.send_document(
-                        chat_id=chat_id,
-                        document=file.file_id,
-                    )
-                await callback_query.answer(f"Sent {len(batch)} Documents")
+                    await bot.send_document(chat_id=chat_id, document=file.file_id)
             elif file_type == "video":
                 for file in batch:
-                    await bot.send_video(
-                        chat_id=chat_id,
-                        video=file.file_id,
-                    )
-                await callback_query.answer(f"Sent {len(batch)} Videos")
+                    await bot.send_video(chat_id=chat_id, video=file.file_id)
             elif file_type == "audio":
                 for file in batch:
-                    await bot.send_audio(
-                        chat_id=chat_id,
-                        audio=file.file_id,
-                    )
-                await callback_query.answer(f"Sent {len(batch)} Audios")
-            time.sleep(2)  # Introduce a 2-second break between batches
+                    await bot.send_audio(chat_id=chat_id, audio=file.file_id)
+            await asyncio.sleep(5)  # Add a delay between batches, adjust as needed
+        return total_files
     except Exception as e:
-        await callback_query.answer(f"Error: {str(e)}")
+        return str(e)
+
 
 @Client.on_callback_query(filters.regex(r"send_documents"))
 async def send_documents_button(bot, callback_query):
-    files = await get_files_from_channel("document", MAX_BTN)
-    if files:
-        await send_media_files(bot, FILE_DB_CHANNEL, files, "document", callback_query)
-    else:
-        await callback_query.answer("No Documents found.")
+    try:
+        files = await get_files_from_channel("document", MAX_BTN)
+        if files:
+            total_sent = await send_media_files_in_batches(bot, files, "document", MAX_BTN, FILE_DB_CHANNEL)
+            await callback_query.answer(f"Sent {total_sent} Documents")
+        else:
+            await callback_query.answer("No Documents found.")
+    except Exception as e:
+        await callback_query.answer(f"Error: {str(e)}")
 
 @Client.on_callback_query(filters.regex(r"send_videos"))
 async def send_videos_button(bot, callback_query):
-    files = await get_files_from_channel("video", MAX_BTN)
-    if files:
-        await send_media_files(bot, FILE_DB_CHANNEL, files, "video", callback_query)
-    else:
-        await callback_query.answer("No Videos found.")
+    try:
+        files = await get_files_from_channel("video", MAX_BTN)
+        if files:
+            total_sent = await send_media_files_in_batches(bot, files, "video", MAX_BTN, FILE_DB_CHANNEL)
+            await callback_query.answer(f"Sent {total_sent} Videos")
+        else:
+            await callback_query.answer("No Videos found.")
+    except Exception as e:
+        await callback_query.answer(f"Error: {str(e)}")
 
 @Client.on_callback_query(filters.regex(r"send_audios"))
 async def send_audios_button(bot, callback_query):
-    files = await get_files_from_channel("audio", MAX_BTN)
-    if files:
-        await send_media_files(bot, FILE_DB_CHANNEL, files, "audio", callback_query)
-    else:
-        await callback_query.answer("No Audios found.")
+    try:
+        files = await get_files_from_channel("audio", MAX_BTN)
+        if files:
+            total_sent = await send_media_files_in_batches(bot, files, "audio", MAX_BTN, FILE_DB_CHANNEL)
+            await callback_query.answer(f"Sent {total_sent} Audios")
+        else:
+            await callback_query.answer("No Audios found.")
+    except Exception as e:
+        await callback_query.answer(f"Error: {str(e)}")
 
 @Client.on_callback_query(filters.regex(r"cancel_send"))
 async def cancel_send_button(bot, callback_query):
     await callback_query.answer("Canceling Send...")
+    
