@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from info import MAX_BTN
+from info import MAX_BTN, FILE_DB_CHANNEL 
 from database.ia_filterdb import Media, get_files_from_channel
 
 @Client.on_message(filters.command("mystats"))
@@ -35,7 +35,10 @@ async def send_documents_button(_, callback_query):
         files = await get_files_from_channel("document", MAX_BTN)
         if files:
             for file in files:
-                await callback_query.message.reply_document(file.file_id)
+                await callback_query.message.send_document(
+                    chat_id=FILE_DB_CHANNEL,
+                    file_id=file.file_id,
+                )
             await callback_query.answer(f"Sent {len(files)} Documents")
         else:
             await callback_query.answer("No Documents found.")
@@ -48,7 +51,10 @@ async def send_videos_button(_, callback_query):
         files = await get_files_from_channel("video", MAX_BTN)
         if files:
             for file in files:
-                await callback_query.message.reply_video(file.file_id)
+                await callback_query.message.send_video(
+                    chat_id=FILE_DB_CHANNEL,
+                    file_id=file.file_id,
+                )
             await callback_query.answer(f"Sent {len(files)} Videos")
         else:
             await callback_query.answer("No Videos found.")
@@ -61,7 +67,10 @@ async def send_audios_button(_, callback_query):
         files = await get_files_from_channel("audio", MAX_BTN)
         if files:
             for file in files:
-                await callback_query.message.reply_audio(file.file_id)
+                await callback_query.message.send_audio(
+                    chat_id=FILE_DB_CHANNEL,
+                    file_id=file.file_id,
+                )
             await callback_query.answer(f"Sent {len(files)} Audios")
         else:
             await callback_query.answer("No Audios found.")
@@ -72,4 +81,3 @@ async def send_audios_button(_, callback_query):
 async def cancel_send_button(_, callback_query):
     await callback_query.answer("Canceling Send...")
 
-    
