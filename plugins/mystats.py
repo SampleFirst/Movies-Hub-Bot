@@ -1,11 +1,12 @@
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.errors import FloodWait
 from info import FILE_DB_CHANNEL 
 from database.ia_filterdb import Media, get_files_from_channel
 import time
 import asyncio
 
-MAX_BUTTON = 50
+MAX_BUTTON = 10
 
 @Client.on_message(filters.command("mystats"))
 async def get_stats(_, message):
@@ -36,30 +37,53 @@ async def get_stats(_, message):
 async def send_media_files_in_batches(bot, files, file_type, batch_size, chat_id):
     try:
         total_files = len(files)
+        sent_count = 0
+        corrupted_count = 0
         for i in range(0, total_files, batch_size):
             batch = files[i:i + batch_size]
             if file_type == "document":
                 for file in batch:
-                    await bot.send_document(chat_id=chat_id, document=file.file_id)
+                    try:
+                        await bot.send_document(chat_id=chat_id, document=file.file_id)
+                        sent_count += 1
+                    except FloodWait as e:
+                        await asyncio.sleep(e.x)
+                        return await send_media_files_in_batches(bot, files, file_type, batch_size, chat_id):
+                    except Exception as e:
+                        corrupted_count += 1
             elif file_type == "video":
                 for file in batch:
-                    await bot.send_video(chat_id=chat_id, video=file.file_id)
+                    try:
+                        await bot.send_video(chat_id=chat_id, video=file.file_id)
+                        sent_count += 1
+                    except FloodWait as e:
+                        await asyncio.sleep(e.x)
+                        return await send_media_files_in_batches(bot, files, file_type, batch_size, chat_id):
+                    except Exception as e:
+                        corrupted_count += 1
             elif file_type == "audio":
                 for file in batch:
-                    await bot.send_audio(chat_id=chat_id, audio=file.file_id)
-            await asyncio.sleep(5)  # Add a delay between batches, adjust as needed
-        return total_files
+                    try:
+                        await bot.send_audio(chat_id=chat_id, audio=file.file_id)
+                        sent_count += 1
+                    except FloodWait as e:
+                        await asyncio.sleep(e.x)
+                        return await send_media_files_in_batches(bot, files, file_type, batch_size, chat_id):
+                    except Exception as e:
+                        corrupted_count += 1
+            await asyncio.sleep(5)
+        return total_files, sent_count, corrupted_count
     except Exception as e:
         return str(e)
-
 
 @Client.on_callback_query(filters.regex(r"send_documents"))
 async def send_documents_button(bot, callback_query):
     try:
         files = await get_files_from_channel("document", MAX_BUTTON)
         if files:
-            total_sent = await send_media_files_in_batches(bot, files, "document", MAX_BUTTON, FILE_DB_CHANNEL)
-            await callback_query.answer(f"Sent {total_sent} Documents")
+            total_files, sent_count, corrupted_count = await send_media_files_in_batches(bot, files, "document", MAX_BUTTON, FILE_DB_CHANNEL)
+            message = f"Total Documents: {total_files}\nSent Documents: {sent_count}\nCorrupted Documents: {corrupted_count}"
+            await callback_query.answer(message)
         else:
             await callback_query.answer("No Documents found.")
     except Exception as e:
@@ -70,8 +94,9 @@ async def send_videos_button(bot, callback_query):
     try:
         files = await get_files_from_channel("video", MAX_BUTTON)
         if files:
-            total_sent = await send_media_files_in_batches(bot, files, "video", MAX_BUTTON, FILE_DB_CHANNEL)
-            await callback_query.answer(f"Sent {total_sent} Videos")
+            total_files, sent_count, corrupted_count = await send_media_files_in_batches(bot, files, "video", MAX_BUTTON, FILE_DB_CHANNEL)
+            message = f"Total Videos: {total_files}\nSent Videos: {sent_count}\nCorrupted Videos: {corrupted_count}"
+            await callback_query.answer(message)
         else:
             await callback_query.answer("No Videos found.")
     except Exception as e:
@@ -82,8 +107,9 @@ async def send_audios_button(bot, callback_query):
     try:
         files = await get_files_from_channel("audio", MAX_BUTTON)
         if files:
-            total_sent = await send_media_files_in_batches(bot, files, "audio", MAX_BUTTON, FILE_DB_CHANNEL)
-            await callback_query.answer(f"Sent {total_sent} Audios")
+            total_files, sent_count, corrupted_count = await send_media_files_in_batches(bot, files, "audio", MAX_BUTTON, FILE_DB_CHANNEL)
+            message = f"Total Audios: {total_files}\nSent Audios: {sent_count}\nCorrupted Audios: {corrupted_count}"
+            await callback_query.answer(message)
         else:
             await callback_query.answer("No Audios found.")
     except Exception as e:
