@@ -30,7 +30,7 @@ async def get_stats(_, message):
         reply_markup=keyboard,
     )
 
-async def send_media_files(chat_id, files, file_type, callback_query):
+async def send_media_files(bot, chat_id, files, file_type, callback_query):
     try:
         batches = [files[i:i + MAX_BTN] for i in range(0, len(files), MAX_BTN)]
         for batch in batches:
@@ -86,3 +86,4 @@ async def send_audios_button(bot, callback_query):
 @Client.on_callback_query(filters.regex(r"cancel_send"))
 async def cancel_send_button(bot, callback_query):
     await callback_query.answer("Canceling Send...")
+
