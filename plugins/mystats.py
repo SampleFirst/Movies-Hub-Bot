@@ -30,7 +30,7 @@ async def get_stats(_, message):
     )
 
 @Client.on_callback_query(filters.regex(r"send_documents"))
-async def send_documents_button(_, callback_query):
+async def send_documents_button(bot, callback_query):
     try:
         files = await get_files_from_channel("document", MAX_BTN)
         if files:
@@ -46,7 +46,7 @@ async def send_documents_button(_, callback_query):
         await callback_query.answer(f"Error: {str(e)}")
 
 @Client.on_callback_query(filters.regex(r"send_videos"))
-async def send_videos_button(_, callback_query):
+async def send_videos_button(bot, callback_query):
     try:
         files = await get_files_from_channel("video", MAX_BTN)
         if files:
@@ -67,7 +67,7 @@ async def send_audios_button(_, callback_query):
         files = await get_files_from_channel("audio", MAX_BTN)
         if files:
             for file in files:
-                await bot.send_audio(
+                await client.send_audio(
                     chat_id=FILE_DB_CHANNEL,
                     audio=file.file_id,
                 )
@@ -78,5 +78,5 @@ async def send_audios_button(_, callback_query):
         await callback_query.answer(f"Error: {str(e)}")
 
 @Client.on_callback_query(filters.regex(r"cancel_send"))
-async def cancel_send_button(_, callback_query):
+async def cancel_send_button(bot, callback_query):
     await callback_query.answer("Canceling Send...")
