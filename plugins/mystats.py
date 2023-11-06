@@ -48,7 +48,7 @@ async def send_media_files_in_batches(bot, files, file_type, batch_size, chat_id
                         sent_count += 1
                     except FloodWait as e:
                         await asyncio.sleep(e.x)
-                        return await send_media_files_in_batches(bot, files, file_type, batch_size, chat_id):
+                        return await send_media_files_in_batches(bot, files, file_type, batch_size, chat_id)
                     except Exception as e:
                         corrupted_count += 1
             elif file_type == "video":
@@ -58,7 +58,7 @@ async def send_media_files_in_batches(bot, files, file_type, batch_size, chat_id
                         sent_count += 1
                     except FloodWait as e:
                         await asyncio.sleep(e.x)
-                        return await send_media_files_in_batches(bot, files, file_type, batch_size, chat_id):
+                        return await send_media_files_in_batches(bot, files, file_type, batch_size, chat_id)
                     except Exception as e:
                         corrupted_count += 1
             elif file_type == "audio":
@@ -68,7 +68,7 @@ async def send_media_files_in_batches(bot, files, file_type, batch_size, chat_id
                         sent_count += 1
                     except FloodWait as e:
                         await asyncio.sleep(e.x)
-                        return await send_media_files_in_batches(bot, files, file_type, batch_size, chat_id):
+                        return await send_media_files_in_batches(bot, files, file_type, batch_size, chat_id)
                     except Exception as e:
                         corrupted_count += 1
             await asyncio.sleep(5)
@@ -118,4 +118,4 @@ async def send_audios_button(bot, callback_query):
 @Client.on_callback_query(filters.regex(r"cancel_send"))
 async def cancel_send_button(bot, callback_query):
     await callback_query.answer("Canceling Send...")
-    
+
