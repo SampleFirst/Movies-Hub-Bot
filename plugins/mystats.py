@@ -82,7 +82,7 @@ async def get_stats(_, message):
     except Exception as e:
         logging.error(f"Error in get_stats: {str(e)}")
 
-@Client.on_callback_queryquery(filters.regex(r"send_documents"))
+@Client.on_callback_query(filters.regex(r"send_documents"))
 async def send_documents_button(bot, callback_query):
     try:
         files = await get_files_from_channel("document", MAX_BUTTON)
