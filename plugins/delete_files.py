@@ -1,50 +1,118 @@
-#https://github.com/Joelkb/DQ-the-file-donor
-
-import re
-import logging
 from pyrogram import Client, filters
-from info import DELETE_CHANNELS
-from database.ia_filterdb import Media, unpack_new_file_id
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.errors import FloodWait
+from info import FILE_DB_CHANNEL
+from database.ia_filterdb import Media, get_files_from_channel
+import asyncio
+import logging
 
-logger = logging.getLogger(__name__)
+MAX_BUTTON = 5
 
-media_filter = filters.document | filters.video | filters.audio
+# Enable logging
+logging.basicConfig(level=logging.INFO)
 
+async def send_media_files_in_batches(bot, files, file_type, batch_size, chat_id, callback_query, batch_index=0):
+    total_files = len(files)
+    sent_count = 0
+    corrupted_count = 0
 
-@Client.on_message(filters.chat(DELETE_CHANNELS) & media_filter)
-async def deletemultiplemedia(bot, message):
-    """Delete Multiple files from database"""
+    for i in range(batch_index, total_files, batch_size):
+        batch = files[i:i + batch_size]
+        for file in batch:
+            try:
+                if file_type == "document":
+                    await bot.send_document(chat_id=chat_id, document=file.file_id)
+                elif file_type == "video":
+                    await bot.send_video(chat_id=chat_id, video=file.file_id)
+                elif file_type == "audio":
+                    await bot.send_audio(chat_id=chat_id, audio=file.file_id)
 
-    for file_type in ("document", "video", "audio"):
-        media = getattr(message, file_type, None)
-        if media is not None:
+                sent_count += 1
+
+                # Update the message with live statistics
+                message = (
+                    f"Total Files: {total_files}\n"
+                    f"Sent Files: {sent_count}\n"
+                    f"Corrupted Files: {corrupted_count}\n"
+                    f"Batches Sent: {i // batch_size + 1}"
+                )
+
+                await callback_query.edit_message_text(message)
+            except FloodWait as e:
+                await asyncio.sleep(e.x)
+            except Exception as e:
+                corrupted_count += 1
+
+        await asyncio.sleep(5)
+
+    return total_files, sent_count, corrupted_count, i
+
+@Client.on_message(filters.command("mystats"))
+async def get_stats(_, message):
+    try:
+        total_documents = await Media.count_documents()
+        total_videos = await Media.count_documents({"file_type": "video"})
+        total_audio = await Media.count_documents({"file_type": "audio"})
+
+        response_text = (
+            f"Total Documents: {total_documents}\n"
+            f"Total Videos: {total_videos}\n"
+            f"Total Audio Files: {total_audio}"
+        )
+
+        keyboard = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton("Send Documents", callback_data="send_documents"),
+                    InlineKeyboardButton("Send Videos", callback_data="send_videos"),
+                ],
+                [
+                    InlineKeyboardButton("Send Audios", callback_data="send_audios"),
+                    InlineKeyboardButton("Cancel Send", callback_data="cancel_send"),
+                ],
+            ]
+        )
+
+        await message.reply(response_text, reply_markup=keyboard)
+
+    except Exception as e:
+        logging.error(f"Error in get_stats: {str(e)}")
+
+async def send_media_files_button(bot, callback_query, file_type, description):
+    batch_index = 0
+    while True:
+        files = await get_files_from_channel(file_type, MAX_BUTTON, batch_index)
+        if not files:
             break
-    else:
-        return
 
-    file_id, file_ref = unpack_new_file_id(media.file_id)
+        total_files, sent_count, corrupted_count, batch_index = await send_media_files_in_batches(
+            bot, files, file_type, MAX_BUTTON, FILE_DB_CHANNEL, callback_query, batch_index
+        )
 
-    result = await Media.collection.delete_one({
-        '_id': file_id,
-    })
-    if result.deleted_count:
-        logger.info('File is successfully deleted from database.')
-    else:
-        file_name = re.sub(r"(_|\-|\.|\+)", " ", str(media.file_name))
-        result = await Media.collection.delete_many({
-            'file_name': file_name,
-            'file_size': media.file_size,
-            'mime_type': media.mime_type
-            })
-        if result.deleted_count:
-            logger.info('File is successfully deleted from database.')
-        else:
-            result = await Media.collection.delete_many({
-                'file_name': media.file_name,
-                'file_size': media.file_size,
-                'mime_type': media.mime_type
-            })
-            if result.deleted_count:
-                logger.info('File is successfully deleted from database.')
-            else:
-                logger.info('File not found in database.')
+    message = (
+        f"Total {description}: {total_files}\n"
+        f"Sent {description}: {sent_count}\n"
+        f"Corrupted {description}: {corrupted_count}\n"
+        f"Batches Sent: {batch_index // MAX_BUTTON}"
+    )
+    await callback_query.message.reply_text(message)
+
+@Client.on_callback_query(filters.regex(r"send_documents"))
+async def send_documents_button(bot, callback_query):
+    await send_media_files_button(bot, callback_query, "document", "Documents")
+
+@Client.on_callback_query(filters.regex(r"send_videos"))
+async def send_videos_button(bot, callback_query):
+    await send_media_files_button(bot, callback_query, "video", "Videos")
+
+@Client.on_callback_query(filters.regex(r"send_audios"))
+async def send_audios_button(bot, callback_query):
+    await send_media_files_button(bot, callback_query, "audio", "Audios")
+
+@Client.on_callback_query(filters.regex(r"cancel_send"))
+async def cancel_send_button(bot, callback_query):
+    try:
+        await callback_query.edit_message_text("Canceling Send...")
+        # Add your cancel logic here if needed
+    except Exception as e:
+        logging.error(f"Error in cancel_send_button: {str(e)}")
