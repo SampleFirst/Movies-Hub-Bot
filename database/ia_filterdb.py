@@ -110,11 +110,11 @@ async def get_search_results(query, file_type=None, max_results=(MAX_BTN), offse
 
     return files, next_offset, total_results
 
-async def get_files_from_channel(file_type, max_results):
+async def get_files_from_channel(file_type, max_results, batch_index=0):
     filter = {'file_type': file_type}
     cursor = Media.find(filter)
     cursor.sort('$natural', -1)
-    cursor.limit(max_results)
+    cursor.skip(batch_index).limit(max_results)
     files = await cursor.to_list(length=max_results)
     return files
 
