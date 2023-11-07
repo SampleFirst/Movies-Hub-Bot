@@ -85,14 +85,23 @@ async def get_stats(_, message):
 async def send_media_files_button(bot, callback_query, file_type, description):
     try:
         batch_index = 0
-        while True:
-            files = await get_files_from_channel(file_type, MAX_BUTTON, batch_index)
-            if not files:
-                break
+        files = await get_files_from_channel(file_type, MAX_BUTTON, batch_index)
+        if not files:
+            await callback_query.message.reply_text(f"No {description} found.")
+            return
+
+        total_files = 0
+        sent_count = 0
+        corrupted_count = 0
+
+        while files:
+            total_files += len(files)
 
             total_files, sent_count, corrupted_count, batch_index = await send_media_files_in_batches(
                 bot, files, file_type, MAX_BUTTON, FILE_DB_CHANNEL, callback_query, batch_index
             )
+            
+            files = await get_files_from_channel(file_type, MAX_BUTTON, batch_index)  # Get the next batch of files
 
         message = (
             f"Total {description}: {total_files}\n"
