@@ -69,7 +69,7 @@ async def send_media_files_in_batches(bot, files, file_type, batch_size, chat_id
                         f"Batches Sent: {i // batch_size + 1}"
                     )
 
-                    await callback_query.message.reply_text(message)
+                    await callback_query.edit_message_text(message)
                 except FloodWait as e:
                     await asyncio.sleep(e.x)
                 except Exception as e:
