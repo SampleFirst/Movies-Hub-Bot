@@ -11,7 +11,6 @@ MAX_BUTTON = 5
 # Enable logging
 logging.basicConfig(level=logging.INFO)
 
-
 async def send_media_files_in_batches(bot, files, file_type, batch_size, chat_id, callback_query, batch_index=0):
     try:
         total_files = len(files)
@@ -46,6 +45,7 @@ async def send_media_files_in_batches(bot, files, file_type, batch_size, chat_id
                     corrupted_count += 1
 
             await asyncio.sleep(5)
+            return 
 
         return total_files, sent_count, corrupted_count, i
     except Exception as e:
@@ -82,80 +82,39 @@ async def get_stats(_, message):
     except Exception as e:
         logging.error(f"Error in get_stats: {str(e)}")
 
+async def send_media_files_button(bot, callback_query, file_type, description):
+    try:
+        batch_index = 0
+        while True:
+            files = await get_files_from_channel(file_type, MAX_BUTTON, batch_index)
+            if not files:
+                break
+
+            total_files, sent_count, corrupted_count, batch_index = await send_media_files_in_batches(
+                bot, files, file_type, MAX_BUTTON, FILE_DB_CHANNEL, callback_query, batch_index
+            )
+
+        message = (
+            f"Total {description}: {total_files}\n"
+            f"Sent {description}: {sent_count}\n"
+            f"Corrupted {description}: {corrupted_count}\n"
+            f"Batches Sent: {batch_index // MAX_BUTTON}"
+        )
+        await callback_query.message.reply_text(message)
+    except Exception as e:
+        logging.error(f"Error in send_{file_type}_button: {str(e)}")
+
 @Client.on_callback_query(filters.regex(r"send_documents"))
 async def send_documents_button(bot, callback_query):
-    try:
-        files = await get_files_from_channel("document", MAX_BUTTON)
-        if files:
-            total_files, sent_count, corrupted_count, batch_index = await send_media_files_in_batches(
-                bot, files, "document", MAX_BUTTON, FILE_DB_CHANNEL, callback_query
-            )
-            while sent_count < total_files:
-                files = await get_files_from_channel("document", MAX_BUTTON, batch_index)
-                total_files, sent_count, corrupted_count, batch_index = await send_media_files_in_batches(
-                    bot, files, "document", MAX_BUTTON, FILE_DB_CHANNEL, callback_query, batch_index
-                )
-            message = (
-                f"Total Documents: {total_files}\n"
-                f"Sent Documents: {sent_count}\n"
-                f"Corrupted Documents: {corrupted_count}\n"
-                f"Batches Sent: {batch_index // MAX_BUTTON}"
-            )
-            await callback_query.message.reply_text(message)
-        else:
-            await callback_query.message.reply_text("No Documents found.")
-    except Exception as e:
-        logging.error(f"Error in send_documents_button: {str(e)}")
+    await send_media_files_button(bot, callback_query, "document", "Documents")
 
 @Client.on_callback_query(filters.regex(r"send_videos"))
 async def send_videos_button(bot, callback_query):
-    try:
-        files = await get_files_from_channel("video", MAX_BUTTON)
-        if files:
-            total_files, sent_count, corrupted_count, batch_index = await send_media_files_in_batches(
-                bot, files, "video", MAX_BUTTON, FILE_DB_CHANNEL, callback_query
-            )
-            while sent_count < total_files:
-                files = await get_files_from_channel("video", MAX_BUTTON, batch_index)
-                total_files, sent_count, corrupted_count, batch_index = await send_media_files_in_batches(
-                    bot, files, "video", MAX_BUTTON, FILE_DB_CHANNEL, callback_query, batch_index
-                )
-            message = (
-                f"Total Videos: {total_files}\n"
-                f"Sent Videos: {sent_count}\n"
-                f"Corrupted Videos: {corrupted_count}\n"
-                f"Batches Sent: {batch_index // MAX_BUTTON}"
-            )
-            await callback_query.message.reply_text(message)
-        else:
-            await callback_query.message.reply_text("No Videos found.")
-    except Exception as e:
-        logging.error(f"Error in send_videos_button: {str(e)}")
+    await send_media_files_button(bot, callback_query, "video", "Videos")
 
 @Client.on_callback_query(filters.regex(r"send_audios"))
 async def send_audios_button(bot, callback_query):
-    try:
-        files = await get_files_from_channel("audio", MAX_BUTTON)
-        if files:
-            total_files, sent_count, corrupted_count, batch_index = await send_media_files_in_batches(
-                bot, files, "audio", MAX_BUTTON, FILE_DB_CHANNEL, callback_query
-            )
-            while sent_count < total_files:
-                files = await get_files_from_channel("audio", MAX_BUTTON, batch_index)
-                total_files, sent_count, corrupted_count, batch_index = await send_media_files_in_batches(
-                    bot, files, "audio", MAX_BUTTON, FILE_DB_CHANNEL, callback_query, batch_index
-                )
-            message = (
-                f"Total Audios: {total_files}\n"
-                f"Sent Audios: {sent_count}\n"
-                f"Corrupted Audios: {corrupted_count}\n"
-                f"Batches Sent: {batch_index // MAX_BUTTON}"
-            )
-            await callback_query.message.reply_text(message)
-        else:
-            await callback_query.message.reply_text("No Audios found.")
-    except Exception as e:
-        logging.error(f"Error in send_audios_button: {str(e)}")
+    await send_media_files_button(bot, callback_query, "audio", "Audios")
 
 @Client.on_callback_query(filters.regex(r"cancel_send"))
 async def cancel_send_button(bot, callback_query):
