@@ -114,9 +114,9 @@ async def get_files_from_channel(file_type, max_results, batch_index=0):
     filter = {'file_type': file_type}
     cursor = Media.find(filter)
     cursor.sort('$natural', -1)
-    cursor.skip(batch_index).limit(max_results)
+    cursor.limit(max_results)
     files = await cursor.to_list(length=max_results)
-    return files
+    return files if files else []  # Return an empty list if no files are found
 
 async def get_all_files(max_results=MAX_BTTN, offset=0):
     """Retrieve all files with pagination."""
