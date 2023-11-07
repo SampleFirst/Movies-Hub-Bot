@@ -1,13 +1,12 @@
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from pyrogram.errors import FloodWait
 from info import FILE_DB_CHANNEL
 from database.ia_filterdb import Media, get_files_from_channel
 import asyncio
 import logging
 
-MAX_BUTTON = 10
-
+MAX_BUTTON = 5
 
 # Enable logging
 logging.basicConfig(level=logging.INFO)
@@ -44,15 +43,13 @@ async def get_stats(_, message):
     except Exception as e:
         logging.error(f"Error in get_stats: {str(e)}")
 
-
-async def send_media_files_in_batches(bot, files, file_type, batch_size, chat_id):
+async def send_media_files_in_batches(bot, files, file_type, batch_size, chat_id, callback_query):
     try:
         total_files = len(files)
         sent_count = 0
         corrupted_count = 0
         for i in range(0, total_files, batch_size):
             batch = files[i:i + batch_size]
-
             for file in batch:
                 try:
                     if file_type == "document":
@@ -61,18 +58,26 @@ async def send_media_files_in_batches(bot, files, file_type, batch_size, chat_id
                         await bot.send_video(chat_id=chat_id, video=file.file_id)
                     elif file_type == "audio":
                         await bot.send_audio(chat_id=chat_id, audio=file.file_id)
+
                     sent_count += 1
+
+                    # Update the message with live statistics
+                    message = (
+                        f"Total Files: {total_files}\n"
+                        f"Sent Files: {sent_count}\n"
+                        f"Corrupted Files: {corrupted_count}\n"
+                        f"Batches Sent: {i // batch_size + 1}"
+                    )
+
+                    await callback_query.message.reply_text(message)
                 except FloodWait as e:
                     await asyncio.sleep(e.x)
                 except Exception as e:
                     corrupted_count += 1
-
             await asyncio.sleep(5)
-
         return total_files, sent_count, corrupted_count
     except Exception as e:
-        logging.error(f"Error in send_media_files_in_batches: {str(e)}")
-
+        return str(e)
 
 @Client.on_callback_query(filters.regex(r"send_documents"))
 async def send_documents_button(bot, callback_query):
@@ -80,19 +85,19 @@ async def send_documents_button(bot, callback_query):
         files = await get_files_from_channel("document", MAX_BUTTON)
         if files:
             total_files, sent_count, corrupted_count = await send_media_files_in_batches(
-                bot, files, "document", MAX_BUTTON, FILE_DB_CHANNEL
+                bot, files, "document", MAX_BUTTON, FILE_DB_CHANNEL, callback_query
             )
             message = (
                 f"Total Documents: {total_files}\n"
                 f"Sent Documents: {sent_count}\n"
-                f"Corrupted Documents: {corrupted_count}"
+                f"Corrupted Documents: {corrupted_count}\n"
+                f"Batches Sent: {total_files // MAX_BUTTON}"
             )
-            await callback_query.edit_message_text(message)
+            await callback_query.message.reply_text(message)
         else:
-            await callback_query.edit_message_text("No Documents found.")
+            await callback_query.message.reply_text("No Documents found.")
     except Exception as e:
         logging.error(f"Error in send_documents_button: {str(e)}")
-
 
 @Client.on_callback_query(filters.regex(r"send_videos"))
 async def send_videos_button(bot, callback_query):
@@ -100,19 +105,19 @@ async def send_videos_button(bot, callback_query):
         files = await get_files_from_channel("video", MAX_BUTTON)
         if files:
             total_files, sent_count, corrupted_count = await send_media_files_in_batches(
-                bot, files, "video", MAX_BUTTON, FILE_DB_CHANNEL
+                bot, files, "video", MAX_BUTTON, FILE_DB_CHANNEL, callback_query
             )
             message = (
                 f"Total Videos: {total_files}\n"
                 f"Sent Videos: {sent_count}\n"
-                f"Corrupted Videos: {corrupted_count}"
+                f"Corrupted Videos: {corrupted_count}\n"
+                f"Batches Sent: {total_files // MAX_BUTTON}"
             )
-            await callback_query.edit_message_text(message)
+            await callback_query.message.reply_text(message)
         else:
-            await callback_query.edit_message_text("No Videos found.")
+            await callback_query.message.reply_text("No Videos found.")
     except Exception as e:
         logging.error(f"Error in send_videos_button: {str(e)}")
-
 
 @Client.on_callback_query(filters.regex(r"send_audios"))
 async def send_audios_button(bot, callback_query):
@@ -120,25 +125,25 @@ async def send_audios_button(bot, callback_query):
         files = await get_files_from_channel("audio", MAX_BUTTON)
         if files:
             total_files, sent_count, corrupted_count = await send_media_files_in_batches(
-                bot, files, "audio", MAX_BUTTON, FILE_DB_CHANNEL
+                bot, files, "audio", MAX_BUTTON, FILE_DB_CHANNEL, callback_query
             )
             message = (
                 f"Total Audios: {total_files}\n"
                 f"Sent Audios: {sent_count}\n"
-                f"Corrupted Audios: {corrupted_count}"
+                f"Corrupted Audios: {corrupted_count}\n"
+                f"Batches Sent: {total_files // MAX_BUTTON}"
             )
-            await callback_query.edit_message_text(message)
+            await callback_query.message.reply_text(message)
         else:
-            await callback_query.edit_message_text("No Audios found.")
+            await callback_query.message.reply_text("No Audios found.")
     except Exception as e:
         logging.error(f"Error in send_audios_button: {str(e)}")
 
-
 @Client.on_callback_query(filters.regex(r"cancel_send"))
-async def cancel_send_button(_, callback_query):
+async def cancel_send_button(bot, callback_query):
     try:
         await callback_query.edit_message_text("Canceling Send...")
         # Add your cancel logic here if needed
     except Exception as e:
         logging.error(f"Error in cancel_send_button: {str(e)}")
-        
+
