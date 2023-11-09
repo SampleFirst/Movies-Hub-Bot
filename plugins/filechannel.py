@@ -1,3 +1,4 @@
+import asyncio
 import math
 import logging
 from pyrogram.errors import MessageNotModified
