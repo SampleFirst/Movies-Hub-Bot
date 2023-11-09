@@ -1,6 +1,7 @@
 import math
 import logging
 from pyrogram.errors import MessageNotModified
+from pyrogram.errors.exceptions.bad_request_400 import MediaEmpty
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from pyrogram import Client, filters
 from database.ia_filterdb import Media, get_all_files, get_file_details
@@ -177,17 +178,22 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
             return await query.answer('No files found on this page.')
 
         for file in files:
-            # Send each file to the FILE_DB_CHANNEL
-            await client.send_cached_media(
-                chat_id=FILE_DB_CHANNEL,
-                file_id=file.file_id,
-                caption=file.file_name,
-            )
+            try:
+                # Send each file to the FILE_DB_CHANNEL
+                await client.send_cached_media(
+                    chat_id=FILE_DB_CHANNEL,
+                    file_id=file.file_id,
+                    caption=file.file_name,
+                )
+            except MediaEmpty as me:
+                # Handle the specific exception for empty or invalid media
+                logger.warning(f"Skipped sending invalid media: {file.file_name} - {str(me)}")
+                continue  # Skip to the next file in case of invalid media
 
         page_number = int(offset) // max_results + 1
-        await query.answer(f'Successfully sent all files from page {page_number} to the channel.')
+        await query.answer(f'Successfully sent all valid files from page {page_number} to the channel.')
     except Exception as e:
-        # Handle exceptions by sending an error message
+        # Handle other exceptions by sending an error message
         error_message = f"An error occurred: {str(e)}"
         await query.message.reply_text(error_message)
         
