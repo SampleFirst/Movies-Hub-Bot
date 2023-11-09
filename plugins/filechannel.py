@@ -180,4 +180,3 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
     except Exception as e:
         # Handle any exceptions here
         print(f"An error occurred: {str(e)}")
-```
