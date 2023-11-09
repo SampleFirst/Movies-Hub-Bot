@@ -1,36 +1,39 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from database.ia_filterdb import Media, get_files_from_channel
+from database.ia_filterdb import Media, get_all_media_files
 import asyncio
 from info import ADMINS, FILE_DB_CHANNEL 
 
 
 # Command to send all saved media in the database to the FILE_CHANNEL
-@Client.on_message(filters.command("send_all_media"))
-async def send_all_media_to_channel(_, message: Message):
+@Client.on_message(filters.command("send_all") & filters.private)
+async def send_all_media(bot, message):
+    if message.from_user.id not in ADMINS:
+        return 
 
-    # Check if the user has the necessary permissions to run this command
-    if user_id in ADMINS:
-        # Get all saved media from the database
-        saved_media, _ = await get_search_results(None, '', file_type=None, max_results=1000000, offset=0, filter=False)
+    files = await get_all_media_files()
+    
+    for file in files:
+        f_caption = file.caption
+        title = file.file_name
+        size = get_size(file.file_size)
 
-        # Send each media to the FILE_CHANNEL
-        for media in saved_media:
-            file_id = media.file_id
-            caption = media.caption
-            file_name = media.file_name
-            file_type = media.file_type
-            mime_type = media.mime_type
+        if f_caption is None:
+            f_caption = f"{title}"
 
-            # Send the media to the channel
-            try:
-                await message.forward(FILE_DB_CHANNEL)
-                await asyncio.sleep(1)  # Add a delay between sending each media
-            except Exception as e:
-                print(f"Error sending media: {e}")
+        try:
+            await bot.send_cached_media(
+                chat_id=FILE_DB_CHANNEL,
+                file_id=file.file_id,
+                caption=f_caption,
+                protect_content=False,
+            )
 
-        # Send a status message to the user
-        await message.reply("All saved media sent to FILE_CHANNEL.")
-    else:
-        await message.reply("You do not have permission to run this command.")
+        except PeerIdInvalid:
+            logger.error("Error: Peer ID Invalid!")
+            return "Peer ID Invalid!"
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            return f"Error: {e}"
 
+    return 'done'
