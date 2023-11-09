@@ -171,30 +171,41 @@ async def send_media_to_channel(client, query: CallbackQuery):
 
 @Client.on_callback_query(filters.regex(r'^get_all'))
 async def send_all_media_to_channel(client, query: CallbackQuery):
-    try:
-        files, offset, total_results = await get_all_files(max_results=max_results)
+    ident, offset, userid = query.data.split("#")
+        is_over = await send_all(client, chat_id, files, ident)
+        if is_over == 'done':
+            return await query.answer(f"Hᴇʏ {query.from_user.first_name}, Aʟʟ ғɪʟᴇs ᴏɴ ᴛʜɪs ᴘᴀɢᴇ ʜᴀs ʙᴇᴇɴ sᴇɴᴛ sᴜᴄᴄᴇssғᴜʟʟʏ ᴛᴏ ʏᴏᴜʀ PM !", show_alert=True)
+        else:
+            return await query.answer(f"Eʀʀᴏʀ: {is_over}", show_alert=True)
 
-        file_list = []
-        total_size = 0
-
-        for file in files:
-            file_list.append(f"{file.file_name} - {get_size(file.file_size)}")
-            total_size += file.file_size
-
-            await client.send_media(FILE_CHANNEL, file.file_id)
-        
-        file_list.append(f"Total: {get_size(total_size)}")
-
-        # Save the list of sent files to a .txt file
-        with open("sent_files.txt", "w") as file_txt:
-            for line in file_list:
-                file_txt.write(f"{line}\n")
-
-        # Send the .txt file as a document
-        await client.send_document(FILE_CHANNEL, document="sent_files.txt")
-
-        await query.answer("All media sent to the channel. File list sent as a .txt document.")
-    except Exception as e:
-        # Handle any exceptions here
-        print(f"An error occurred: {str(e)}")
-
+async def send_all(bot, chat_id, files, ident):
+    for file in files:
+        f_caption = file.caption
+        title = file.file_name
+        size = get_size(file.file_size)
+        if CUSTOM_FILE_CAPTION:
+            try:
+                f_caption = CUSTOM_FILE_CAPTION.format(
+                    file_name='' if title is None else title,
+                    file_size='' if size is None else size,
+                    file_caption='' if f_caption is None else f_caption
+                )
+            except Exception as e:
+                print(e)
+                f_caption = f_caption
+        if f_caption is None:
+            f_caption = f"{title}"
+        try:
+            await bot.send_cached_media(
+                chat_id=FILE_CHANNEL,
+                file_id=file.file_id,
+                caption=f_caption,
+            )
+                
+        except PeerIdInvalid:
+            logger.error("Eʀʀᴏʀ: Pᴇᴇʀ ID ɪɴᴠᴀʟɪᴅ !")
+            return "Pᴇᴇʀ ID ɪɴᴠᴀʟɪᴅ !"
+        except Exception as e:
+            logger.error(f"Eʀʀᴏʀ: {e}")
+            return f"Eʀʀᴏʀ: {e}"
+    return 'done'
