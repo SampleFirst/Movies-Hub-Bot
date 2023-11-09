@@ -124,7 +124,7 @@ async def get_all_media_files():
         filter = {}
         cursor = Media.find(filter)
         cursor.sort('$natural', -1)
-        files = await cursor.to_list(length=MAX_BTTN)  # Fetch all saved media files
+        files = await cursor.to_list(length=MAX_BTN)  # Fetch all saved media files
         return files
     except Exception as e:
         logger.exception(f'Error occurred while fetching all saved media: {str(e)}')
