@@ -62,7 +62,7 @@ async def next_page_button(client, query: CallbackQuery):
             [InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')]
             for file in files
         ]
-        btn.insert(49, 
+        btn.insert(MAX_BTTN,
          [
             InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data=f"get_all")
         ])
@@ -102,7 +102,7 @@ async def prev_page_button(client, query: CallbackQuery):
             [InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')]
             for file in files
         ]
-        btn.insert(49, 
+        btn.insert(MAX_BTTN,
          [
             InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data=f"get_all")
         ])
