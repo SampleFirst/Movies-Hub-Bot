@@ -21,36 +21,43 @@ def get_size(size):
     return f"{size:.2f} {power_labels[n]}"
 
     
-
-    
 @Client.on_message(filters.command("getallmedia") & filters.user(ADMINS))
 async def send_all_media(client, message):
     try:
         files, offset, total_results = await get_all_files(max_results=max_results)
 
-        page_number = int(offset) // max_results + 1
-
-        btn_rows = [
+        btn = [
             [
-                InlineKeyboardButton(text=f"{file.file_name} ({file.total_files})", callback_data=f'send#{file.file_id}')
-            ] for file in files
+                InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')
+            ]
+            for file in files
         ]
 
-        btn_rows.append([InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data="get_all")])
-
+        btn.insert(MAX_BTN, 
+            [
+                InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data=f"get_all")
+            ]
+        )
         if offset:
-            btn_rows.append([
+            page_number = int(offset) // max_results
+            btn.append([
                 InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages"),
                 InlineKeyboardButton(text="Next", callback_data=f"pmnext_{offset}")
             ])
+        else:
+            btn.append(
+                [
+                    InlineKeyboardButton(text=f"📄 Page 1/1", callback_data="pages")
+                ]
+            )
 
         cap = f"Here are the {total_results} media files found in the database."
 
-        await message.reply_text(cap, quote=True, reply_markup=InlineKeyboardMarkup(btn_rows))
+        abc = await message.reply_text(cap, quote=True, reply_markup=InlineKeyboardMarkup(btn))
     except Exception as e:
         # Handle any exceptions here
         print(f"An error occurred: {str(e)}")
-
+        
 @Client.on_callback_query(filters.regex(r'^pmnext_'))
 async def next_page_button(client, query: CallbackQuery):
     try:
