@@ -3,22 +3,12 @@ from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from pyrogram import Client, filters
 from database.ia_filterdb import Media, get_all_files, get_file_details
-from info import ADMINS, MAX_BTTN, FILE_CHANNEL
+from info import ADMINS, MAX_BTTN, FILE_DB_CHANNEL
+from utils import get_size, send_all
 
 max_results = MAX_BTTN
 MAX_BTN = 10
 
-def get_size(size):
-    size = int(size)
-    power = 2**10
-    n = 0
-    power_labels = {0: 'B', 1: 'KB', 2: 'MB', 3: 'GB', 4: 'TB'}
-
-    while size > power:
-        size /= power
-        n += 1
-
-    return f"{size:.2f} {power_labels[n]}"
 
     
 @Client.on_message(filters.command("getallmedia") & filters.user(ADMINS))
@@ -125,7 +115,6 @@ async def prev_page_button(client, query: CallbackQuery):
                 ])
             if next_offset < total_results:
                 btn.append([
-                    InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages"),
                     InlineKeyboardButton(text="Next", callback_data=f"pmnext_{next_offset}")
                 ])
                 await query.edit_message_text(
@@ -159,7 +148,7 @@ async def send_media_to_channel(client, query: CallbackQuery):
         
         # Send the selected media to the FILE_CHANNEL
         await client.send_cached_media(
-            chat_id=FILE_CHANNEL,
+            chat_id=FILE_DB_CHANNEL,
             file_id=file_id,
             caption=title,
         )
@@ -177,34 +166,3 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
     else:
         return await query.answer(f"Eʀʀᴏʀ: {is_over}", show_alert=True)
 
-async def send_all(bot, chat_id, files):
-    for file in files:
-        f_caption = file.caption
-        title = file.file_name
-        size = get_size(file.file_size)
-        if CUSTOM_FILE_CAPTION:
-            try:
-                f_caption = CUSTOM_FILE_CAPTION.format(
-                    file_name='' if title is None else title,
-                    file_size='' if size is None else size,
-                    file_caption='' if f_caption is None else f_caption
-                )
-            except Exception as e:
-                print(e)
-                f_caption = f_caption
-        if f_caption is None:
-            f_caption = f"{title}"
-        try:
-            await bot.send_cached_media(
-                chat_id=FILE_CHANNEL,
-                file_id=file.file_id,
-                caption=f_caption,
-            )
-                
-        except PeerIdInvalid:
-            logger.error("Eʀʀᴏʀ: Pᴇᴇʀ ID ɪɴᴠᴀʟɪᴅ !")
-            return "Pᴇᴇʀ ID ɪɴᴠᴀʟɪᴅ !"
-        except Exception as e:
-            logger.error(f"Eʀʀᴏʀ: {e}")
-            return f"Eʀʀᴏʀ: {e}"
-    return 'done'
