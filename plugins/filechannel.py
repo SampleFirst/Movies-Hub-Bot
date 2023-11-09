@@ -1,4 +1,5 @@
 import math
+import logging
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from pyrogram import Client, filters
@@ -10,7 +11,10 @@ max_results = MAX_BTTN
 MAX_BTN = 10
 
 
-    
+# Logging Configuration
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 @Client.on_message(filters.command("getallmedia") & filters.user(ADMINS))
 async def send_all_media(client, message):
     try:
@@ -45,8 +49,9 @@ async def send_all_media(client, message):
 
         abc = await message.reply_text(cap, quote=True, reply_markup=InlineKeyboardMarkup(btn))
     except Exception as e:
-        # Handle any exceptions here
-        print(f"An error occurred: {str(e)}")
+        # Handle exceptions by sending an error message
+        error_message = f"An error occurred: {str(e)}"
+        await query.message.reply_text(error_message)
         
 @Client.on_callback_query(filters.regex(r'^pmnext_'))
 async def next_page_button(client, query: CallbackQuery):
@@ -85,8 +90,9 @@ async def next_page_button(client, query: CallbackQuery):
             reply_markup=InlineKeyboardMarkup(btn)
         )
     except Exception as e:
-        # Handle any exceptions here
-        print(f"An error occurred: {str(e)}")
+        # Handle exceptions by sending an error message
+        error_message = f"An error occurred: {str(e)}"
+        await query.message.reply_text(error_message)
 
 @Client.on_callback_query(filters.regex(r'^pmprev_'))
 async def prev_page_button(client, query: CallbackQuery):
@@ -129,8 +135,9 @@ async def prev_page_button(client, query: CallbackQuery):
             reply_markup=InlineKeyboardMarkup(btn)
         )
     except Exception as e:
-        # Handle any exceptions here
-        print(f"An error occurred: {str(e)}")
+        # Handle exceptions by sending an error message
+        error_message = f"An error occurred: {str(e)}"
+        await query.message.reply_text(error_message)
 
 
 @Client.on_callback_query(filters.regex(r'^send#'))
@@ -155,8 +162,9 @@ async def send_media_to_channel(client, query: CallbackQuery):
         
         await query.answer('Media sent to the channel.')
     except Exception as e:
-        # Handle any exceptions here
-        print(f"An error occurred: {str(e)}")
+        # Handle exceptions by sending an error message
+        error_message = f"An error occurred: {str(e)}"
+        await query.message.reply_text(error_message)
 
 @Client.on_callback_query(filters.regex(r'^get_all'))
 async def send_all_media_to_channel(client, query: CallbackQuery):
@@ -178,5 +186,7 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
         page_number = int(offset) // max_results + 1
         await query.answer(f'Successfully sent all files from page {page_number} to the channel.')
     except Exception as e:
-        # Handle any exceptions here
-        print(f"An error occurred: {str(e)}")
+        # Handle exceptions by sending an error message
+        error_message = f"An error occurred: {str(e)}"
+        await query.message.reply_text(error_message)
+        
