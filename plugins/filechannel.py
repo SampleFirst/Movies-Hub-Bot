@@ -169,7 +169,8 @@ async def send_media_to_channel(client, query: CallbackQuery):
 @Client.on_callback_query(filters.regex(r'^get_all'))
 async def send_all_media_to_channel(client, query: CallbackQuery):
     try:
-        offset = query.data.split("_")[1] if "_" in query.data else 0
+        offset_str = query.data.split("_")[1] if "_" in query.data else "0"
+        offset = int(offset_str) if offset_str.isdigit() else 0
         files, new_offset, total_results = await get_all_files(max_results=max_results, offset=int(offset))
 
         if not files:
