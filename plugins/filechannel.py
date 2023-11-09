@@ -10,7 +10,8 @@ from utils import get_size
 
 max_results = MAX_BTTN
 MAX_BTN = 10
-
+BATCH_SIZE = 5  # Number of media files to send in each batch
+SEND_INTERVAL = 10  # Time interval (in seconds) between batches
 
 # Logging Configuration
 logger = logging.getLogger(__name__)
@@ -177,20 +178,26 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
         if not files:
             return await query.answer('No files found on this page.')
 
-        for file in files:
-            try:
-                # Send each file to the FILE_DB_CHANNEL
-                await client.send_cached_media(
-                    chat_id=FILE_DB_CHANNEL,
-                    file_id=file.file_id,
-                    caption=file.file_name,
-                )
-            except MediaEmpty as me:
-                # Handle the specific exception for empty or invalid media
-                logger.warning(f"Skipped sending invalid media: {file.file_name} - {str(me)}")
-                continue  # Skip to the next file in case of invalid media
-
         page_number = int(offset) // max_results + 1
+
+        for i in range(0, len(files), BATCH_SIZE):
+            batch = files[i:i+BATCH_SIZE]
+            for file in batch:
+                try:
+                    # Send each file to the FILE_DB_CHANNEL
+                    await client.send_cached_media(
+                        chat_id=FILE_DB_CHANNEL,
+                        file_id=file.file_id,
+                        caption=file.file_name,
+                    )
+                except MediaEmpty as me:
+                    # Handle the specific exception for empty or invalid media
+                    logger.warning(f"Skipped sending invalid media: {file.file_name} - {str(me)}")
+                    continue  # Skip to the next file in case of invalid media
+
+            # Add a break between batches
+            await asyncio.sleep(SEND_INTERVAL)
+
         await query.answer(f'Successfully sent all valid files from page {page_number} to the channel.')
     except Exception as e:
         # Handle other exceptions by sending an error message
