@@ -23,7 +23,9 @@ from info import(
     LONG_IMDB_DESCRIPTION, 
     MAX_LIST_ELM, 
     SHORTLINK_URL, 
-    SHORTLINK_API
+    SHORTLINK_API,
+    CUSTOM_FILE_CAPTION,
+    FILE_DB_CHANNEL
 )
 
 # Logging Configuration
