@@ -4,7 +4,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQ
 from pyrogram import Client, filters
 from database.ia_filterdb import Media, get_all_files, get_file_details
 from info import ADMINS, MAX_BTTN, FILE_DB_CHANNEL
-from utils import get_size, send_all
+from utils import get_size
 
 max_results = MAX_BTTN
 MAX_BTN = 10
@@ -160,9 +160,20 @@ async def send_media_to_channel(client, query: CallbackQuery):
 
 @Client.on_callback_query(filters.regex(r'^get_all'))
 async def send_all_media_to_channel(client, query: CallbackQuery):
-    is_over = await send_all(client, chat_id, files)
-    if is_over == 'done':
-        return await query.answer(f"Hᴇʏ {query.from_user.first_name}, Aʟʟ ғɪʟᴇs ᴏɴ ᴛʜɪs ᴘᴀɢᴇ ʜᴀs ʙᴇᴇɴ sᴇɴᴛ sᴜᴄᴄᴇssғᴜʟʟʏ ᴛᴏ ʏᴏᴜʀ PM !", show_alert=True)
-    else:
-        return await query.answer(f"Eʀʀᴏʀ: {is_over}", show_alert=True)
+    try:
+        offset = query.data.split("#")[1] if "#" in query.data else 0
+        files, _, total_results = await get_all_files(max_results=max_results, offset=int(offset))
 
+        for file in files:
+            await client.send_cached_media(
+                chat_id=FILE_DB_CHANNEL,
+                file_id=file.file_id,
+                caption=file.file_name,
+            )
+
+        page_number = int(offset) // max_results + 1
+        await query.answer(f'Sent all files from page {page_number}/{math.ceil(total_results / max_results)} to the channel.')
+    except Exception as e:
+        # Handle any exceptions here
+        print(f"An error occurred: {str(e)}")
+        
