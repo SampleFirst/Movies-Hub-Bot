@@ -171,12 +171,11 @@ async def send_media_to_channel(client, query: CallbackQuery):
 
 @Client.on_callback_query(filters.regex(r'^get_all'))
 async def send_all_media_to_channel(client, query: CallbackQuery):
-    ident, offset, userid = query.data.split("#")
-        is_over = await send_all(client, chat_id, files)
-        if is_over == 'done':
-            return await query.answer(f"Hᴇʏ {query.from_user.first_name}, Aʟʟ ғɪʟᴇs ᴏɴ ᴛʜɪs ᴘᴀɢᴇ ʜᴀs ʙᴇᴇɴ sᴇɴᴛ sᴜᴄᴄᴇssғᴜʟʟʏ ᴛᴏ ʏᴏᴜʀ PM !", show_alert=True)
-        else:
-            return await query.answer(f"Eʀʀᴏʀ: {is_over}", show_alert=True)
+    is_over = await send_all(client, chat_id, files)
+    if is_over == 'done':
+        return await query.answer(f"Hᴇʏ {query.from_user.first_name}, Aʟʟ ғɪʟᴇs ᴏɴ ᴛʜɪs ᴘᴀɢᴇ ʜᴀs ʙᴇᴇɴ sᴇɴᴛ sᴜᴄᴄᴇssғᴜʟʟʏ ᴛᴏ ʏᴏᴜʀ PM !", show_alert=True)
+    else:
+        return await query.answer(f"Eʀʀᴏʀ: {is_over}", show_alert=True)
 
 async def send_all(bot, chat_id, files):
     for file in files:
