@@ -6,6 +6,7 @@ from database.ia_filterdb import Media, get_all_files, get_file_details
 from info import ADMINS, MAX_BTTN, FILE_CHANNEL
 
 max_results = MAX_BTTN
+MAX_BTN = 10
 
 def get_size(size):
     size = int(size)
@@ -20,32 +21,32 @@ def get_size(size):
     return f"{size:.2f} {power_labels[n]}"
 
     
+
+    
 @Client.on_message(filters.command("getallmedia") & filters.user(ADMINS))
 async def send_all_media(client, message):
     try:
         files, offset, total_results = await get_all_files(max_results=max_results)
 
-        btn = [
-            [InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')]
-            for file in files
+        page_number = int(offset) // max_results + 1
+
+        btn_rows = [
+            [
+                InlineKeyboardButton(text=f"{file.file_name} ({file.total_files})", callback_data=f'send#{file.file_id}')
+            ] for file in files
         ]
 
-        btn.insert(49, 
-         [
-            InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data=f"get_all")
-        ])
+        btn_rows.append([InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data="get_all")])
+
         if offset:
-            page_number = int(offset) // max_results
-            btn.append([
+            btn_rows.append([
                 InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages"),
                 InlineKeyboardButton(text="Next", callback_data=f"pmnext_{offset}")
             ])
-        else:
-            btn.append([InlineKeyboardButton(text=f"📄 Page 1/1", callback_data="pages")])
 
         cap = f"Here are the {total_results} media files found in the database."
 
-        abc = await message.reply_text(cap, quote=True, reply_markup=InlineKeyboardMarkup(btn))
+        await message.reply_text(cap, quote=True, reply_markup=InlineKeyboardMarkup(btn_rows))
     except Exception as e:
         # Handle any exceptions here
         print(f"An error occurred: {str(e)}")
