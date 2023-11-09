@@ -33,7 +33,7 @@ async def send_all_media(client, message):
             for file in files
         ]
 
-        btn.insert(MAX_BTN, 
+        btn.insert(MAX_BTTN, 
             [
                 InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data=f"get_all")
             ]
