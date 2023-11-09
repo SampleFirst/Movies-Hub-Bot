@@ -161,18 +161,23 @@ async def send_media_to_channel(client, query: CallbackQuery):
 @Client.on_callback_query(filters.regex(r'^get_all'))
 async def send_all_media_to_channel(client, query: CallbackQuery):
     try:
-        offset = query.data.split("_")[1] if '_' in query.data else 0
-        files, _, _ = await get_all_files(max_results=max_results, offset=int(offset))
-        
+        offset = query.data.split("_")[1] if "_" in query.data else 0
+        files, new_offset, total_results = await get_all_files(max_results=max_results, offset=int(offset))
+
+        if not files:
+            return await query.answer('No files found on this page.')
+
         for file in files:
+            # Send each file to the FILE_DB_CHANNEL
             await client.send_cached_media(
                 chat_id=FILE_DB_CHANNEL,
                 file_id=file.file_id,
                 caption=file.file_name,
             )
 
-        await query.answer('All media files from the current page sent to the channel.')
+        page_number = int(offset) // max_results + 1
+        await query.answer(f'Successfully sent all files from page {page_number} to the channel.')
     except Exception as e:
         # Handle any exceptions here
         print(f"An error occurred: {str(e)}")
-        
+```
