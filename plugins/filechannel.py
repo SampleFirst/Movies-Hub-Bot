@@ -175,7 +175,7 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
     try:
         offset_str = query.data.split("_")[1] if "_" in query.data else "0"
         offset = int(offset_str) if offset_str.isdigit() else 0
-        files, new_offset, total_results = await get_all_files(max_results=max_results, offset=int(offset))
+        files, _, total_results = await get_all_files(max_results=max_results, offset=int(offset))
         
         if not files:
             return await query.answer('No files found on this page.')
