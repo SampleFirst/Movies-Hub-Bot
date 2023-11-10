@@ -176,13 +176,15 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
         offset_str = query.data.split("_")[1] if "_" in query.data else "0"
         offset = int(offset_str) if offset_str.isdigit() else 0
         files, new_offset, total_results = await get_all_files(max_results=max_results, offset=int(offset))
-
+        
         if not files:
             return await query.answer('No files found on this page.')
-
-        page_number = int(offset) // max_results + 1
-        total_files_sent = 0
-        errors = 0
+        else:
+            total_files = len(files)
+            total_sent = 0
+            total_invalid = 0
+            status_message = f"Total Files: {total_files}. Sending process started."
+            status = await query.message.reply_text(status_message)
 
         for i in range(0, len(files), BATCH_SIZE):
             batch = files[i:i+BATCH_SIZE]
@@ -193,33 +195,28 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
                         file_id=file.file_id,
                         caption=file.file_name,
                     )
-                    total_files_sent += 1
+                    total_sent += 1
                 except FloodWait as e:
                     await asyncio.sleep(e.value)
                     continue
                 except PeerIdInvalid:
-                    errors += 1
-                    logger.error("Error: Peer ID invalid!")
+                    total_invalid += 1
                     continue
                 except MediaEmpty as me:
-                    errors += 1
-                    logger_warning = f"Skipped sending invalid media: {file.file_name} - {str(me)}"
-                    logger.warning(logger_warning)
+                    total_invalid += 1
                     continue
                 except Exception as e:
-                    errors += 1
+                    total_invalid += 1
                     error_message = f"An error occurred: {str(e)}"
                     logger.error(error_message)
+                    await query.message.reply_text(error_message)
                     continue
             await asyncio.sleep(SEND_INTERVAL)
+            status_update = f"Total Files: {total_files}\nSent: {total_sent}\nInvalid: {total_invalid}"
+            await status.edit_text(status_update)
 
-        success_message = f'Successfully sent {total_files_sent} out of {len(files)} files from page {page_number} to the channel.'
-        if errors > 0:
-            error_message = f'Encountered {errors} errors while sending files.'
-            await query.answer(f"{success_message}\n{error_message}")
-        else:
-            await query.answer(success_message)
     except Exception as e:
         error_message = f"An error occurred: {str(e)}"
         logger.error(error_message)
         await query.message.reply_text(error_message)
+        
