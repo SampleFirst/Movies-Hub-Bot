@@ -2,8 +2,9 @@ import asyncio
 import math
 import logging
 from pyrogram.errors import MessageNotModified
-from pyrogram.errors.exceptions.bad_request_400 import MediaEmpty
+from pyrogram.errors.exceptions.bad_request_400 import MediaEmpty,
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from pyrogram.errors import FloodWait, PeerIdInvalid
 from pyrogram import Client, filters
 from database.ia_filterdb import Media, get_all_files, get_file_details
 from info import ADMINS, MAX_BTTN, FILE_DB_CHANNEL
@@ -191,10 +192,20 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
                         file_id=file.file_id,
                         caption=file.file_name,
                     )
+                except FloodWait as e:
+                    await asyncio.sleep(e.value)
+                except PeerIdInvalid:
+                    logger.error("Error: Peer ID invalid!")
                 except MediaEmpty as me:
                     # Handle the specific exception for empty or invalid media
-                    logger.warning(f"Skipped sending invalid media: {file.file_name} - {str(me)}")
+                    logger_warning = f"Skipped sending invalid media: {file.file_name} - {str(me)}"
+                    logger.warning(logger_warning)
                     continue  # Skip to the next file in case of invalid media
+                except Exception as e:
+                    # Handle other exceptions by sending an error message
+                    error_message = f"An error occurred: {str(e)}"
+                    logger.error(error_message)
+                    await query.message.reply_text(error_message)
 
             # Add a break between batches
             await asyncio.sleep(SEND_INTERVAL)
@@ -203,5 +214,6 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
     except Exception as e:
         # Handle other exceptions by sending an error message
         error_message = f"An error occurred: {str(e)}"
+        logger.error(error_message)
         await query.message.reply_text(error_message)
-        
+
