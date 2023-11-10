@@ -12,7 +12,7 @@ from utils import get_size
 
 max_results = MAX_BTTN
 MAX_BTN = 10
-BATCH_SIZE = 5  # Number of media files to send in each batch
+BATCH_SIZE = 10 # Number of media files to send in each batch
 SEND_INTERVAL = 10  # Time interval (in seconds) between batches
 
 # Logging Configuration
