@@ -12,7 +12,7 @@ from utils import get_size
 
 max_results = MAX_BTTN
 MAX_BTN = 10
-BATCH_SIZE = 10 # Number of media files to send in each batch
+BATCH_SIZE = 5  # Number of media files to send in each batch
 SEND_INTERVAL = 10  # Time interval (in seconds) between batches
 
 # Logging Configuration
@@ -174,8 +174,10 @@ async def send_media_to_channel(client, query: CallbackQuery):
 async def send_all_media_to_channel(client, query: CallbackQuery):
     try:
         offset_str = query.data.split("_")[1] if "_" in query.data else "0"
-        offset = int(offset_str) if offset_str.isdigit() else 0
-        files, _, total_results = await get_all_files(max_results=max_results, offset=int(offset))
+        current_page = int(offset_str) if offset_str.isdigit() else 0
+        offset = current_page * max_results  # Calculate the proper offset for the current page
+
+        files, _, total_results = await get_all_files(max_results=max_results, offset=offset)
         
         if not files:
             return await query.answer('No files found on this page.')
