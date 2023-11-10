@@ -2,7 +2,7 @@ import asyncio
 import math
 import logging
 from pyrogram.errors import MessageNotModified
-from pyrogram.errors.exceptions.bad_request_400 import MediaEmpty,
+from pyrogram.errors.exceptions.bad_request_400 import MediaEmpty
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from pyrogram.errors import FloodWait, PeerIdInvalid
 from pyrogram import Client, filters
