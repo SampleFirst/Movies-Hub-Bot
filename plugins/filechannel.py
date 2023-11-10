@@ -181,39 +181,45 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
             return await query.answer('No files found on this page.')
 
         page_number = int(offset) // max_results + 1
+        total_files_sent = 0
+        errors = 0
 
         for i in range(0, len(files), BATCH_SIZE):
             batch = files[i:i+BATCH_SIZE]
             for file in batch:
                 try:
-                    # Send each file to the FILE_DB_CHANNEL
                     await client.send_cached_media(
                         chat_id=FILE_DB_CHANNEL,
                         file_id=file.file_id,
                         caption=file.file_name,
                     )
+                    total_files_sent += 1
                 except FloodWait as e:
                     await asyncio.sleep(e.value)
+                    continue
                 except PeerIdInvalid:
+                    errors += 1
                     logger.error("Error: Peer ID invalid!")
+                    continue
                 except MediaEmpty as me:
-                    # Handle the specific exception for empty or invalid media
+                    errors += 1
                     logger_warning = f"Skipped sending invalid media: {file.file_name} - {str(me)}"
                     logger.warning(logger_warning)
-                    continue  # Skip to the next file in case of invalid media
+                    continue
                 except Exception as e:
-                    # Handle other exceptions by sending an error message
+                    errors += 1
                     error_message = f"An error occurred: {str(e)}"
                     logger.error(error_message)
-                    await query.message.reply_text(error_message)
-
-            # Add a break between batches
+                    continue
             await asyncio.sleep(SEND_INTERVAL)
 
-        await query.answer(f'Successfully sent all valid files from page {page_number} to the channel.')
+        success_message = f'Successfully sent {total_files_sent} out of {len(files)} files from page {page_number} to the channel.'
+        if errors > 0:
+            error_message = f'Encountered {errors} errors while sending files.'
+            await query.answer(f"{success_message}\n{error_message}")
+        else:
+            await query.answer(success_message)
     except Exception as e:
-        # Handle other exceptions by sending an error message
         error_message = f"An error occurred: {str(e)}"
         logger.error(error_message)
         await query.message.reply_text(error_message)
-
