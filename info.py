@@ -120,7 +120,7 @@ AUTO_DELETE = is_enabled((environ.get('AUTO_DELETE', "True")), True)
 # Other 
 PORT = os.environ.get("PORT", "8080")
 MAX_BTN = int(environ.get('MAX_BTN', "5"))
-MAX_BTTN = int(environ.get('MAX_BTTN', "50"))
+MAX_BTTN = int(environ.get('MAX_BTTN', "5"))
 MSG_ALRT = environ.get('MSG_ALRT', 'Thank You Users....❤')
 CUSTOM_FILE_CAPTION = environ.get("CUSTOM_FILE_CAPTION", f"{script.CUSTOM_FILE_CAPTION}")
 BATCH_FILE_CAPTION = environ.get("BATCH_FILE_CAPTION", CUSTOM_FILE_CAPTION)
