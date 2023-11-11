@@ -136,7 +136,21 @@ async def get_all_files(max_results=MAX_BTTN, offset=0):
     files = await cursor.to_list(length=max_results)
 
     return files, next_offset, total_results
-    
+
+async def get_all_media(offset=0):
+    total_results = await Media.count_documents({})
+    cursor = Media.find({})
+
+    # Sort by recent
+    cursor.sort('$natural', -1)
+    # Skip files according to offset
+    cursor.skip(offset)
+    # Get all files
+    files = await cursor.to_list(length=total_results)
+
+    return files, total_results
+
+
 async def get_all_media_files():
     """Get all saved media files from the database."""
     try:
