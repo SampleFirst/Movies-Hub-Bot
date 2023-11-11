@@ -23,7 +23,7 @@ logger.setLevel(logging.INFO)
 @Client.on_message(filters.command("get_out") & filters.user(ADMINS))
 async def send_all_media_on(client, message):
     try:
-        files, offset, total_results = await get_all_media(offset=offset)
+        files, total_results = await get_all_media(offset=0)
         
         if not files:
             return await query.answer('No files found on this page.')
