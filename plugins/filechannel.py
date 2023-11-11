@@ -15,7 +15,7 @@ SEND_INTERVAL = 10
 
 # Logging Configuration
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name)
+logger = logging.getLogger(__name__)
 
 
 @Client.on_message(filters.command("getallmedia") & filters.user(ADMINS))
