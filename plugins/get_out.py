@@ -28,8 +28,6 @@ async def send_all_media_on(client, message):
         if not files:
             return await query.answer('No files found on this page.')
         else:
-            return await query.answer('No files found on this page.')
-        else:
             total_files = len(files)
             total_sent = 0
             total_invalid = 0
