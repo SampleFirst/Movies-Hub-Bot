@@ -10,6 +10,15 @@ from utils import get_size
 
 
 # Define constants
+MAX_BTN = 10
+BATCH_SIZE = 5
+SEND_INTERVAL = 10
+
+# Logging Configuration
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
 @Client.on_message(filters.command("getallmedia") & filters.user(ADMINS))
 async def send_all_media(client, message):
     try:
@@ -47,7 +56,6 @@ async def send_all_media(client, message):
         # Handle exceptions by sending an error message
         error_message = f"An error occurred: {str(e)}"
         await query.message.reply_text(error_message)
-
 
 @Client.on_callback_query(filters.regex(r'^pmnext_'))
 async def next_page_button(client, query: CallbackQuery):
@@ -169,46 +177,51 @@ async def send_media_to_channel(client, query: CallbackQuery):
 @Client.on_callback_query(filters.regex(r'^send_all'))
 async def send_all_media_to_channel(client, query: CallbackQuery):
     try:
-        offset_str = query.data.split("_")[1] if "_" in query.data else "0"
-        current_page = int(offset_str) if offset_str.isdigit() else 0
-        offset = current_page * MAX_BTTN
+        max_results = MAX_BTN  # Update to the correct constant name
+        offset = 0  # Start from the beginning
 
-        max_results = MAX_BTTN
-        files, _, total_results = await get_all_files(max_results=max_results, offset=offset)
+        files = []  # Initialize an empty list to store all files
 
+        # Retrieve all files by looping through all pages
+        while True:
+            batch, _, _ = await get_all_files(max_results=max_results, offset=offset)
+            if not batch:
+                break  # Exit the loop if no more files
+            files.extend(batch)
+            offset += max_results  # Move to the next set of files
+
+        total_files = len(files)
         if not files:
-            return await query.answer('No files found on this page.')
-        else:
-            total_files = len(files)
-            total_sent = 0
-            total_invalid = 0
-            status_message = f"Total Files: {total_files}. Sending process started."
-            status = await query.message.reply_text(status_message)
+            return await query.answer('No files found.')
 
-        for i in range(0, len(files), BATCH_SIZE):
-            batch = files[i:i + BATCH_SIZE]
-            for file in batch:
-                try:
-                    await client.send_cached_media(
-                        chat_id=FILE_DB_CHANNEL,
-                        file_id=file.file_id,
-                        caption=file.file_name,
-                    )
-                    total_sent += 1
-                except FloodWait as e:
-                    await asyncio.sleep(e.value)
-                    continue
-                except PeerIdInvalid:
-                    total_invalid += 1
-                    continue
-                except Exception as e:
-                    total_invalid += 1
-                    error_message = f"An error occurred: {str(e)}"
-                    logger.error(error_message)
-                    await query.message.reply_text(error_message)
-                    continue
+        total_sent = 0
+        total_invalid = 0
+        status_message = f"Total Files: {total_files}. Sending process started."
+        status = await query.message.reply_text(status_message)
+
+        for file in files:
+            try:
+                await client.send_cached_media(
+                    chat_id=FILE_DB_CHANNEL,
+                    file_id=file.file_id,
+                    caption=file.file_name,
+                )
+                total_sent += 1
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                continue
+            except PeerIdInvalid:
+                total_invalid += 1
+                continue
+            except Exception as e:
+                total_invalid += 1
+                error_message = f"An error occurred: {str(e)}"
+                logger.error(error_message)
+                await query.message.reply_text(error_message)
+                continue
 
             await asyncio.sleep(SEND_INTERVAL)
+
             status_update = f"Total Files: {total_files}\nSent: {total_sent}\nInvalid: {total_invalid}"
             await status.edit_text(status_update)
 
@@ -216,4 +229,4 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
         error_message = f"An error occurred: {str(e)}"
         logger.error(error_message)
         await query.message.reply_text(error_message)
-
+        
