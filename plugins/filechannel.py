@@ -185,11 +185,13 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
             total_files = len(files)
             total_sent = 0
             total_invalid = 0
+            left_files = total_files - total_sent - total_invalid
             status_message = f"Total Files: {total_files}. Sending process started."
             status = await query.message.reply_text(status_message)
 
         for i in range(0, len(files), BATCH_SIZE):
             batch = files[i:i + BATCH_SIZE]
+            deleted = 0
             for file in batch:
                 try:
                     await client.send_cached_media(
@@ -198,6 +200,11 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
                         caption=file.file_name,
                     )
                     total_sent += 1
+                    result = await Media.collection.delete_one({
+                        '_id': file_ids,
+                    })
+                    if result.deleted_count:
+                    deleted += 1
                 except FloodWait as e:
                     await asyncio.sleep(e.value)
                     continue
@@ -212,7 +219,7 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
                     continue
 
             await asyncio.sleep(SEND_INTERVAL)
-            status_update = f"Total Files: {total_files}\nSent: {total_sent}\nInvalid: {total_invalid}"
+            status_update = f"Total Files: {total_files}\nSent: {total_sent}\nInvalid: {total_invalid}\nTotal Deleted: {deleted}\nLeft Files: {left_files}"
             await status.edit_text(status_update)
 
     except Exception as e:
@@ -221,3 +228,4 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
         await query.message.reply_text(error_message)
         
         
+
