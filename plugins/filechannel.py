@@ -9,7 +9,6 @@ from info import ADMINS, MAX_BTTN, FILE_DB_CHANNEL
 from utils import get_size
 
 # Define constants
-MAX_BTN = 10
 BATCH_SIZE = 5
 SEND_INTERVAL = 10
 
@@ -31,9 +30,9 @@ async def send_all_media(client, message):
             for file in files
         ]
 
-        btn.insert(MAX_BTN,
+        btn.insert(MAX_BTTN,
             [
-                InlineKeyboardButton("Send All", callback_data=f"send_all{offset}")
+                InlineKeyboardButton("Send All", callback_data=f"send_all")
             ]
         )
 
@@ -70,9 +69,9 @@ async def next_page_button(client, query: CallbackQuery):
             for file in files
         ]
 
-        btn.insert(MAX_BTN,
+        btn.insert(MAX_BTTN,
             [
-                InlineKeyboardButton("Send All", callback_data=f"send_all{new_offset}")
+                InlineKeyboardButton("Send All", callback_data=f"send_all")
             ]
         )
 
@@ -113,9 +112,9 @@ async def prev_page_button(client, query: CallbackQuery):
             for file in files
         ]
 
-        btn.insert(MAX_BTN,
+        btn.insert(MAX_BTTN,
             [
-                InlineKeyboardButton("Send All", callback_data=f"send_all{new_offset}")
+                InlineKeyboardButton("Send All", callback_data=f"send_all")
             ]
         )
 
@@ -128,19 +127,13 @@ async def prev_page_button(client, query: CallbackQuery):
                 btn.append([
                     InlineKeyboardButton(text="Previous", callback_data=f"pmprev_{prev_offset}"),
                     InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages"),
+                    InlineKeyboardButton(text="Next", callback_data=f"pmnext_{next_offset}"),
                 ])
-
-            if next_offset < total_results:
+            elif next_offset < total_results:
                 btn.append([
-                    InlineKeyboardButton(text="Next", callback_data=f"pmnext_{next_offset}")
+                    InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages"),
+                    InlineKeyboardButton(text="Next", callback_data=f"pmnext_{new_offset}")
                 ])
-
-                await query.edit_message_text(
-                    text=query.message.text.markdown,
-                    reply_markup=InlineKeyboardMarkup(btn)
-                )
-        else:
-            btn.append([InlineKeyboardButton(text=f"📄 Page {page_number}/{math.ceil(total_results / max_results)}", callback_data="pages")])
 
         await query.edit_message_text(
             text=query.message.text.markdown,
@@ -149,6 +142,7 @@ async def prev_page_button(client, query: CallbackQuery):
     except Exception as e:
         error_message = f"An error occurred: {str(e)}"
         await query.message.reply_text(error_message)
+
 
 @Client.on_callback_query(filters.regex(r'^send#'))
 async def send_media_to_channel(client, query: CallbackQuery):
