@@ -9,6 +9,7 @@ from info import ADMINS, MAX_BTTN, FILE_DB_CHANNEL
 from utils import get_size
 
 # Define constants
+MAX_BTNN = 1000000
 BATCH_SIZE = 5
 SEND_INTERVAL = 10
 
@@ -175,7 +176,7 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
         current_page = int(offset_str) if offset_str.isdigit() else 0
         offset = current_page * MAX_BTTN
         
-        max_results = await Media.count_documents({})
+        max_results = MAX_BTNN
         files, _, total_results = await get_all_files(max_results=max_results, offset=offset)
 
         if not files:
