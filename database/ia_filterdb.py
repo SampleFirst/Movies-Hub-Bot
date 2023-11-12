@@ -137,6 +137,22 @@ async def get_all_files(max_results=MAX_BTTN, offset=0):
 
     return files, next_offset, total_results
 
+async def get_all_mediafiles(offset=0):
+    """Retrieve all files without respecting max_results."""
+
+    total_results = await Media.count_documents({})
+    next_offset = ''  # Always send all, so no next_offset required
+
+    cursor = Media.find({})
+    # Sort by recent
+    cursor.sort('$natural', -1)
+    # Slice files according to the offset without considering max_results
+    cursor.skip(offset)
+    # Get a list of all files, regardless of the limit
+    files = await cursor.to_list(length=None)  # Fetch all files
+
+    return files, next_offset, total_results
+
 async def get_all_media(offset=0):
     total_results = await Media.count_documents({})
     cursor = Media.find({})
