@@ -174,8 +174,10 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
         offset_str = query.data.split("_")[1] if "_" in query.data else "0"
         current_page = int(offset_str) if offset_str.isdigit() else 0
         offset = current_page * MAX_BTTN
+        
+        total_media = await Media.count_documents()
 
-        max_results = MAX_BTTN
+        max_results = total_media
         files, _, total_results = await get_all_files(max_results=max_results, offset=offset)
 
         if not files:
