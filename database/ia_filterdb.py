@@ -118,7 +118,7 @@ async def get_files_from_channel(file_type, max_results, batch_index=0):
     files = await cursor.to_list(length=max_results)
     return files if files else []  # Return an empty list if no files are found
 
-async def get_all_files(max_results=max_results, offset=0):
+async def get_all_files(max_results=0, offset=0):
     """Retrieve all files with pagination."""
     
     total_results = await Media.count_documents({})
