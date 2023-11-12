@@ -46,7 +46,6 @@ async def send_all_media(client, message):
         total_videos = sum(1 for file in files if file.file_type == 'video')
         total_audios = sum(1 for file in files if file.file_type == 'audio')
         total_documents = sum(1 for file in files if file.file_type == 'document')
-        total_corrupted_files = sum(1 for file in files if file.is_corrupted)
 
         # Generating statistics message
         stats_message = (
@@ -54,7 +53,6 @@ async def send_all_media(client, message):
             f"Total Videos: {total_videos}\n"
             f"Total Audio: {total_audios}\n"
             f"Total Documents: {total_documents}\n"
-            f"Total Corrupted Files: {total_corrupted_files}"
         )
 
         # Prepare pagination button if there are multiple pages
@@ -81,6 +79,7 @@ async def send_all_media(client, message):
     except Exception as e:
         error_message = f"An error occurred: {str(e)}"
         await message.reply_text(error_message)
+
 
 @Client.on_callback_query(filters.regex(r'^pmnext_'))
 async def next_page_button(client, query: CallbackQuery):
