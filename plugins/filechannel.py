@@ -4,7 +4,7 @@ import logging
 from pyrogram.errors import FloodWait, PeerIdInvalid
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from database.ia_filterdb import Media, get_all_files, get_file_details
+from database.ia_filterdb import Media, get_all_files, get_all_mediafiles, get_file_details
 from info import ADMINS, MAX_BTTN, FILE_DB_CHANNEL
 from utils import get_size
 
@@ -175,8 +175,8 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
         current_page = int(offset_str) if offset_str.isdigit() else 0
         offset = current_page * MAX_BTTN
 
-        max_results = MAX_BTTN
-        files, _, total_results = await get_all_files(max_results=max_results, offset=offset)
+        # Call the updated get_all_files function without specifying max_results
+        files, _, total_results = await get_all_mediafiles(offset=offset)
 
         if not files:
             return await query.answer('No files found on this page.')
@@ -187,35 +187,33 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
             status_message = f"Total Files: {total_files}. Sending process started."
             status = await query.message.reply_text(status_message)
 
-        for i in range(0, len(files), BATCH_SIZE):
-            batch = files[i:i + BATCH_SIZE]
-            for file in batch:
-                try:
-                    await client.send_cached_media(
-                        chat_id=FILE_DB_CHANNEL,
-                        file_id=file.file_id,
-                        caption=file.file_name,
-                    )
-                    total_sent += 1
-                except FloodWait as e:
-                    await asyncio.sleep(e.value)
-                    continue
-                except PeerIdInvalid:
-                    total_invalid += 1
-                    continue
-                except Exception as e:
-                    total_invalid += 1
-                    error_message = f"An error occurred: {str(e)}"
-                    logger.error(error_message)
-                    await query.message.reply_text(error_message)
-                    continue
+        for file in files:
+            try:
+                await client.send_cached_media(
+                    chat_id=FILE_DB_CHANNEL,
+                    file_id=file.file_id,
+                    caption=file.file_name,
+                )
+                total_sent += 1
+            except FloodWait as e:
+                await asyncio.sleep(e.value)
+                continue
+            except PeerIdInvalid:
+                total_invalid += 1
+                continue
+            except Exception as e:
+                total_invalid += 1
+                error_message = f"An error occurred: {str(e)}"
+                logger.error(error_message)
+                await query.message.reply_text(error_message)
+                continue
 
             await asyncio.sleep(SEND_INTERVAL)
-            status_update = f"Total Files: {total_files}\nSent: {total_sent}\nInvalid: {total_invalid}"
-            await status.edit_text(status_update)
+
+        status_update = f"Total Files: {total_files}\nSent: {total_sent}\nInvalid: {total_invalid}"
+        await status.edit_text(status_update)
 
     except Exception as e:
         error_message = f"An error occurred: {str(e)}"
         logger.error(error_message)
         await query.message.reply_text(error_message)
-        
