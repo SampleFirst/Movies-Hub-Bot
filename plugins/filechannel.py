@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 @Client.on_message(filters.command("getallmedia") & filters.user(ADMINS))
 async def send_all_media(client, message):
     try:
+        max_results = MAX_BTTN
         files, offset, total_results = await get_all_files(max_results=max_results)
 
         btn = [
@@ -177,7 +178,7 @@ async def send_media_to_channel(client, query: CallbackQuery):
 @Client.on_callback_query(filters.regex(r'^send_all'))
 async def send_all_media_to_channel(client, query: CallbackQuery):
     try:
-        max_results = MAX_BTN  # Update to the correct constant name
+        max_results = MAX_BTTN  # Update to the correct constant name
         offset = 0  # Start from the beginning
 
         files = []  # Initialize an empty list to store all files
