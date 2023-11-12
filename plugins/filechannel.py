@@ -8,7 +8,6 @@ from database.ia_filterdb import Media, get_all_files, get_file_details
 from info import ADMINS, MAX_BTTN, FILE_DB_CHANNEL
 from utils import get_size
 
-
 # Define constants
 MAX_BTN = 10
 BATCH_SIZE = 5
@@ -32,11 +31,12 @@ async def send_all_media(client, message):
             for file in files
         ]
 
-        btn.insert(MAX_BTTN, 
+        btn.insert(MAX_BTN,
             [
-                InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data=f"get_all{current_page}{current_page}")
+                InlineKeyboardButton("Send All", callback_data=f"send_all{offset}")
             ]
         )
+
         if offset:
             page_number = int(offset) // max_results
             btn.append([
@@ -52,11 +52,10 @@ async def send_all_media(client, message):
 
         cap = f"Here are the {total_results} media files found in the database."
 
-        abc = await message.reply_text(cap, quote=True, reply_markup=InlineKeyboardMarkup(btn))
+        await message.reply_text(cap, quote=True, reply_markup=InlineKeyboardMarkup(btn))
     except Exception as e:
-        # Handle exceptions by sending an error message
         error_message = f"An error occurred: {str(e)}"
-        await query.message.reply_text(error_message)
+        await message.reply_text(error_message)
 
 @Client.on_callback_query(filters.regex(r'^pmnext_'))
 async def next_page_button(client, query: CallbackQuery):
@@ -71,7 +70,7 @@ async def next_page_button(client, query: CallbackQuery):
             for file in files
         ]
 
-        btn.insert(MAX_BTTN,
+        btn.insert(MAX_BTN,
             [
                 InlineKeyboardButton("Send All", callback_data=f"send_all{new_offset}")
             ]
@@ -114,7 +113,7 @@ async def prev_page_button(client, query: CallbackQuery):
             for file in files
         ]
 
-        btn.insert(MAX_BTTN,
+        btn.insert(MAX_BTN,
             [
                 InlineKeyboardButton("Send All", callback_data=f"send_all{new_offset}")
             ]
@@ -178,51 +177,46 @@ async def send_media_to_channel(client, query: CallbackQuery):
 @Client.on_callback_query(filters.regex(r'^send_all'))
 async def send_all_media_to_channel(client, query: CallbackQuery):
     try:
-        max_results = MAX_BTTN  # Update to the correct constant name
-        offset = 0  # Start from the beginning
+        offset_str = query.data.split("_")[1] if "_" in query.data else "0"
+        current_page = int(offset_str) if offset_str.isdigit() else 0
+        offset = current_page * MAX_BTTN
 
-        files = []  # Initialize an empty list to store all files
+        max_results = MAX_BTTN
+        files, _, total_results = await get_all_files(max_results=max_results, offset=offset)
 
-        # Retrieve all files by looping through all pages
-        while True:
-            batch, _, _ = await get_all_files(max_results=max_results, offset=offset)
-            if not batch:
-                break  # Exit the loop if no more files
-            files.extend(batch)
-            offset += max_results  # Move to the next set of files
-
-        total_files = len(files)
         if not files:
-            return await query.answer('No files found.')
+            return await query.answer('No files found on this page.')
+        else:
+            total_files = len(files)
+            total_sent = 0
+            total_invalid = 0
+            status_message = f"Total Files: {total_files}. Sending process started."
+            status = await query.message.reply_text(status_message)
 
-        total_sent = 0
-        total_invalid = 0
-        status_message = f"Total Files: {total_files}. Sending process started."
-        status = await query.message.reply_text(status_message)
-
-        for file in files:
-            try:
-                await client.send_cached_media(
-                    chat_id=FILE_DB_CHANNEL,
-                    file_id=file.file_id,
-                    caption=file.file_name,
-                )
-                total_sent += 1
-            except FloodWait as e:
-                await asyncio.sleep(e.value)
-                continue
-            except PeerIdInvalid:
-                total_invalid += 1
-                continue
-            except Exception as e:
-                total_invalid += 1
-                error_message = f"An error occurred: {str(e)}"
-                logger.error(error_message)
-                await query.message.reply_text(error_message)
-                continue
+        for i in range(0, len(files), BATCH_SIZE):
+            batch = files[i:i + BATCH_SIZE]
+            for file in batch:
+                try:
+                    await client.send_cached_media(
+                        chat_id=FILE_DB_CHANNEL,
+                        file_id=file.file_id,
+                        caption=file.file_name,
+                    )
+                    total_sent += 1
+                except FloodWait as e:
+                    await asyncio.sleep(e.value)
+                    continue
+                except PeerIdInvalid:
+                    total_invalid += 1
+                    continue
+                except Exception as e:
+                    total_invalid += 1
+                    error_message = f"An error occurred: {str(e)}"
+                    logger.error(error_message)
+                    await query.message.reply_text(error_message)
+                    continue
 
             await asyncio.sleep(SEND_INTERVAL)
-
             status_update = f"Total Files: {total_files}\nSent: {total_sent}\nInvalid: {total_invalid}"
             await status.edit_text(status_update)
 
