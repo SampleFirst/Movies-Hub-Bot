@@ -10,23 +10,11 @@ from utils import get_size
 
 
 # Define constants
-MAX_BTN = 10
-BATCH_SIZE = 5
-SEND_INTERVAL = 10
-
-# Logging Configuration
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-
 @Client.on_message(filters.command("getallmedia") & filters.user(ADMINS))
 async def send_all_media(client, message):
     try:
-        # Fetching all the files
-        max_results = MAX_BTTN
         files, offset, total_results = await get_all_files(max_results=max_results)
 
-        # Prepare buttons for each file
         btn = [
             [
                 InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'send#{file.file_id}')
@@ -34,28 +22,11 @@ async def send_all_media(client, message):
             for file in files
         ]
 
-        # Add 'Send All' button if there are more files
-        if offset:
-            btn.insert(MAX_BTTN,
-                [
-                    InlineKeyboardButton("Send All", callback_data=f"send_all{offset}")
-                ]
-            )
-
-        # Calculate statistics of the files
-        total_videos = sum(1 for file in files if file.file_type == 'video')
-        total_audios = sum(1 for file in files if file.file_type == 'audio')
-        total_documents = sum(1 for file in files if file.file_type == 'document')
-
-        # Generating statistics message
-        stats_message = (
-            f"Total Files: {total_results}\n"
-            f"Total Videos: {total_videos}\n"
-            f"Total Audio: {total_audios}\n"
-            f"Total Documents: {total_documents}\n"
+        btn.insert(MAX_BTTN, 
+            [
+                InlineKeyboardButton("! Sᴇɴᴅ Aʟʟ !", callback_data=f"get_all{current_page}{current_page}")
+            ]
         )
-
-        # Prepare pagination button if there are multiple pages
         if offset:
             page_number = int(offset) // max_results
             btn.append([
@@ -69,16 +40,13 @@ async def send_all_media(client, message):
                 ]
             )
 
-        # Text indicating the number of media files found
         cap = f"Here are the {total_results} media files found in the database."
 
-        # Send the statistics and media files information
-        await message.reply_text(stats_message, quote=True)
-        await message.reply_text(cap, reply_markup=InlineKeyboardMarkup(btn))
-
+        abc = await message.reply_text(cap, quote=True, reply_markup=InlineKeyboardMarkup(btn))
     except Exception as e:
+        # Handle exceptions by sending an error message
         error_message = f"An error occurred: {str(e)}"
-        await message.reply_text(error_message)
+        await query.message.reply_text(error_message)
 
 
 @Client.on_callback_query(filters.regex(r'^pmnext_'))
