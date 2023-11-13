@@ -208,7 +208,7 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
                     if result.deleted_count:
                         deleted += 1
                 except FloodWait as e:
-                    await asyncio.sleep(e.seconds)
+                    await asyncio.sleep(e.value)
                     continue
                 except PeerIdInvalid:
                     total_invalid += 1
@@ -246,7 +246,7 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
                     if result.deleted_count:
                         deleted += 1
                 except FloodWait as e:
-                    await asyncio.sleep(e.seconds)
+                    await asyncio.sleep(e.value)
                     continue
                 except Exception as e:
                     error_message = f"An error occurred: {str(e)}"
