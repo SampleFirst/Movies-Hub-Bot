@@ -5,11 +5,11 @@ from pyrogram.errors import FloodWait, PeerIdInvalid
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from database.ia_filterdb import Media, get_all_files, get_file_details
-from info import ADMINS, MAX_BTTN, FILE_DB_CHANNEL
+from info import ADMINS, MAX_BTTN, INVALID_SKIP, FILE_DB_CHANNEL
 from utils import get_size
 
 # Define constants
-MAX_BTNN = 10
+MAX_BTNN = 50
 BATCH_SIZE = 5
 SEND_INTERVAL = 10
 
@@ -194,6 +194,10 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
             deleted = 0
             for file in batch:
                 try:
+                    if INVALID_SKIP and total_invalid > 0:
+                        total_invalid -= 1  # Skip invalid file
+                        continue
+
                     await client.send_cached_media(
                         chat_id=FILE_DB_CHANNEL,
                         file_id=file.file_id,
