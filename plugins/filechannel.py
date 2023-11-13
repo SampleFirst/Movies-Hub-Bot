@@ -9,7 +9,7 @@ from info import ADMINS, MAX_BTTN, FILE_DB_CHANNEL
 from utils import get_size
 
 # Define constants
-MAX_BTNN = 50000
+MAX_BTNN = 5
 BATCH_SIZE = 5
 SEND_INTERVAL = 10
 
@@ -204,7 +204,7 @@ async def send_all_media_to_channel(client, query: CallbackQuery):
                         '_id': file_ids,
                     })
                     if result.deleted_count:
-                    deleted += 1
+                        deleted += 1
                 except FloodWait as e:
                     await asyncio.sleep(e.value)
                     continue
