@@ -9,7 +9,7 @@ from info import ADMINS, MAX_BTTN, FILE_DB_CHANNEL
 from utils import get_size
 
 # Define constants
-MAX_BTNN = 5
+MAX_BTNN = 10
 BATCH_SIZE = 5
 SEND_INTERVAL = 10
 
