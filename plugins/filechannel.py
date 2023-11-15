@@ -10,7 +10,7 @@ from utils import get_size
 
 # Define constants
 MAX_BTNN = 50000
-BATCH_SIZE = 5
+BATCH_SIZE = 10
 SEND_INTERVAL = 10
 
 # Logging Configuration
