@@ -392,19 +392,47 @@ async def list_users(bot, message):
             outfile.write(out)
         await message.reply_document('users.txt', caption="List Of Users")
 
+@Client.on_message(filters.command('is_premium') & filters.user(ADMINS))
+async def is_premium_list(bot, message):
+    raju = await message.reply('Getting List Of Users')
+    users = await db.get_all_users()
+    out = "Users Saved In DB Are:\n\n"
+    for user in users:
+        if user.get('is_premium'):
+            out += f"<a href=tg://user?id={user['id']}>{user['name']}</a>"
+            if user['ban_status']['is_banned']:
+                out += ' (Banned User)'
+            out += '\n'
+    try:
+        await raju.edit_text(out)
+    except MessageTooLong:
+        with open('premium_users.txt', 'w+') as outfile:
+            outfile.write(out)
+        await message.reply_document('premium_users.txt', caption="List Of Premium Users")
+        
 @Client.on_message(filters.command('chats') & filters.user(ADMINS))
 async def list_chats(bot, message):
-    raju = await message.reply('Getting List Of chats')
+    msg = await message.reply('Getting List Of chats')
     chats = await db.get_all_chats()
     out = "Chats Saved In DB Are:\n\n"
-    async for chat in chats:
-        out += f"**Title:** `{chat['title']}`\n**- ID:** `{chat['id']}`"
+    for chat in chats:
+        try:
+            chat_info = await bot.get_chat(chat['id'])
+            chat_title = chat_info.title
+            total_members = chat_info.members_count
+        except Exception as e:
+            chat_title = chat['title']
+            total_members = "N/A"
+            print(f"Error getting info for chat ID {chat['id']}: {e}")
+        
+        out += f"**Title:** `{chat_title}`\n**- ID:** `{chat['id']}`\n**- Members Count:** `{total_members}`"
         if chat['chat_status']['is_disabled']:
             out += '( Disabled Chat )'
         out += '\n'
     try:
-        await raju.edit_text(out)
+        await msg.edit_text(out)
     except MessageTooLong:
         with open('chats.txt', 'w+') as outfile:
             outfile.write(out)
         await message.reply_document('chats.txt', caption="List Of Chats")
+        
