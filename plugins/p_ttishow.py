@@ -412,26 +412,50 @@ async def is_premium_list(bot, message):
         
 @Client.on_message(filters.command('chats') & filters.user(ADMINS))
 async def list_chats(bot, message):
-    msg = await message.reply('Getting List Of chats')
+    # Start the process and show a status message
+    status_message = await message.reply('Fetching List Of Chats...')
+    
+    # Get all chats from the database
     chats = await db.get_all_chats()
-    out = "Chats Saved In DB Are:\n\n"
+    
+    # Initialize variables to count total complete chats and left time
+    total_complete_chats = 0
+    left_time = 0
+    
+    # Iterate through each chat
     for chat in chats:
         try:
+            # Get information about the chat
             chat_info = await bot.get_chat(chat['id'])
             chat_title = chat_info.title
             total_members = chat_info.members_count
         except Exception as e:
+            # If there's an error, handle it gracefully and continue
             chat_title = chat['title']
             total_members = "N/A"
             print(f"Error getting info for chat ID {chat['id']}: {e}")
         
-        out += f"**Title:** `{chat_title}`\n**- ID:** `{chat['id']}`\n**- Members Count:** `{total_members}`"
+        # Increment the total complete chats count
+        total_complete_chats += 1
+        
+        # Add information about the chat to the output string
+        out = f"**Title:** `{chat_title}`\n**- ID:** `{chat['id']}`\n**- Members Count:** `{total_members}`"
+        
+        # Check if the chat is disabled
         if chat['chat_status']['is_disabled']:
             out += '( Disabled Chat )'
+        
+        # Add a new line after each chat's information
         out += '\n'
+        
+        # Update the status message with the current progress
+        await status_message.edit_text(f'Fetching List Of Chats...\nTotal Complete Chats: {total_complete_chats}\nEstimated Left Time: {left_time} seconds')
+    
     try:
-        await msg.edit_text(out)
+        # Edit the status message with the final output
+        await status_message.edit_text(out)
     except MessageTooLong:
+        # If the output is too long, save it to a file and send as a document
         with open('chats.txt', 'w+') as outfile:
             outfile.write(out)
         await message.reply_document('chats.txt', caption="List Of Chats")
